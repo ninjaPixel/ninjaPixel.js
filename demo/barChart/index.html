@@ -73,7 +73,7 @@
     var barChart = new ninjaPixel.BarChart();
     barChart.transitionDuration(2000)
         .margin({
-            top: 100,
+            top: 40,
             bottom: 250,
             left: 60,
             right: 30
@@ -85,7 +85,7 @@
     .onMouseover(function (d, i) {
             d3.select('#message').text(d.x);
         })
-    .height(600)
+    .height(500)
     .plotHorizontalGridTopping(true)
     .cornerRounding(0)
     .title('UK Christmas Number Ones')

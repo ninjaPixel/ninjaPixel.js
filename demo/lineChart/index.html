@@ -121,23 +121,20 @@
     var chart = new ninjaPixel.LineChart();
     chart.transitionDuration(2000)
         .margin({
-            top: 100,
+            top: 50,
             bottom: 50,
             left: 60,
             right: 30
         })
         .transitionEase('linear')
-        .transitionDelay(function (d, i) {
-                return i * 600;
-        })
-        .height(600)
+        .height(500)
         .title('Random Time-Series data')
         .itemFill(function(d){return d.color;})
         .xAxisTickFormat(customTimeFormat)
         .areaOpacity(0.1)
         .isTimeseries(true);
 
-    ready();
+    
 
     function ready() {
         var data = randomTimeseries();
@@ -145,6 +142,12 @@
         chart.plot(d3.select("#chart")
             .datum(data));
     }
+    
+    ready();
+    setTimeout(function run() { 
+         ready();
+        setTimeout(run, 5000); 
+    }, 5000);
 </script>
 
 </html>

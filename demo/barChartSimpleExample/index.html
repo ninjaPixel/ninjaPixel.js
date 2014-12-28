@@ -28,7 +28,7 @@
     }
     .ninja-horizontalGrid,
     .ninja-verticalGrid {
-        stroke: lightgrey;
+        stroke: black;
         opacity: 0.7;
     }
 </style>
@@ -41,19 +41,12 @@
 <script>
     var barChart = new ninjaPixel.BarChartSimpleExample();
     barChart.transitionDuration(2000)
-            .margin({
-            top: 100,
-            bottom: 50,
-            left: 60,
-            right: 30
+            .margin({ top: 100, bottom: 50, left: 60, right: 30
         })
         .y1Max(10)
         .plotBackground(true)
         .plotHorizontalGrid(true)
-        .transitionEase('cubic')
-        .transitionDelay(function (d, i) {
-            return i * 30;
-        })
+        .transitionDelay(function (d, i) { return i * 30;})
         .height(600)
         .title('Random Bars')
         .yAxis1Title('Y Value')
@@ -74,12 +67,12 @@
         barChart.plot(d3.select("#chart")
             .datum(data));
     }
-//    setTimeout(ready(), 1000);
+
     ready();
     
-    setTimeout(function getDate() { 
+    setTimeout(function run() { 
          ready();
-        setTimeout(getDate, 5000); 
+        setTimeout(run, 5000); 
     }, 5000);
 </script>
 

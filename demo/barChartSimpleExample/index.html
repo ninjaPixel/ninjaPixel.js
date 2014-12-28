@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>ninjaPixel.js Bar Chart</title>
+</head>
+<style>
+    .ninja-axis path,
+    .ninja-axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+    .ninja-background {
+        fill: #333333;
+        stroke: black;
+    }
+    text {
+        font: 12px sans-serif;
+        position: absolute;
+    }
+    .ninja-chartTitle {
+        font: 18px sans-serif;
+    }
+    .yTitle,
+    .xTitle {
+        font: 16px sans-serif;
+    }
+    .ninja-horizontalGrid,
+    .ninja-verticalGrid {
+        stroke: lightgrey;
+        opacity: 0.7;
+    }
+</style>
+
+<body>
+    <div id="chart"></div>
+    <div id="message"></div>
+</body>
+<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script>
+    var barChart = new ninjaPixel.BarChartSimpleExample();
+    barChart.transitionDuration(2000)
+            .margin({
+            top: 100,
+            bottom: 50,
+            left: 60,
+            right: 30
+        })
+        .y1Max(10)
+        .plotBackground(true)
+        .plotHorizontalGrid(true)
+        .transitionEase('cubic')
+        .transitionDelay(function (d, i) {
+            return i * 30;
+        })
+        .height(600)
+        .title('Random Bars')
+        .yAxis1Title('Y Value')
+
+    function randomBars() {
+        var data = [];
+        for (var i = 1; i < 10; i++) {
+            data.push({
+                x: 'Item ' + i,
+                y: ~~(Math.random() * 10)
+            });
+        }
+        return data;
+    };
+
+    function ready() {
+        var data = randomBars();
+        barChart.plot(d3.select("#chart")
+            .datum(data));
+    }
+//    setTimeout(ready(), 1000);
+    ready();
+    
+    setTimeout(function getDate() { 
+         ready();
+        setTimeout(getDate, 5000); 
+    }, 5000);
+</script>
+
+</html>

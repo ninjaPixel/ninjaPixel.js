@@ -9840,6 +9840,7 @@ var ninjaPixel;
             if (!this._svg) {
                 this._svg = _selection.append('svg').classed('ninja-chart', true);
                 var container = this._svg.append('g').classed('ninja-containerGroup', true);
+                container.append('g').classed('ninja-backgroundGroup', true);
                 container.append('g').classed('ninja-horizontalGrid', true);
                 container.append('g').classed('ninja-verticalGrid', true);
                 container.append('g').classed('ninja-chartGroup', true);
@@ -10003,7 +10004,7 @@ var ninjaPixel;
 
         _Chart.prototype._plotTheBackground = function () {
             if (this._plotBackground == true) {
-                var background = this._svg.select('.ninja-chartGroup').selectAll('.ninja-background').data([1]);
+                var background = this._svg.select('.ninja-backgroundGroup').selectAll('.ninja-background').data([1]);
 
                 background.enter().append('rect').classed('ninja-background', true).attr({
                     x: 0,
@@ -10843,4 +10844,110 @@ var ninjaPixel;
         return LineChart;
     })(ninjaPixel._Chart);
     ninjaPixel.LineChart = LineChart;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var BarChartSimpleExample = (function (_super) {
+        __extends(BarChartSimpleExample, _super);
+        function BarChartSimpleExample() {
+            _super.call(this);
+        }
+        BarChartSimpleExample.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection);
+            var functor = this._functor;
+
+            _selection.each(function (_data) {
+                var barW = _this._chartWidth / _data.length;
+                var minData = 0;
+                var maxData = 0;
+
+                if (_this._y1Max != null) {
+                    maxData = _this._y1Max;
+                } else {
+                    var d3MaxY = d3.max(_data, function (d) {
+                        return d.y;
+                    });
+                    if (d3MaxY > 0) {
+                        maxData = d3MaxY;
+                    }
+                }
+
+                if (_this._y1Min != null) {
+                    minData = _this._y1Min;
+                } else {
+                    var d3MinY = d3.min(_data, function (d) {
+                        return d.y;
+                    });
+                    if (d3MinY < 0) {
+                        minData = d3MinY;
+                    }
+                }
+
+                var xScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
+                    return d.x;
+                })).rangeRoundBands([0, _this._chartWidth], 0);
+
+                var yScale = d3.scale.linear().domain([minData, maxData]).range([_this._chartHeight, 0]);
+
+                var barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
+
+                var yScale0 = yScale(0);
+                var bars = _this._svg.select('.ninja-chartGroup').selectAll('.bar').data(_data);
+
+                bars.enter().append('rect').classed('bar', true).attr({
+                    x: function (d, i) {
+                        return xScale(d.x);
+                    },
+                    width: barW * 0.95,
+                    y: yScale0,
+                    height: 0,
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    }
+                });
+
+                bars.transition().duration(_this._transitionDuration).delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                }).ease(_this._transitionEase).style({
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    }
+                }).attr({
+                    x: function (d, i) {
+                        return xScale(d.x);
+                    },
+                    width: barW * 0.9,
+                    y: function (d) {
+                        if (d.y > 0) {
+                            return yScale(d.y);
+                        } else {
+                            return yScale(0);
+                        }
+                    },
+                    height: function (d) {
+                        return Math.abs(barScale(d.y));
+                    }
+                });
+
+                bars.exit().transition().style({
+                    opacity: 0
+                }).remove();
+
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+                _this._plotGrids(xScale, yScale);
+            });
+        };
+        return BarChartSimpleExample;
+    })(ninjaPixel._Chart);
+    ninjaPixel.BarChartSimpleExample = BarChartSimpleExample;
 })(ninjaPixel || (ninjaPixel = {}));

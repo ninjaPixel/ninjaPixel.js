@@ -8,7 +8,7 @@ module.exports = function (grunt) {
                 //                separator: ';',
             },
             basic: {
-                src: ['src/js/_chart.js', 'src/js/barChart.js', 'src/js/bubbleChart.js', 'src/js/lineChart.js' ],
+                src: ['src/js/_chart.js', 'src/js/barChart.js', 'src/js/bubbleChart.js', 'src/js/lineChart.js', 'src/js/barChartSimpleExample.js' ],
                 dest: 'dist/ninjaPixel.js',
             },
             bundle: {

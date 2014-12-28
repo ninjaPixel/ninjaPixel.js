@@ -109,7 +109,5 @@ module ninjaPixel{
             });
             //end BarChart            
         }
-        
-        
     }
 }

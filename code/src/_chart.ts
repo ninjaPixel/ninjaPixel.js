@@ -89,6 +89,7 @@ export class _Chart {
                 .append('svg')
                 .classed('ninja-chart', true);
             var container = this._svg.append('g').classed('ninja-containerGroup', true);
+            container.append('g').classed('ninja-backgroundGroup', true);
             container.append('g').classed('ninja-horizontalGrid', true);
             container.append('g').classed('ninja-verticalGrid', true);
             container.append('g').classed('ninja-chartGroup', true);
@@ -315,7 +316,7 @@ export class _Chart {
     
     _plotTheBackground(){
         if(this._plotBackground == true){
-            var background = this._svg.select('.ninja-chartGroup')
+            var background = this._svg.select('.ninja-backgroundGroup')
                 .selectAll('.ninja-background')
                 .data([1]);
                 

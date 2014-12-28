@@ -14,7 +14,7 @@ After cloning your fork of the ninjaPixel.js repository, from the terminal navig
 
     npm install 
 
-ninjaPixel is written in TypeCcript. The `.ts` files are located in the source directory and the compiled ninjaPixel.js file is output to the `dir` directory. There is a `gruntfile` configured to compile the TypeScript files and concatenate them into a single `.js` file. Again, from the `code` directory run
+ninjaPixel is written in TypeScript; the `.ts` files are located in the `code\src` directory and the compiled ninjaPixel.js file is output to the `code\dir` directory. There is a `gruntfile` configured to compile the TypeScript files and concatenate them into a single JavaScript file. Again, from the `code` directory run
 
     grunt
     

@@ -85,13 +85,13 @@
     .onMouseover(function (d, i) {
             d3.select('#message').text(d.x);
         })
-        .height(600)
-        .plotHorizontalGridTopping(true)
-        .cornerRounding(0)
-        .title('UK Christmas Number Ones')
-        .yAxis1Title('Weeks at Number 1')
-        .mouseOverItemOpacity(function(d,i){return d.opacity;})
-        .xAxisTextTransform('rotate(-90) translate(-10,-13)');
+    .height(600)
+    .plotHorizontalGridTopping(true)
+    .cornerRounding(0)
+    .title('UK Christmas Number Ones')
+    .yAxis1Title('Weeks at Number 1')
+    .mouseOverItemOpacity(function(d,i){return d.opacity;})
+    .xAxisTextTransform('rotate(-90) translate(-10,-13)');
     
     var toolTip = barChart.toolTip();
     toolTip.html(function(d){return '<i>'+d.artist + '</i><br/>'+ d.song});
@@ -119,13 +119,9 @@
         var filteredData = topHits.filter(function (d) {
             if (d.year >= 1980 & d.year < 2020) return d;
         });
-//        console.log(filteredData);
 
         barChart.plot(d3.select("#chart")
             .datum(filteredData));
-            
-
-        //        console.log(barChart);
     }
 </script>
 

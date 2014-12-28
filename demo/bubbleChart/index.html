@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>d3.ninja Bubble Chart</title>
+    <title>ninjaPixel.js Bubble Chart</title>
 </head>
 <style>
     .ninja-axis path,
@@ -70,7 +70,6 @@
     <div id="message"></div>
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
-<!--<script src="../../code/node_modules/queue-async/queue.js"></script>-->
 <script>
     function randomBubbleData() {
         function randomNumber(maxAbsoluteValue) {
@@ -99,36 +98,6 @@
             });
         }
 
-        // bubbleData.push({
-        //     x: 100,
-        //     y: 100,
-        //     r: 250,
-        //     color: 'black'
-        // });
-        // bubbleData.push({
-        //     x: -100,
-        //     y: 100,
-        //     r: 250,
-        //     color: 'black'
-        // });
-        // bubbleData.push({
-        //     x: -100,
-        //     y: -100,
-        //     r: 250,
-        //     color: 'black'
-        // });
-        // bubbleData.push({
-        //     x: 100,
-        //     y: -100,
-        //     r: 250,
-        //     color: 'black'
-        // });
-        // bubbleData.push({
-        //     x: 0,
-        //     y: 0,
-        //     r: 50,
-        //     color: 'black'
-        // });
         return bubbleData;
     }
 
@@ -141,7 +110,6 @@
             right: 30
         })
         .plotBackground(false)
-    //    .y1Max(12)
         .transitionEase('cubic')
         .transitionDelay(function (d, i) {
             return i * 25;
@@ -168,18 +136,10 @@
     });
         bubbleChart.toolTip(toolTip);
 
-
-
-
-    function ready(error) {
-
-
+    function ready() {
         var bubbleData = randomBubbleData();
         bubbleChart.plot(d3.select("#chart")
             .datum(bubbleData));
-
-
-        //        console.log(bubbleChart);
     }
 
     ready();

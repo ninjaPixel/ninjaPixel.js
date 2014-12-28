@@ -69,7 +69,6 @@
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script src="../../code/node_modules/moment/moment.js"></script>
-<!--<script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>-->
 <script>
     function randomTimeseries() {
     var lineChartData = [],
@@ -123,39 +122,28 @@
     chart.transitionDuration(2000)
         .margin({
             top: 100,
-            bottom: 250,
+            bottom: 50,
             left: 60,
             right: 30
         })
         .transitionEase('linear')
         .transitionDelay(function (d, i) {
-                return i * 30;
+                return i * 600;
         })
         .height(600)
         .title('Random Time-Series data')
-        .mouseOverItemOpacity(function (d, i) {
-            return d.opacity;
-        })
         .itemFill(function(d){return d.color;})
-        .xAxisTickFormat(d3.time.format('%B %d'))
-        .areaOpacity(0.5)
+        .xAxisTickFormat(customTimeFormat)
+        .areaOpacity(0.1)
         .isTimeseries(true);
-
-    //    var toolTip = chart.toolTip();
-    //    toolTip.html(function(d){return '<i>'+d.artist + '</i><br/>'+ d.song});
-    //    chart.toolTip(toolTip);
 
     ready();
 
-    function ready(error) {
-
+    function ready() {
         var data = randomTimeseries();
         console.log('length',data.length, data);
         chart.plot(d3.select("#chart")
             .datum(data));
-
-
-        //        console.log(barChart);
     }
 </script>
 

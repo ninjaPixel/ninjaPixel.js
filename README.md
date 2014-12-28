@@ -5,7 +5,7 @@ ninjaPixel.js
 
 This is not a charting library. No charting library will ever be complete with all the various charts that you could want; if you are using d3.js then you know this already. Instead, this is a framework which handles the boring plumbing - like drawing axes, labels and setting dimensions - leaving you free to do the Hollywood coding.
 
-See the wiki for how to use ninjaPixel.js
+See the [wiki](https://github.com/ninjaPixel/ninjaPixel.js/wiki) for how to use ninjaPixel.js
 
 
 ###Compiling the source

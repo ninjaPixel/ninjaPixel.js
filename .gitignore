@@ -1,0 +1,4 @@
+*/.tscache/
+code/.tscache/*
+code/.tscache/
+code/node_modules

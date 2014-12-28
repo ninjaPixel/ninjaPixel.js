@@ -1,6 +1,6 @@
 {
-  "name": "d3.ninja",
-  "version": "0.4.0",
+  "name": "ninjaPixel.js",
+  "version": "0.0.1",
   "devDependencies": {
     "d3": "^3.5.0",
     "d3-tip": "0",
@@ -10,12 +10,10 @@
     "grunt-rename": "^0.1.4",
     "grunt-ts": "^2.0.1",
     "moment": "2",
-    "queue-async": "1",
-    "smash": "0",
-    "uglify-js": "2"
+    "queue-async": "1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ninjaPixel/ninjaCharts"
+    "url": "https://github.com/ninjaPixel/ninjaPixel.js"
   }
 }

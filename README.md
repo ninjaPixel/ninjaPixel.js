@@ -19,3 +19,6 @@ ninjaPixel is written in TypeScript; the `.ts` files are located in the `code\sr
     grunt
     
 This will create ninjaPixel.js and ninjaPixel.bundle.js. The later includes [d3.js](https://github.com/mbostock/d3) and the [d3-tip](https://github.com/Caged/d3-tip) extension.
+
+###Demos
+There are some demo pages located in the `demo` directory.

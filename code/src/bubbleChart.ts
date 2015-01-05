@@ -1,5 +1,5 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
-/// <reference path="_chart.ts" />
+/// <reference path="chart.ts" />
 module ninjaPixel{
     interface bubbleChartDataItem {
         color?: string;
@@ -8,7 +8,7 @@ module ninjaPixel{
         r: number;
     }
 
-    export class BubbleChart extends ninjaPixel._Chart {
+    export class BubbleChart extends ninjaPixel.Chart {
         private _allowBubblesToSpillOffChart:boolean = false;
         private _maxBubbleRadius = 50; // this value is in pixels
         

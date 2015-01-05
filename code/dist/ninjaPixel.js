@@ -1,8 +1,9 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    var _Chart = (function () {
-        function _Chart() {
+    ninjaPixel.version = '0.0.2';
+    var Chart = (function () {
+        function Chart() {
             this._width = 800;
             this._height = 600;
             this._margin = {
@@ -40,14 +41,13 @@ var ninjaPixel;
                 return 'Tooltip HTML not defined';
             }).direction('n');
         }
-        _Chart.prototype._init = function (_selection) {
+        Chart.prototype._init = function (_selection) {
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
             if (!this._svg) {
                 this._svg = _selection.append('svg').classed('ninja-chart', true);
                 var container = this._svg.append('g').classed('ninja-containerGroup', true);
-                container.append('g').classed('ninja-backgroundGroup', true);
                 container.append('g').classed('ninja-horizontalGrid', true);
                 container.append('g').classed('ninja-verticalGrid', true);
                 container.append('g').classed('ninja-chartGroup', true);
@@ -69,7 +69,7 @@ var ninjaPixel;
             this._plotTheBackground();
         };
 
-        _Chart.prototype._plotXAxis = function (xScale, yScale) {
+        Chart.prototype._plotXAxis = function (xScale, yScale) {
             var _this = this;
             var xAxis = d3.svg.axis().scale(xScale).orient('bottom').outerTickSize(0);
 
@@ -94,7 +94,7 @@ var ninjaPixel;
             }
         };
 
-        _Chart.prototype._plotYAxis = function (xScale, yScale) {
+        Chart.prototype._plotYAxis = function (xScale, yScale) {
             var _this = this;
             var yAxis = d3.svg.axis().scale(yScale).orient('left').outerTickSize(0);
 
@@ -107,7 +107,7 @@ var ninjaPixel;
             }).call(yAxis);
         };
 
-        _Chart.prototype._plotLabels = function () {
+        Chart.prototype._plotLabels = function () {
             if (this._svg.select('.ninja-chartTitle')[0][0] == null) {
                 this._svg.append("g").classed("ninja-chartTitle", true);
                 this._svg.append("g").classed("ninja-y1Title", true);
@@ -142,14 +142,14 @@ var ninjaPixel;
             xTitleSvg.transition().duration(this._transitionDuration).text(this._xAxisTitle).attr('y', this._chartHeight + this._margin.top + this._margin.bottom / 2).attr('x', (this._chartWidth / 2) + this._margin.left);
         };
 
-        _Chart.prototype._getChartWidth = function () {
+        Chart.prototype._getChartWidth = function () {
             return this._width - this._margin.left - this._margin.right;
         };
-        _Chart.prototype._getChartHeight = function () {
+        Chart.prototype._getChartHeight = function () {
             return this._height - this._margin.bottom - this._margin.top;
         };
 
-        _Chart.prototype._plotGrids = function (xScale, yScale) {
+        Chart.prototype._plotGrids = function (xScale, yScale) {
             var svg = this._svg;
             var chartWidth = this._chartWidth;
             var chartHeight = this._chartHeight;
@@ -209,9 +209,9 @@ var ninjaPixel;
             }
         };
 
-        _Chart.prototype._plotTheBackground = function () {
+        Chart.prototype._plotTheBackground = function () {
             if (this._plotBackground == true) {
-                var background = this._svg.select('.ninja-backgroundGroup').selectAll('.ninja-background').data([1]);
+                var background = this._svg.select('.ninja-chartGroup').selectAll('.ninja-background').data([1]);
 
                 background.enter().append('rect').classed('ninja-background', true).attr({
                     x: 0,
@@ -229,7 +229,7 @@ var ninjaPixel;
             }
         };
 
-        _Chart.prototype._functor = function (variable, d, i) {
+        Chart.prototype._functor = function (variable, d, i) {
             function isFunction(functionToCheck) {
                 return !!(functionToCheck && functionToCheck.constructor && functionToCheck.call && functionToCheck.apply);
             }
@@ -241,213 +241,213 @@ var ninjaPixel;
             }
         };
 
-        _Chart.prototype.axesOrigin = function (_x) {
+        Chart.prototype.axesOrigin = function (_x) {
             if (!arguments.length)
                 return this._axesOrigin;
             this._axesOrigin = _x;
             return this;
         };
-        _Chart.prototype.itemFill = function (_x) {
+        Chart.prototype.itemFill = function (_x) {
             if (!arguments.length)
                 return this._itemFill;
             this._itemFill = _x;
             return this;
         };
-        _Chart.prototype.itemStroke = function (_x) {
+        Chart.prototype.itemStroke = function (_x) {
             if (!arguments.length)
                 return this._itemStroke;
             this._itemStroke = _x;
             return this;
         };
-        _Chart.prototype.itemOpacity = function (_x) {
+        Chart.prototype.itemOpacity = function (_x) {
             if (!arguments.length)
                 return this._itemOpacity;
             this._itemOpacity = _x;
             return this;
         };
-        _Chart.prototype.mouseOverItemOpacity = function (_x) {
+        Chart.prototype.mouseOverItemOpacity = function (_x) {
             if (!arguments.length)
                 return this._mouseOverItemOpacity;
             this._mouseOverItemOpacity = _x;
             return this;
         };
-        _Chart.prototype.mouseOverItemStroke = function (_x) {
+        Chart.prototype.mouseOverItemStroke = function (_x) {
             if (!arguments.length)
                 return this._mouseOverItemStroke;
             this._mouseOverItemStroke = _x;
             return this;
         };
-        _Chart.prototype.transitionDelay = function (_x) {
+        Chart.prototype.transitionDelay = function (_x) {
             if (!arguments.length)
                 return this._transitionDelay;
             this._transitionDelay = _x;
             return this;
         };
-        _Chart.prototype.y1Max = function (_x) {
+        Chart.prototype.y1Max = function (_x) {
             if (!arguments.length)
                 return this._y1Max;
             this._y1Max = _x;
             return this;
         };
-        _Chart.prototype.y2Max = function (_x) {
+        Chart.prototype.y2Max = function (_x) {
             if (!arguments.length)
                 return this._y2Max;
             this._y2Max = _x;
             return this;
         };
-        _Chart.prototype.y1Min = function (_x) {
+        Chart.prototype.y1Min = function (_x) {
             if (!arguments.length)
                 return this._y1Min;
             this._y1Min = _x;
             return this;
         };
-        _Chart.prototype.y2Min = function (_x) {
+        Chart.prototype.y2Min = function (_x) {
             if (!arguments.length)
                 return this._y2Min;
             this._y2Min = _x;
             return this;
         };
-        _Chart.prototype.xMax = function (_x) {
+        Chart.prototype.xMax = function (_x) {
             if (!arguments.length)
                 return this._xMax;
             this._xMax = _x;
             return this;
         };
-        _Chart.prototype.xMin = function (_x) {
+        Chart.prototype.xMin = function (_x) {
             if (!arguments.length)
                 return this._xMin;
             this._xMin = _x;
             return this;
         };
-        _Chart.prototype.plotBackground = function (_x) {
+        Chart.prototype.plotBackground = function (_x) {
             if (!arguments.length)
                 return this._plotBackground;
             this._plotBackground = _x;
             return this;
         };
-        _Chart.prototype.onMouseover = function (_x) {
+        Chart.prototype.onMouseover = function (_x) {
             if (!arguments.length)
                 return this._onMouseover;
             this._onMouseover = _x;
             return this;
         };
-        _Chart.prototype.onMouseout = function (_x) {
+        Chart.prototype.onMouseout = function (_x) {
             if (!arguments.length)
                 return this._onMouseout;
             this._onMouseout = _x;
             return this;
         };
-        _Chart.prototype.onClick = function (_x) {
+        Chart.prototype.onClick = function (_x) {
             if (!arguments.length)
                 return this._onClick;
             this._onClick = _x;
             return this;
         };
-        _Chart.prototype.toolTip = function (_x) {
+        Chart.prototype.toolTip = function (_x) {
             if (!arguments.length)
                 return this._toolTip;
             this._toolTip = _x;
             return this;
         };
-        _Chart.prototype.showToolTip = function (_x) {
+        Chart.prototype.showToolTip = function (_x) {
             if (!arguments.length)
                 return this._showToolTip;
             this._showToolTip = _x;
             return this;
         };
-        _Chart.prototype.plotVerticalGridTopping = function (_x) {
+        Chart.prototype.plotVerticalGridTopping = function (_x) {
             if (!arguments.length)
                 return this._plotVerticalGridTopping;
             this._plotVerticalGridTopping = _x;
             return this;
         };
-        _Chart.prototype.plotVerticalGrid = function (_x) {
+        Chart.prototype.plotVerticalGrid = function (_x) {
             if (!arguments.length)
                 return this._plotVerticalGrid;
             this._plotVerticalGrid = _x;
             return this;
         };
-        _Chart.prototype.plotHorizontalGridTopping = function (_x) {
+        Chart.prototype.plotHorizontalGridTopping = function (_x) {
             if (!arguments.length)
                 return this._plotHorizontalGridTopping;
             this._plotHorizontalGridTopping = _x;
             return this;
         };
-        _Chart.prototype.plotHorizontalGrid = function (_x) {
+        Chart.prototype.plotHorizontalGrid = function (_x) {
             if (!arguments.length)
                 return this._plotHorizontalGrid;
             this._plotHorizontalGrid = _x;
             return this;
         };
-        _Chart.prototype.transitionEase = function (_x) {
+        Chart.prototype.transitionEase = function (_x) {
             if (!arguments.length)
                 return this._transitionEase;
             this._transitionEase = _x;
             return this;
         };
-        _Chart.prototype.transitionDuration = function (_x) {
+        Chart.prototype.transitionDuration = function (_x) {
             if (!arguments.length)
                 return this._transitionDuration;
             this._transitionDuration = _x;
             return this;
         };
-        _Chart.prototype.yAxis1Title = function (_x) {
+        Chart.prototype.yAxis1Title = function (_x) {
             if (!arguments.length)
                 return this._yAxis1Title;
             this._yAxis1Title = _x;
             return this;
         };
-        _Chart.prototype.yAxis2Title = function (_x) {
+        Chart.prototype.yAxis2Title = function (_x) {
             if (!arguments.length)
                 return this._yAxis2Title;
             this._yAxis2Title = _x;
             return this;
         };
-        _Chart.prototype.xAxisTitle = function (_x) {
+        Chart.prototype.xAxisTitle = function (_x) {
             if (!arguments.length)
                 return this._xAxisTitle;
             this._xAxisTitle = _x;
             return this;
         };
-        _Chart.prototype.width = function (_x) {
+        Chart.prototype.width = function (_x) {
             if (!arguments.length)
                 return this._width;
             this._width = _x;
             return this;
         };
-        _Chart.prototype.height = function (_x) {
+        Chart.prototype.height = function (_x) {
             if (!arguments.length)
                 return this._height;
             this._height = _x;
             return this;
         };
-        _Chart.prototype.margin = function (_x) {
+        Chart.prototype.margin = function (_x) {
             if (!arguments.length)
                 return this._margin;
             this._margin = _x;
             return this;
         };
-        _Chart.prototype.title = function (_x) {
+        Chart.prototype.title = function (_x) {
             if (!arguments.length)
                 return this._title;
             this._title = _x;
             return this;
         };
-        _Chart.prototype.xAxisTextTransform = function (_x) {
+        Chart.prototype.xAxisTextTransform = function (_x) {
             if (!arguments.length)
                 return this._xAxisTextTransform;
             this._xAxisTextTransform = _x;
             return this;
         };
-        _Chart.prototype.xAxisTickFormat = function (_x) {
+        Chart.prototype.xAxisTickFormat = function (_x) {
             if (!arguments.length)
                 return this._xAxisTickFormat;
             this._xAxisTickFormat = _x;
             return this;
         };
-        return _Chart;
+        return Chart;
     })();
-    ninjaPixel._Chart = _Chart;
+    ninjaPixel.Chart = Chart;
 })(ninjaPixel || (ninjaPixel = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -602,7 +602,7 @@ var ninjaPixel;
             });
         };
         return BarChart;
-    })(ninjaPixel._Chart);
+    })(ninjaPixel.Chart);
     ninjaPixel.BarChart = BarChart;
 })(ninjaPixel || (ninjaPixel = {}));
 
@@ -808,7 +808,7 @@ var ninjaPixel;
             });
         };
         return BubbleChart;
-    })(ninjaPixel._Chart);
+    })(ninjaPixel.Chart);
     ninjaPixel.BubbleChart = BubbleChart;
 })(ninjaPixel || (ninjaPixel = {}));
 
@@ -1049,112 +1049,6 @@ var ninjaPixel;
             });
         };
         return LineChart;
-    })(ninjaPixel._Chart);
+    })(ninjaPixel.Chart);
     ninjaPixel.LineChart = LineChart;
-})(ninjaPixel || (ninjaPixel = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var ninjaPixel;
-(function (ninjaPixel) {
-    var BarChartSimpleExample = (function (_super) {
-        __extends(BarChartSimpleExample, _super);
-        function BarChartSimpleExample() {
-            _super.call(this);
-        }
-        BarChartSimpleExample.prototype.plot = function (_selection) {
-            var _this = this;
-            this._init(_selection);
-            var functor = this._functor;
-
-            _selection.each(function (_data) {
-                var barW = _this._chartWidth / _data.length;
-                var minData = 0;
-                var maxData = 0;
-
-                if (_this._y1Max != null) {
-                    maxData = _this._y1Max;
-                } else {
-                    var d3MaxY = d3.max(_data, function (d) {
-                        return d.y;
-                    });
-                    if (d3MaxY > 0) {
-                        maxData = d3MaxY;
-                    }
-                }
-
-                if (_this._y1Min != null) {
-                    minData = _this._y1Min;
-                } else {
-                    var d3MinY = d3.min(_data, function (d) {
-                        return d.y;
-                    });
-                    if (d3MinY < 0) {
-                        minData = d3MinY;
-                    }
-                }
-
-                var xScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
-                    return d.x;
-                })).rangeRoundBands([0, _this._chartWidth], 0);
-
-                var yScale = d3.scale.linear().domain([minData, maxData]).range([_this._chartHeight, 0]);
-
-                var barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
-
-                var yScale0 = yScale(0);
-                var bars = _this._svg.select('.ninja-chartGroup').selectAll('.bar').data(_data);
-
-                bars.enter().append('rect').classed('bar', true).attr({
-                    x: function (d, i) {
-                        return xScale(d.x);
-                    },
-                    width: barW * 0.95,
-                    y: yScale0,
-                    height: 0,
-                    fill: function (d, i) {
-                        return functor(_this._itemFill, d, i);
-                    }
-                });
-
-                bars.transition().duration(_this._transitionDuration).delay(function (d, i) {
-                    return functor(_this._transitionDelay, d, i);
-                }).ease(_this._transitionEase).style({
-                    fill: function (d, i) {
-                        return functor(_this._itemFill, d, i);
-                    }
-                }).attr({
-                    x: function (d, i) {
-                        return xScale(d.x);
-                    },
-                    width: barW * 0.9,
-                    y: function (d) {
-                        if (d.y > 0) {
-                            return yScale(d.y);
-                        } else {
-                            return yScale(0);
-                        }
-                    },
-                    height: function (d) {
-                        return Math.abs(barScale(d.y));
-                    }
-                });
-
-                bars.exit().transition().style({
-                    opacity: 0
-                }).remove();
-
-                _this._plotLabels();
-                _this._plotXAxis(xScale, yScale);
-                _this._plotYAxis(xScale, yScale);
-                _this._plotGrids(xScale, yScale);
-            });
-        };
-        return BarChartSimpleExample;
-    })(ninjaPixel._Chart);
-    ninjaPixel.BarChartSimpleExample = BarChartSimpleExample;
 })(ninjaPixel || (ninjaPixel = {}));

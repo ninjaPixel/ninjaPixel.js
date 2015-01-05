@@ -1,15 +1,15 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="typescript_definitions/moment.d.ts" />
-/// <reference path="_chart.ts" />
+/// <reference path="chart.ts" />
 module ninjaPixel{
     interface lineChartDataItem {
         color?: string;
         data: { x: number;
                 y: number;};
         
-    }
+    }    
     
-    export class LineChart extends ninjaPixel._Chart{
+    export class LineChart extends ninjaPixel.Chart{
         private _isTimeseries: boolean= false;
         private _areaOpacity: number= 0;
         private _lineInterpolation: string = 'basis';

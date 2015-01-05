@@ -1,5 +1,5 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
-/// <reference path="_chart.ts" />
+/// <reference path="chart.ts" />
 //declare var d3: D3.Base;
 module ninjaPixel{
     interface barChartDataItem {
@@ -8,7 +8,7 @@ module ninjaPixel{
         y: number;        
     }
 
-    export class BarChart extends ninjaPixel._Chart {
+    export class BarChart extends ninjaPixel.Chart {
         private _cornerRounding: number = 1;
         private barcolor: string = '#6E9489';
 

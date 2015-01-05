@@ -1,6 +1,6 @@
 {
   "name": "ninjaPixel.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "devDependencies": {
     "d3": "^3.5.0",
     "d3-tip": "0",

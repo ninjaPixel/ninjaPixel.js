@@ -1,12 +1,12 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
-/// <reference path="_chart.ts" />
+/// <reference path="chart.ts" />
 module ninjaPixel{
     interface barChartDataItem {
         x: string;
         y: number;        
     }
 
-    export class BarChartSimpleExample extends ninjaPixel._Chart {        
+    export class BarChartSimpleExample extends ninjaPixel.Chart {        
         constructor() {             
             super(); 
         }

@@ -7,7 +7,7 @@ module ninjaPixel{
         data: { x: number;
                 y: number;};
         
-    }    
+    }
     
     export class LineChart extends ninjaPixel.Chart{
         private _isTimeseries: boolean= false;

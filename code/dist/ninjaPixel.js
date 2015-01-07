@@ -1052,3 +1052,117 @@ var ninjaPixel;
     })(ninjaPixel.Chart);
     ninjaPixel.LineChart = LineChart;
 })(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Histogram = (function (_super) {
+        __extends(Histogram, _super);
+        function Histogram() {
+            _super.call(this);
+            this._cornerRounding = 1;
+            this._plotFrequency = true;
+            this._histogramFunction = d3.layout.histogram();
+        }
+        Histogram.prototype.cornerRounding = function (_x) {
+            if (!arguments.length)
+                return this._cornerRounding;
+            this._cornerRounding = _x;
+            return this;
+        };
+        Histogram.prototype.bins = function (_x) {
+            if (!arguments.length)
+                return this._bins;
+            this._bins = _x;
+            return this;
+        };
+        Histogram.prototype.plotFrequency = function (_x) {
+            if (!arguments.length)
+                return this._plotFrequency;
+            this._plotFrequency = _x;
+            return this;
+        };
+
+        Histogram.prototype.plot = function (_selection) {
+            var _this = this;
+            _selection.each(function (_data) {
+                _this._init(_selection);
+                var functor = _this._functor;
+                var myToolTip = _this._toolTip;
+
+                if (_this._bins != null) {
+                    _this._histogramFunction.bins(_this._bins);
+                }
+                _this._histogramFunction.frequency(_this._plotFrequency);
+                _data = _this._histogramFunction(_data);
+
+                var xScale = d3.scale.ordinal().domain(_data.map(function (d) {
+                    return d.x;
+                }));
+                xScale.rangeRoundBands([0, _this._chartWidth], .1);
+                var barWidth = xScale.rangeBand();
+
+                var yMax = d3.max(_data, function (d) {
+                    return d.y;
+                });
+                if (_this._y1Max != null) {
+                    yMax = _this._y1Max;
+                }
+
+                var yScale = d3.scale.linear().domain([0, yMax]).range([_this._chartHeight, 0]);
+
+                var bar = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bars').data(_data);
+
+                bar.enter().append('rect').classed('bars', true).attr({
+                    'x': function (d) {
+                        return xScale(d.x);
+                    },
+                    'y': function (d) {
+                        return yScale(0);
+                    },
+                    'height': function (d) {
+                        return 0;
+                    },
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    },
+                    rx: _this._cornerRounding,
+                    ry: _this._cornerRounding,
+                    opacity: function (d, i) {
+                        return functor(_this._itemOpacity, d, i);
+                    }
+                });
+                bar.exit().remove();
+                bar.transition().duration(_this._transitionDuration).ease(_this._transitionEase).attr('width', barWidth).attr({
+                    'x': function (d) {
+                        return xScale(d.x);
+                    },
+                    'y': function (d) {
+                        return yScale(d.y);
+                    },
+                    'height': function (d) {
+                        return yScale.range()[0] - yScale(d.y);
+                    },
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    },
+                    opacity: function (d, i) {
+                        return functor(_this._itemOpacity, d, i);
+                    }
+                });
+
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+                _this._plotGrids(xScale, yScale);
+            });
+        };
+        return Histogram;
+    })(ninjaPixel.Chart);
+    ninjaPixel.Histogram = Histogram;
+})(ninjaPixel || (ninjaPixel = {}));

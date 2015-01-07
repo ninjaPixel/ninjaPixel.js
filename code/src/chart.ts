@@ -19,7 +19,7 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.2';
+    export var version:string =  '0.0.3';
     export class Chart {
         // gettable / settable variables
         _width: number = 800;

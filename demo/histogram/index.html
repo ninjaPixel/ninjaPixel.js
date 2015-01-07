@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>ninjaPixel.js Histogram</title>
+</head>
+<style>
+    .ninja-axis path,
+    .ninja-axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+    .ninja-background {
+        fill: #333333;
+        stroke: black;
+    }
+    text {
+        font: 12px sans-serif;
+        position: absolute;
+    }
+    .ninja-chartTitle {
+        font: 18px sans-serif;
+    }
+    .yTitle,
+    .xTitle {
+        font: 16px sans-serif;
+    }
+    .ninja-horizontalGrid,
+    .ninja-verticalGrid {
+        stroke: black;
+        opacity: 0.7;
+    }
+</style>
+
+<body>
+    <div id="chart"></div>
+    <div id="message"></div>
+</body>
+<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script>
+    function irwinHallDistribution(n, m) {
+        var distribution = [];
+        for (var i = 0; i < n; i++) {
+            for (var s = 0, j = 0; j < m; j++) {
+                s += Math.random();
+            }
+            distribution.push(s / m);
+        }
+        return distribution;
+    }
+
+    var chart = new ninjaPixel.Histogram();
+    chart.transitionDuration(2000)
+        .margin({
+            top: 100,
+            bottom: 50,
+            left: 60,
+            right: 30
+        })
+        .height(500)
+        .axesOrigin({x:0.4, y:0})
+        .plotFrequency(false)
+        .bins(d3.scale.linear().ticks(15))
+        .title('An Irwin-Hall Distribution');
+
+
+
+    function ready() {
+        var data = irwinHallDistribution(10000, 3);
+//        console.log(data);
+        chart.plot(d3.select("#chart")
+            .datum(data));
+    }
+
+    ready();
+
+
+</script>
+
+</html>

@@ -10,7 +10,6 @@ module ninjaPixel{
 
     export class BarChart extends ninjaPixel.Chart {
         private _cornerRounding: number = 1;
-        private barcolor: string = '#6E9489';
 
         cornerRounding(_x: number):any {
             if (!arguments.length) return this._cornerRounding;

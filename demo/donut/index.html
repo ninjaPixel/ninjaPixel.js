@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>ninjaPixel.js Donut Chart</title>
+</head>
+<style>
+    .ninja-axis path,
+    .ninja-axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+    text {
+        font: 12px sans-serif;
+        position: absolute;
+    }
+    .ninja-chartTitle {
+        font: 18px sans-serif;
+    }
+    .yTitle,
+    .xTitle {
+        font: 16px sans-serif;
+    }
+    .d3-tip {
+        line-height: 1;
+        padding: 8px;
+        background: rgba(100, 100, 100, 0.7);
+        color: #fff;
+        border-radius: 2px;
+        font: 12px sans-serif;
+        width: 100px;
+    }
+    /* Creates a small triangle extender for the tip */
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 10px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(100, 100, 100, 0.7);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+    /* Style northward tooltips differently */
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+</style>
+
+<body>
+    <div id="chart"></div>
+    <div id="message"></div>
+</body>
+<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script>
+    var chart = new ninjaPixel.Donut();
+    chart.transitionDuration(1000)
+        .margin({
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        })
+        .transitionDelay(function (d, i) {
+            return i * 25;
+        })
+        .height(200)
+    .width(200)
+        .title('Random Bubbles')
+        .itemStroke('white')
+        .itemFill(function (d) {
+            return d.color;
+        })
+        .itemOpacity(0.5)
+        .mouseOverItemOpacity(0.9)
+        .mouseOverItemStroke('#333333');
+
+
+
+
+    function ready() {
+        var data= [
+                {
+                    x: 'Yes',
+                    y: 70,
+                    color: 'green'
+                },
+                {
+                    x: 'No',
+                    y: 30,
+                    color: 'red'
+                }
+            ];
+        
+        chart.plot(d3.select("#chart")
+            .datum(data));
+    }
+
+    ready();
+</script>
+
+</html>

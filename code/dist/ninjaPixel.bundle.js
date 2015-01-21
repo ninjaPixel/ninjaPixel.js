@@ -9794,7 +9794,14 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.2';
+    ninjaPixel.version = '0.0.4';
+
+    (function (Type) {
+        Type[Type["xy"] = 0] = "xy";
+        Type[Type["pie"] = 1] = "pie";
+    })(ninjaPixel.Type || (ninjaPixel.Type = {}));
+    var Type = ninjaPixel.Type;
+
     var Chart = (function () {
         function Chart() {
             this._width = 800;
@@ -9834,7 +9841,8 @@ var ninjaPixel;
                 return 'Tooltip HTML not defined';
             }).direction('n');
         }
-        Chart.prototype._init = function (_selection) {
+        Chart.prototype._init = function (_selection, _type) {
+            if (typeof _type === "undefined") { _type = 0 /* xy */; }
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
@@ -9855,9 +9863,15 @@ var ninjaPixel;
                 height: this._height
             });
 
-            this._svg.select('.ninja-containerGroup').attr({
-                transform: 'translate(' + this._margin.left + ',' + this._margin.top + ')'
-            });
+            if (_type == 1 /* pie */) {
+                this._svg.select('.ninja-containerGroup').attr({
+                    transform: 'translate(' + this._margin.left + this._chartWidth / 2 + ',' + this._margin.top + this._chartHeight / 2 + ')'
+                });
+            } else if (_type == 0 /* xy */) {
+                this._svg.select('.ninja-containerGroup').attr({
+                    transform: 'translate(' + this._margin.left + ',' + this._margin.top + ')'
+                });
+            }
 
             this._plotTheBackground();
         };
@@ -10256,7 +10270,6 @@ var ninjaPixel;
         function BarChart() {
             _super.call(this);
             this._cornerRounding = 1;
-            this.barcolor = '#6E9489';
         }
         BarChart.prototype.cornerRounding = function (_x) {
             if (!arguments.length)
@@ -10397,6 +10410,149 @@ var ninjaPixel;
         return BarChart;
     })(ninjaPixel.Chart);
     ninjaPixel.BarChart = BarChart;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var StackedBarChart = (function (_super) {
+        __extends(StackedBarChart, _super);
+        function StackedBarChart() {
+            _super.call(this);
+        }
+        StackedBarChart.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection);
+
+            var functor = this._functor;
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            var onClick = this._onClick;
+            var mouseOverBarOpacity = this._mouseOverItemOpacity;
+            var defaultBarOpacity = this._itemOpacity;
+            var mouseOverBarStroke = this._mouseOverItemStroke;
+            var defaultStroke = this._itemStroke;
+            var barFill = this._itemFill;
+
+            _selection.each(function (_data) {
+                var stack = d3.layout.stack();
+                stack(_data.data);
+
+                console.log('this is the stack', _data);
+
+                var minData = 0;
+                var maxData = 0;
+
+                if (_this._y1Max != null) {
+                    maxData = _this._y1Max;
+                } else {
+                }
+
+                if (_this._y1Min != null) {
+                    minData = _this._y1Min;
+                } else {
+                }
+
+                console.log('maxData', maxData, 'minData', minData);
+
+                var xScale = d3.scale.ordinal().domain(_data.data[0].map(function (d, i) {
+                    return d.x;
+                })).rangeRoundBands([0, _this._chartWidth], 0);
+                var barWidth = xScale.rangeBand();
+
+                var yScale = d3.scale.linear().domain([minData, maxData]).range([_this._chartHeight, 0]);
+
+                var barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
+
+                var yScale0 = yScale(0);
+                var bars = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bar').data(_data);
+
+                bars.enter().append('rect').classed('bar', true).attr({
+                    x: function (d, i) {
+                        return xScale(d.data.x);
+                    },
+                    width: barWidth,
+                    y: yScale0,
+                    height: 0,
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    },
+                    rx: _this._cornerRounding,
+                    ry: _this._cornerRounding
+                }).on('mouseover', function (d, i) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(mouseOverBarOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(mouseOverBarStroke, d, i);
+                        }
+                    });
+                    myToolTip.show(d);
+                    onMouseover(d);
+                }).on('mouseout', function (d, i) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(defaultBarOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(defaultStroke, d, i);
+                        }
+                    });
+                    myToolTip.hide();
+                    onMouseout(d);
+                }).on('click', function (d, i) {
+                    onClick(d);
+                });
+
+                bars.transition().duration(_this._transitionDuration).delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                }).ease(_this._transitionEase).style({
+                    opacity: function (d, i) {
+                        return functor(defaultBarOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(defaultStroke, d, i);
+                    },
+                    fill: function (d, i) {
+                        return functor(barFill, d, i);
+                    }
+                }).attr({
+                    x: function (d, i) {
+                        return xScale(d.x);
+                    },
+                    width: barWidth,
+                    y: function (d) {
+                        if (d.y > 0) {
+                            return yScale(d.y);
+                        } else {
+                            return yScale(0);
+                        }
+                    },
+                    height: function (d) {
+                        barScale(5);
+                    }
+                });
+
+                bars.exit().transition().style({
+                    opacity: 0
+                }).remove();
+
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+                _this._plotGrids(xScale, yScale);
+            });
+        };
+        return StackedBarChart;
+    })(ninjaPixel.BarChart);
+    ninjaPixel.StackedBarChart = StackedBarChart;
 })(ninjaPixel || (ninjaPixel = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -10958,4 +11114,70 @@ var ninjaPixel;
         return Histogram;
     })(ninjaPixel.Chart);
     ninjaPixel.Histogram = Histogram;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Donut = (function (_super) {
+        __extends(Donut, _super);
+        function Donut() {
+            _super.call(this);
+            this._outerRadius = 80;
+            this._innerRadius = 50;
+        }
+        Donut.prototype.outerRadius = function (_x) {
+            if (!arguments.length)
+                return this._outerRadius;
+            this._outerRadius = _x;
+            return this;
+        };
+        Donut.prototype.innerRadius = function (_x) {
+            if (!arguments.length)
+                return this._innerRadius;
+            this._innerRadius = _x;
+            return this;
+        };
+
+        Donut.prototype.plot = function (_selection) {
+            var _this = this;
+            _selection.each(function (_data) {
+                _this._init(_selection, 1 /* pie */);
+
+                var arc = d3.svg.arc().outerRadius(_this._outerRadius).innerRadius(_this._innerRadius);
+
+                var pie = d3.layout.pie().sort(null).value(function (d) {
+                    return d.y;
+                });
+
+                var path = _this._svg.select('.ninja-chartGroup').selectAll("path").data(pie(_data)).enter().append("path");
+
+                path.transition().duration(_this._transitionDuration).attr("fill", function (d, i) {
+                    return d.color;
+                }).attr("d", arc).each(function (d) {
+                    this._current = d;
+                });
+
+                function change(data) {
+                    path.data(pie(data));
+                    path.transition().duration(750).attrTween("d", arcTween);
+                }
+
+                function arcTween(a) {
+                    var i = d3.interpolate(this._current, a);
+                    this._current = i(0);
+                    return function (t) {
+                        return arc(i(t));
+                    };
+                }
+            });
+        };
+        return Donut;
+    })(ninjaPixel.Chart);
+    ninjaPixel.Donut = Donut;
 })(ninjaPixel || (ninjaPixel = {}));

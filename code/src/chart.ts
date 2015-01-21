@@ -19,7 +19,13 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.3';
+    export var version:string =  '0.0.4';
+    
+    export enum Type {
+        xy = 0,
+        pie = 1 // donuts are a type of pie        
+    }
+    
     export class Chart {
         // gettable / settable variables
         _width: number = 800;
@@ -79,7 +85,8 @@ module ninjaPixel{
 
         }
 
-        _init(_selection: any){
+        _init(_selection: any, _type = Type.xy){
+            
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
@@ -102,10 +109,19 @@ module ninjaPixel{
                 height: this._height
             });
 
+            if(_type == Type.pie){
+                this._svg.select('.ninja-containerGroup')
+                    .attr({
+                        transform: 'translate(' + this._margin.left + this._chartWidth/2 + ',' + this._margin.top + this._chartHeight/2 + ')'
+                });
+            } else if (_type == Type.xy) {
             this._svg.select('.ninja-containerGroup')
                 .attr({
                     transform: 'translate(' + this._margin.left + ',' + this._margin.top + ')'
             });
+            }
+            
+
 
             this._plotTheBackground();
         }

@@ -5,22 +5,12 @@
     <title>ninjaPixel.js Donut Chart</title>
 </head>
 <style>
-    .ninja-axis path,
-    .ninja-axis line {
-        fill: none;
-        stroke: black;
-        shape-rendering: crispEdges;
-    }
     text {
         font: 12px sans-serif;
         position: absolute;
     }
     .ninja-chartTitle {
         font: 18px sans-serif;
-    }
-    .yTitle,
-    .xTitle {
-        font: 16px sans-serif;
     }
     .d3-tip {
         line-height: 1;
@@ -52,6 +42,12 @@
 </style>
 
 <body>
+    <input type="radio" name="radData" id="rad1" value="data1" checked="checked" onclick='ready(data1);' />
+    <label for="rad1">Data1</label>
+
+    <input type="radio" name="radData" id="rad2" value="data2" onclick='ready(data2);' />
+    <label for="rad2">Data2</label>
+    </br>
     <div id="chart"></div>
     <div id="message"></div>
 </body>
@@ -69,8 +65,10 @@
             return i * 25;
         })
         .height(200)
-    .width(200)
-        .title('Random Bubbles')
+        .width(200)
+        .innerRadius(40)
+        .outerRadius(80)
+        .title('Do I look like Pac Man?')
         .itemStroke('white')
         .itemFill(function (d) {
             return d.color;
@@ -80,27 +78,37 @@
         .mouseOverItemStroke('#333333');
 
 
-
-
-    function ready() {
-        var data= [
-                {
-                    x: 'Yes',
-                    y: 70,
-                    color: 'green'
+    var data1 = [
+        {
+            x: 'No',
+            y: 2,
+            color: '#fc8d59'
                 },
-                {
-                    x: 'No',
-                    y: 30,
-                    color: 'red'
+        {
+            x: 'Yes',
+            y: 3,
+            color: '#99d594'
                 }
             ];
-        
+    var data2 = [
+        {
+            x: 'No',
+            y: 4,
+            color: '#fc8d59'
+                },
+        {
+            x: 'Yes',
+            y: 1,
+            color: '#99d594'
+                }
+            ];
+
+    function ready(data) {
         chart.plot(d3.select("#chart")
             .datum(data));
     }
 
-    ready();
+    ready(data1);
 </script>
 
 </html>

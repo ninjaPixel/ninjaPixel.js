@@ -11155,18 +11155,17 @@ var ninjaPixel;
                     return d.y;
                 });
 
-                var path = _this._svg.select('.ninja-chartGroup').selectAll("path").data(pie(_data)).enter().append("path");
+                var path = _this._svg.select('.ninja-chartGroup').selectAll('path').data(pie(_data));
 
-                path.transition().duration(_this._transitionDuration).attr("fill", function (d, i) {
-                    return d.color;
-                }).attr("d", arc).each(function (d) {
+                path.enter().append('path').attr('fill', function (d, i) {
+                    return _data[i].color;
+                }).attr('d', arc).each(function (d) {
                     this._current = d;
                 });
 
-                function change(data) {
-                    path.data(pie(data));
-                    path.transition().duration(750).attrTween("d", arcTween);
-                }
+                path.transition().duration(_this._transitionDuration).attr('fill', function (d, i) {
+                    return _data[i].color;
+                }).attr('d', arc).attrTween('d', arcTween);
 
                 function arcTween(a) {
                     var i = d3.interpolate(this._current, a);

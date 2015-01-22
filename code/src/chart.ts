@@ -19,7 +19,13 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.3';
+    export var version:string =  '0.0.4';
+    
+    export enum Category {
+        xy = 0,
+        donut = 1 
+    }
+    
     export class Chart {
         // gettable / settable variables
         _width: number = 800;
@@ -74,12 +80,14 @@ module ninjaPixel{
         // internal variables
         _chartHeight: number;
         _chartWidth: number;
+        _category: Category;
 
         constructor() {
 
         }
 
-        _init(_selection: any){
+        _init(_selection: any, category = Category.xy){
+            this._category = category;
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
@@ -102,10 +110,19 @@ module ninjaPixel{
                 height: this._height
             });
 
+            if(this._category == Category.donut){
+                this._svg.select('.ninja-containerGroup')
+                    .attr({
+                        transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth/2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight/2)) + ')'
+                });
+            } else if (this._category == Category.xy) {
             this._svg.select('.ninja-containerGroup')
                 .attr({
-                    transform: 'translate(' + this._margin.left + ',' + this._margin.top + ')'
+                    transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
             });
+            }
+            
+
 
             this._plotTheBackground();
         }
@@ -148,7 +165,7 @@ module ninjaPixel{
                 var yAxis = d3.svg.axis()
                     .scale(yScale)
                     .orient('left')
-                    .outerTickSize(0); // remove that presky final tick;
+                    .outerTickSize(0); // remove that pesky final tick;
 
                  this._svg.select('.ninja-yAxisGroup.ninja-axis')
                     .transition()
@@ -162,6 +179,7 @@ module ninjaPixel{
                     })
                     .call(yAxis);
         }
+
 
         _plotLabels(){
             if (this._svg.select('.ninja-chartTitle')[0][0] == null) {
@@ -197,12 +215,12 @@ module ninjaPixel{
 
 
             // y title
-            var yTitleSvg1 = this._svg.select(".ninja-y1Title")
-                .selectAll("text.ninja-y1Title")
+            var yTitleSvg1 = this._svg.select('.ninja-y1Title')
+                .selectAll('text.ninja-y1Title')
                 .data(arr);
             // enter
-            yTitleSvg1.enter().append("text")
-                .attr("class", "ninja-y1Title")
+            yTitleSvg1.enter().append('text')
+                .attr('class', 'ninja-y1Title')
                 .attr('transform', 'rotate(-90)')
                 .style('text-anchor', 'middle');
             // exit
@@ -217,11 +235,11 @@ module ninjaPixel{
                 .attr('y', (this._margin.left * 0.4));
 
             // x title
-            var xTitleSvg = this._svg.select(".ninja-xTitle")
-                .selectAll("text.ninja-xTitle").data(arr);
+            var xTitleSvg = this._svg.select('.ninja-xTitle')
+                .selectAll('text.ninja-xTitle').data(arr);
             // enter
-            xTitleSvg.enter().append("text")
-                .attr("class", "ninja-xTitle")
+            xTitleSvg.enter().append('text')
+                .attr('class', 'ninja-xTitle')
                 .style('text-anchor', 'middle');
             // exit
             xTitleSvg.exit().transition()
@@ -235,6 +253,7 @@ module ninjaPixel{
                 .attr('x', (this._chartWidth / 2) + this._margin.left);
         }
 
+        
         _getChartWidth(): number{
             return this._width - this._margin.left - this._margin.right;
         }
@@ -345,7 +364,7 @@ module ninjaPixel{
             function isFunction(functionToCheck) {
                 //                    var getType = {};
                 //                    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-                return !!(functionToCheck && functionToCheck.constructor && functionToCheck.call && functionToCheck.apply); // this is how underscore does it.
+                return !!(functionToCheck && functionToCheck.constructor && functionToCheck.call && functionToCheck.apply); // this is how underscore.js does it.
             }
 
             if(isFunction(variable)){

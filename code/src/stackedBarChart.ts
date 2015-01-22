@@ -1,5 +1,6 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
+/// <reference path="barChart.ts" />
 //declare var d3: D3.Base;
 module ninjaPixel{
     interface barChartDataItem {
@@ -7,22 +8,15 @@ module ninjaPixel{
         x: string;
         y: number;        
     }
-
-    export class BarChart extends ninjaPixel.Chart {
-        _cornerRounding: number = 1;
-
-        cornerRounding(_x: number):any {
-            if (!arguments.length) return this._cornerRounding;
-            this._cornerRounding = _x;
-            return this;
+    
+    export class StackedBarChart extends ninjaPixel.BarChart{
+        constructor(){
+            super();
         }
         
-        constructor() {             
-            super(); 
-        }
-        
-        plot(_selection) {            
+        plot(_selection){
             this._init(_selection);
+            
             var functor = this._functor;
             var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
             var onMouseover = this._onMouseover;
@@ -35,33 +29,35 @@ module ninjaPixel{
             var barFill = this._itemFill;
             
             _selection.each((_data) => {
-                var barW: number = this._chartWidth / _data.length; 
+             
+                var stack = d3.layout.stack();
+                    stack(_data.data);
+                
+                console.log('this is the stack', _data);
+                                
                 var minData:any = 0;
                 var maxData:any = 0;
             
                 if(this._y1Max != null){
                   maxData = this._y1Max;  
                 } else{
-                    var d3MaxY = d3.max(_data, (d:barChartDataItem) => d.y);                
-                    if(d3MaxY > 0){
-                        maxData = d3MaxY;   
-                    }
+                    
                 }
                 
                 if(this._y1Min != null){
                     minData = this._y1Min;
                 } else {
-                    var d3MinY = d3.min(_data, (d:barChartDataItem) => d.y);
-                    if(d3MinY < 0){
-                        minData = d3MinY;   
-                    }
+                    
                 }
                 
+                console.log('maxData',maxData,'minData',minData);
+                
             var xScale = d3.scale.ordinal()
-                .domain(_data.map(function (d, i) {
+                .domain(_data.data[0].map(function (d, i) {
                     return d.x;
                 }))
                 .rangeRoundBands([0, this._chartWidth], 0);
+            var barWidth = xScale.rangeBand();
 
             var yScale = d3.scale.linear()
                 .domain([minData, maxData])
@@ -70,7 +66,7 @@ module ninjaPixel{
             var barScale = d3.scale.linear()
                 .domain([Math.abs(maxData - minData), 0])
                 .range([this._chartHeight, 0]);
-
+            
                 
             // Enter, Update, Exit on bars
             var yScale0 = yScale(0);
@@ -83,9 +79,9 @@ module ninjaPixel{
                 .classed('bar', true)
                 .attr({
                     x: function (d, i) {
-                        return xScale(d.x);
+                        return xScale(d.data.x);
                     },
-                    width: barW * 0.95,
+                    width: barWidth,
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill, d, i)},
@@ -127,7 +123,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xScale(d.x);
                     },
-                    width: barW * 0.9,
+                    width: barWidth,
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);
@@ -136,7 +132,7 @@ module ninjaPixel{
                         }
                     },
                     height: function (d) {
-                        return Math.abs(barScale(d.y));
+                        barScale(5);//return Math.abs(barScale(d.y));
                     },
                 });
                 
@@ -150,13 +146,11 @@ module ninjaPixel{
             this._plotLabels();
             this._plotXAxis(xScale, yScale);
             this._plotYAxis(xScale, yScale); 
-            this._plotGrids(xScale, yScale);
-                
-            // end data loop
+            this._plotGrids(xScale, yScale);    
+                // end _data loop
             });
-            //end BarChart            
+            
         }
-        
-        
     }
+    
 }

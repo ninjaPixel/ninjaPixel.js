@@ -9932,17 +9932,17 @@ var ninjaPixel;
 
             titleSvg.transition().duration(this._transitionDuration).text(this._title);
 
-            var yTitleSvg1 = this._svg.select(".ninja-y1Title").selectAll("text.ninja-y1Title").data(arr);
+            var yTitleSvg1 = this._svg.select('.ninja-y1Title').selectAll('text.ninja-y1Title').data(arr);
 
-            yTitleSvg1.enter().append("text").attr("class", "ninja-y1Title").attr('transform', 'rotate(-90)').style('text-anchor', 'middle');
+            yTitleSvg1.enter().append('text').attr('class', 'ninja-y1Title').attr('transform', 'rotate(-90)').style('text-anchor', 'middle');
 
             yTitleSvg1.exit().transition().duration(this._transitionDuration).remove();
 
             yTitleSvg1.transition().duration(this._transitionDuration).text(this._yAxis1Title).attr('x', -(this._chartHeight / 2) - this._margin.top).attr('y', (this._margin.left * 0.4));
 
-            var xTitleSvg = this._svg.select(".ninja-xTitle").selectAll("text.ninja-xTitle").data(arr);
+            var xTitleSvg = this._svg.select('.ninja-xTitle').selectAll('text.ninja-xTitle').data(arr);
 
-            xTitleSvg.enter().append("text").attr("class", "ninja-xTitle").style('text-anchor', 'middle');
+            xTitleSvg.enter().append('text').attr('class', 'ninja-xTitle').style('text-anchor', 'middle');
 
             xTitleSvg.exit().transition().duration(this._transitionDuration).remove();
 
@@ -11182,6 +11182,16 @@ var ninjaPixel;
                         return _this._functor(_this._itemFill, d, i);
                     }
                 }).attr('d', arc).attrTween('d', arcTween);
+
+                var labels = _this._svg.select('.ninja-chartGroup').selectAll('text.donut-label').data(pie(_data));
+
+                labels.enter().append("text").classed('donut-label', true).attr("dy", ".35em").style("text-anchor", "middle");
+
+                labels.transition().duration(_this._transitionDuration).attr("transform", function (d) {
+                    return "translate(" + arc.centroid(d) + ")";
+                }).text(function (d) {
+                    return d.data.x;
+                });
 
                 function arcTween(a) {
                     var i = d3.interpolate(this._current, a);

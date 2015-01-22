@@ -213,12 +213,12 @@ module ninjaPixel{
 
 
             // y title
-            var yTitleSvg1 = this._svg.select(".ninja-y1Title")
-                .selectAll("text.ninja-y1Title")
+            var yTitleSvg1 = this._svg.select('.ninja-y1Title')
+                .selectAll('text.ninja-y1Title')
                 .data(arr);
             // enter
-            yTitleSvg1.enter().append("text")
-                .attr("class", "ninja-y1Title")
+            yTitleSvg1.enter().append('text')
+                .attr('class', 'ninja-y1Title')
                 .attr('transform', 'rotate(-90)')
                 .style('text-anchor', 'middle');
             // exit
@@ -233,11 +233,11 @@ module ninjaPixel{
                 .attr('y', (this._margin.left * 0.4));
 
             // x title
-            var xTitleSvg = this._svg.select(".ninja-xTitle")
-                .selectAll("text.ninja-xTitle").data(arr);
+            var xTitleSvg = this._svg.select('.ninja-xTitle')
+                .selectAll('text.ninja-xTitle').data(arr);
             // enter
-            xTitleSvg.enter().append("text")
-                .attr("class", "ninja-xTitle")
+            xTitleSvg.enter().append('text')
+                .attr('class', 'ninja-xTitle')
                 .style('text-anchor', 'middle');
             // exit
             xTitleSvg.exit().transition()
@@ -361,7 +361,7 @@ module ninjaPixel{
             function isFunction(functionToCheck) {
                 //                    var getType = {};
                 //                    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-                return !!(functionToCheck && functionToCheck.constructor && functionToCheck.call && functionToCheck.apply); // this is how underscore does it.
+                return !!(functionToCheck && functionToCheck.constructor && functionToCheck.call && functionToCheck.apply); // this is how underscore.js does it.
             }
 
             if(isFunction(variable)){

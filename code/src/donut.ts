@@ -39,9 +39,6 @@ module ninjaPixel{
             
             path.enter()
                 .append('path')
-//                .attr('fill', function(d, i) {
-//                    return _data[i].color;
-//                })
                 .style({
                     opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
                     stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
@@ -63,7 +60,19 @@ module ninjaPixel{
                 .attr('d', arc)
                 .attrTween('d', arcTween);
 
-
+            var labels = this._svg.select('.ninja-chartGroup')
+                .selectAll('text.donut-label')
+                .data(pie(_data));
+            
+            labels.enter().append("text")
+                .classed('donut-label', true)                
+                .attr("dy", ".35em")
+                .style("text-anchor", "middle");
+            
+            labels.transition()
+                .duration(this._transitionDuration)
+                .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                .text(function(d) { return d.data.x; });
     
 
             // Store the displayed angles in _current.

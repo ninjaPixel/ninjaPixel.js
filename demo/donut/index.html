@@ -5,6 +5,9 @@
     <title>ninjaPixel.js Donut Chart</title>
 </head>
 <style>
+    path {
+stroke-width: 5px;
+}
     text {
         font: 12px sans-serif;
         position: absolute;
@@ -70,10 +73,10 @@
         .outerRadius(80)
         .title('Do I look like Pac Man?')
         .itemStroke('white')
-        .itemFill(function (d) {
-            return d.color;
+        .itemFill(function (d, i) {
+        return d.data.color;
         })
-        .itemOpacity(0.5)
+        .itemOpacity(1)
         .mouseOverItemOpacity(0.9)
         .mouseOverItemStroke('#333333');
 

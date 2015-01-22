@@ -1364,14 +1364,30 @@ var ninjaPixel;
 
                 var path = _this._svg.select('.ninja-chartGroup').selectAll('path').data(pie(_data));
 
-                path.enter().append('path').attr('fill', function (d, i) {
-                    return _data[i].color;
+                path.enter().append('path').style({
+                    opacity: function (d, i) {
+                        return _this._functor(_this._itemOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return _this._functor(_this._itemStroke, d, i);
+                    },
+                    fill: function (d, i) {
+                        return _this._functor(_this._itemFill, d, i);
+                    }
                 }).attr('d', arc).each(function (d) {
                     this._current = d;
                 });
 
-                path.transition().duration(_this._transitionDuration).attr('fill', function (d, i) {
-                    return _data[i].color;
+                path.transition().duration(_this._transitionDuration).style({
+                    opacity: function (d, i) {
+                        return _this._functor(_this._itemOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return _this._functor(_this._itemStroke, d, i);
+                    },
+                    fill: function (d, i) {
+                        return _this._functor(_this._itemFill, d, i);
+                    }
                 }).attr('d', arc).attrTween('d', arcTween);
 
                 function arcTween(a) {

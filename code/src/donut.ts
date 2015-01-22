@@ -39,8 +39,13 @@ module ninjaPixel{
             
             path.enter()
                 .append('path')
-                .attr('fill', function(d, i) {
-                    return _data[i].color;
+//                .attr('fill', function(d, i) {
+//                    return _data[i].color;
+//                })
+                .style({
+                    opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
+                    stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
+                    fill:    (d, i) => {return this._functor(this._itemFill, d, i);}
                 })
                 .attr('d', arc)            
                 .each(function(d) {
@@ -50,8 +55,10 @@ module ninjaPixel{
 
             path.transition()
                 .duration(this._transitionDuration)
-                .attr('fill', function(d, i) {
-                    return _data[i].color;
+                .style({
+                    opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
+                    stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
+                    fill:    (d, i) => {return this._functor(this._itemFill, d, i);}
                 })
                 .attr('d', arc)
                 .attrTween('d', arcTween);

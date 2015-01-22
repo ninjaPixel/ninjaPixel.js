@@ -51,15 +51,15 @@ stroke-width: 5px;
     <input type="radio" name="radData" id="rad2" value="data2" onclick='ready(data2);' />
     <label for="rad2">Data2</label>
     </br>
-    <div id="chart"></div>
+    <div id="chart"><span id="chart1"></span><span id="chart2"></span></div>
     <div id="message"></div>
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script>
-    var chart = new ninjaPixel.Donut();
-    chart.transitionDuration(1000)
+    var chart1 = new ninjaPixel.Donut();
+    chart1.transitionDuration(1000)
         .margin({
-            top: 0,
+            top: 60,
             bottom: 0,
             left: 0,
             right: 0
@@ -67,11 +67,34 @@ stroke-width: 5px;
         .transitionDelay(function (d, i) {
             return i * 25;
         })
-        .height(200)
+        .height(220)
         .width(200)
-        .innerRadius(40)
+        .innerRadius(0)
         .outerRadius(80)
         .title('Do I look like Pac Man?')
+        .itemStroke('white')
+        .itemFill(function (d, i) {
+        return d.data.color;
+        })
+        .itemOpacity(1)
+        .mouseOverItemOpacity(0.9)
+        .mouseOverItemStroke('#333333');
+    
+    var chart2 = new ninjaPixel.Donut();
+    chart2.transitionDuration(1000)
+        .margin({
+            top: 60,
+            bottom: 0,
+            left: 0,
+            right: 0
+        })
+        .transitionDelay(function (d, i) {
+            return i * 25;
+        })
+        .height(220)
+        .width(200)
+        .innerRadius(50)
+        .outerRadius(80)        
         .itemStroke('white')
         .itemFill(function (d, i) {
         return d.data.color;
@@ -84,13 +107,13 @@ stroke-width: 5px;
     var data1 = [
         {
             x: 'No',
-            y: 2,
+            y: 1,
             color: '#fc8d59'
                 },
         {
             x: 'Yes',
-            y: 3,
-            color: '#99d594'
+            y: 4,
+            color: '#ffde58'//'#99d594'
                 }
             ];
     var data2 = [
@@ -107,7 +130,10 @@ stroke-width: 5px;
             ];
 
     function ready(data) {
-        chart.plot(d3.select("#chart")
+        chart1.plot(d3.select("#chart1")
+            .datum(data));
+        
+        chart2.plot(d3.select("#chart2")
             .datum(data));
     }
 

@@ -21,7 +21,7 @@ module ninjaPixel{
      
     plot(_selection){        
         _selection.each((_data) => {
-            this._init(_selection, Type.pie);
+            this._init(_selection, Category.donut);
             
             var arc = d3.svg.arc()
                 .outerRadius(this._outerRadius)
@@ -60,21 +60,11 @@ module ninjaPixel{
                 .attr('d', arc)
                 .attrTween('d', arcTween);
 
-            var labels = this._svg.select('.ninja-chartGroup')
-                .selectAll('text.donut-label')
-                .data(pie(_data));
-            
-            labels.enter().append("text")
-                .classed('donut-label', true)                
-                .attr("dy", ".35em")
-                .style("text-anchor", "middle");
-            
-            labels.transition()
-                .duration(this._transitionDuration)
-                .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-                .text(function(d) { return d.data.x; });
-    
 
+    
+            plotDonutLabels(this);
+            this._plotLabels();
+            
             // Store the displayed angles in _current.
             // Then, interpolate from _current to the new angles.
             // During the transition, _current is updated in-place by d3.interpolate.
@@ -84,6 +74,28 @@ module ninjaPixel{
                 return function(t) {
                     return arc(i(t));
                 };}
+            
+            function plotDonutLabels(that){
+                var labels = that._svg.select('.ninja-chartGroup')
+                    .selectAll('text.donut-label')
+                    .data(pie(_data));
+
+                labels.enter().append('text')
+                    .classed('donut-label', true)                
+                    .attr('dy', '.35em')
+                    .style('text-anchor', 'middle')
+                    .attr('transform', function(d) { return 'translate(' + arc.centroid(d) + ')'; });
+
+                labels.transition()
+                    .duration(that._transitionDuration)
+                    .attr('transform', function(d) { return 'translate(' + arc.centroid(d) + ')'; })
+                    .text(function(d) { return d.data.x; });
+
+                labels.exit()
+                    .transition()
+                    .duration(this._transitionDuration)
+                    .remove();
+            }
             
             // end data loop
          }); 

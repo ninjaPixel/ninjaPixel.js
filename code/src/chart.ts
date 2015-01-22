@@ -21,9 +21,9 @@ module ninjaPixel{
     
     export var version:string =  '0.0.4';
     
-    export enum Type {
+    export enum Category {
         xy = 0,
-        pie = 1 // donuts are a type of pie        
+        donut = 1 
     }
     
     export class Chart {
@@ -80,13 +80,14 @@ module ninjaPixel{
         // internal variables
         _chartHeight: number;
         _chartWidth: number;
+        _category: Category;
 
         constructor() {
 
         }
 
-        _init(_selection: any, _type = Type.xy){
-            
+        _init(_selection: any, category = Category.xy){
+            this._category = category;
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
@@ -109,15 +110,15 @@ module ninjaPixel{
                 height: this._height
             });
 
-            if(_type == Type.pie){
+            if(this._category == Category.donut){
                 this._svg.select('.ninja-containerGroup')
                     .attr({
-                        transform: 'translate(' + this._margin.left + this._chartWidth/2 + ',' + this._margin.top + this._chartHeight/2 + ')'
+                        transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth/2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight/2)) + ')'
                 });
-            } else if (_type == Type.xy) {
+            } else if (this._category == Category.xy) {
             this._svg.select('.ninja-containerGroup')
                 .attr({
-                    transform: 'translate(' + this._margin.left + ',' + this._margin.top + ')'
+                    transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
             });
             }
             
@@ -164,7 +165,7 @@ module ninjaPixel{
                 var yAxis = d3.svg.axis()
                     .scale(yScale)
                     .orient('left')
-                    .outerTickSize(0); // remove that presky final tick;
+                    .outerTickSize(0); // remove that pesky final tick;
 
                  this._svg.select('.ninja-yAxisGroup.ninja-axis')
                     .transition()
@@ -178,6 +179,7 @@ module ninjaPixel{
                     })
                     .call(yAxis);
         }
+
 
         _plotLabels(){
             if (this._svg.select('.ninja-chartTitle')[0][0] == null) {
@@ -251,6 +253,7 @@ module ninjaPixel{
                 .attr('x', (this._chartWidth / 2) + this._margin.left);
         }
 
+        
         _getChartWidth(): number{
             return this._width - this._margin.left - this._margin.right;
         }

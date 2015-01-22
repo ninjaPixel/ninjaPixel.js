@@ -3,11 +3,11 @@ var ninjaPixel;
 (function (ninjaPixel) {
     ninjaPixel.version = '0.0.4';
 
-    (function (Type) {
-        Type[Type["xy"] = 0] = "xy";
-        Type[Type["pie"] = 1] = "pie";
-    })(ninjaPixel.Type || (ninjaPixel.Type = {}));
-    var Type = ninjaPixel.Type;
+    (function (Category) {
+        Category[Category["xy"] = 0] = "xy";
+        Category[Category["donut"] = 1] = "donut";
+    })(ninjaPixel.Category || (ninjaPixel.Category = {}));
+    var Category = ninjaPixel.Category;
 
     var Chart = (function () {
         function Chart() {
@@ -48,8 +48,9 @@ var ninjaPixel;
                 return 'Tooltip HTML not defined';
             }).direction('n');
         }
-        Chart.prototype._init = function (_selection, _type) {
-            if (typeof _type === "undefined") { _type = 0 /* xy */; }
+        Chart.prototype._init = function (_selection, category) {
+            if (typeof category === "undefined") { category = 0 /* xy */; }
+            this._category = category;
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
@@ -70,13 +71,13 @@ var ninjaPixel;
                 height: this._height
             });
 
-            if (_type == 1 /* pie */) {
+            if (this._category == 1 /* donut */) {
                 this._svg.select('.ninja-containerGroup').attr({
-                    transform: 'translate(' + this._margin.left + this._chartWidth / 2 + ',' + this._margin.top + this._chartHeight / 2 + ')'
+                    transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth / 2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight / 2)) + ')'
                 });
-            } else if (_type == 0 /* xy */) {
+            } else if (this._category == 0 /* xy */) {
                 this._svg.select('.ninja-containerGroup').attr({
-                    transform: 'translate(' + this._margin.left + ',' + this._margin.top + ')'
+                    transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
                 });
             }
 
@@ -1354,7 +1355,7 @@ var ninjaPixel;
         Donut.prototype.plot = function (_selection) {
             var _this = this;
             _selection.each(function (_data) {
-                _this._init(_selection, 1 /* pie */);
+                _this._init(_selection, 1 /* donut */);
 
                 var arc = d3.svg.arc().outerRadius(_this._outerRadius).innerRadius(_this._innerRadius);
 
@@ -1390,15 +1391,8 @@ var ninjaPixel;
                     }
                 }).attr('d', arc).attrTween('d', arcTween);
 
-                var labels = _this._svg.select('.ninja-chartGroup').selectAll('text.donut-label').data(pie(_data));
-
-                labels.enter().append("text").classed('donut-label', true).attr("dy", ".35em").style("text-anchor", "middle");
-
-                labels.transition().duration(_this._transitionDuration).attr("transform", function (d) {
-                    return "translate(" + arc.centroid(d) + ")";
-                }).text(function (d) {
-                    return d.data.x;
-                });
+                plotDonutLabels(_this);
+                _this._plotLabels();
 
                 function arcTween(a) {
                     var i = d3.interpolate(this._current, a);
@@ -1406,6 +1400,22 @@ var ninjaPixel;
                     return function (t) {
                         return arc(i(t));
                     };
+                }
+
+                function plotDonutLabels(that) {
+                    var labels = that._svg.select('.ninja-chartGroup').selectAll('text.donut-label').data(pie(_data));
+
+                    labels.enter().append('text').classed('donut-label', true).attr('dy', '.35em').style('text-anchor', 'middle').attr('transform', function (d) {
+                        return 'translate(' + arc.centroid(d) + ')';
+                    });
+
+                    labels.transition().duration(that._transitionDuration).attr('transform', function (d) {
+                        return 'translate(' + arc.centroid(d) + ')';
+                    }).text(function (d) {
+                        return d.data.x;
+                    });
+
+                    labels.exit().transition().duration(this._transitionDuration).remove();
                 }
             });
         };

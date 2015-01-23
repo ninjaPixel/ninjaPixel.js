@@ -70,55 +70,38 @@
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
 <script>
-    var barChart = new ninjaPixel.BarChart();
-    barChart.transitionDuration(2000)
+    var barChart = new ninjaPixel.Lollipop();
+    barChart.transitionDuration(800)
         .margin({
             top: 40,
-            bottom: 250,
+            bottom: 50,
             left: 60,
             right: 30
         })
-    .plotBackground(true)
     .y1Max(12)
-    .transitionEase('elastic')
-    .transitionDelay(function(d,i){return i*30;})
-    .onMouseover(function (d, i) {
-            d3.select('#message').text(d.x);
-        })
-    .height(500)
-    .plotHorizontalGridTopping(true)
+    .plotBackground(true)
+    .itemOpacity(0.5)
+    .itemStroke('white')
+    .transitionEase('linear')
+    .transitionDelay(function(d,i){return i*100;})
+    .height(500)    
     .cornerRounding(0)
-    .title('UK Christmas Number Ones')
-    .yAxis1Title('Weeks at Number 1')
+    .title('Lollipop Sales')
+    .yAxis1Title('Items Sold')
     .mouseOverItemOpacity(function(d,i){return d.opacity;})
-    .xAxisTextTransform('rotate(-90) translate(-10,-13)');
     
     var toolTip = barChart.toolTip();
-    toolTip.html(function(d){return '<i>'+d.artist + '</i><br/>'+ d.song});
+    toolTip.html(function(d){return '<i>'+d.x + '</i><br/>'+ d.y});
     barChart.toolTip(toolTip);
 
 
-    topHits = [];
+    
 
-    queue()
-        .defer(d3.csv, "xmas-number-ones.csv", function (d) {
-            topHits.push({
-                x: d.Artist + " ... " + d.Year,
-                y: +d.Weeks,
-                song: d.Song,
-                artist: d.Artist,
-                year: +d.Year,
-                color: 'lightsteelblue',
-                opacity: 0.3
-            });
-        })
-        .await(ready);
+ready();
 
     function ready(error) {
 
-        var filteredData = topHits.filter(function (d) {
-            if (d.year >= 1980 & d.year < 1985) return d;
-        });
+        var filteredData = [{x: 'Strawberry', y: 6}, {x: 'Bubblegum', y: 3}, {x: 'Apple', y: 7}, {x: 'Cola', y: 10}]
 
         barChart.plot(d3.select("#chart")
             .datum(filteredData));

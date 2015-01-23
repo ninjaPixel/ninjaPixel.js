@@ -10,6 +10,10 @@ module ninjaPixel{
 
     export class BarChart extends ninjaPixel.Chart {
         _cornerRounding: number = 1;
+        _xScale: any;
+        _yScale:any;
+        _barScale: any;
+        _xScaleAdjusted: any;
 
         cornerRounding(_x: number):any {
             if (!arguments.length) return this._cornerRounding;
@@ -21,7 +25,7 @@ module ninjaPixel{
             super(); 
         }
         
-        plot(_selection) {            
+        plot(_selection, barWidth?: number) {            
             this._init(_selection);
             var functor = this._functor;
             var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
@@ -35,7 +39,7 @@ module ninjaPixel{
             var barFill = this._itemFill;
             
             _selection.each((_data) => {
-                var barW: number = this._chartWidth / _data.length; 
+
                 var minData:any = 0;
                 var maxData:any = 0;
             
@@ -57,20 +61,42 @@ module ninjaPixel{
                     }
                 }
                 
-            var xScale = d3.scale.ordinal()
+            this._xScale = d3.scale.ordinal()
                 .domain(_data.map(function (d, i) {
                     return d.x;
                 }))
-                .rangeRoundBands([0, this._chartWidth], 0);
+                .rangeRoundBands([0, this._chartWidth], 0.1);                
 
-            var yScale = d3.scale.linear()
+            this._yScale = d3.scale.linear()
                 .domain([minData, maxData])
                 .range([this._chartHeight, 0]);
                 
-            var barScale = d3.scale.linear()
+            this._barScale = d3.scale.linear()
                 .domain([Math.abs(maxData - minData), 0])
                 .range([this._chartHeight, 0]);
-
+                
+//            this._xScale = xScale;
+//            this._yScale = yScale;
+//            this._barScale = barScale;
+                
+            var xScale = this._xScale;
+            var yScale = this._yScale;
+            var barScale = this._barScale;
+                
+            var barW: number;
+            if(barWidth != null){
+                    barW = barWidth;
+            } else {
+//                    barW= this._chartWidth / _data.length; 
+                barW = xScale.rangeBand();
+            }
+                
+            var barAdjustmentX = (xScale.rangeBand() - barW)/2;
+//            this._barAdjustmentX = barAdjustmentX;
+            function xScaleAdjusted(x){
+              return xScale(x) + barAdjustmentX;   
+            }
+                this._xScaleAdjusted = xScaleAdjusted;
                 
             // Enter, Update, Exit on bars
             var yScale0 = yScale(0);
@@ -83,7 +109,8 @@ module ninjaPixel{
                 .classed('bar', true)
                 .attr({
                     x: function (d, i) {
-                        return xScale(d.x);
+//                        return xScale(d.x)+barAdjustmentX;
+                        return xScaleAdjusted(d.x);
                     },
                     width: barW * 0.95,
                     y: yScale0,
@@ -125,9 +152,10 @@ module ninjaPixel{
                 })
                 .attr({
                     x: function (d, i) {
-                        return xScale(d.x);
+                        //return xScale(d.x) + barAdjustmentX;
+                        return xScaleAdjusted(d.x);
                     },
-                    width: barW * 0.9,
+                    width: barW,
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);

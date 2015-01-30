@@ -11248,6 +11248,12 @@ var ninjaPixel;
             _super.call(this);
             this._stickWidth = 6;
             this._headRadius = 20;
+            this._headFill = 'white';
+            this._headStroke = 'none';
+            this._headOpacity = 1;
+            this._headToolTip = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).transitionDuration(300).html(function () {
+                return 'Tooltip HTML not defined';
+            }).direction('n');
         }
         Lollipop.prototype.stickWidth = function (_x) {
             if (!arguments.length)
@@ -11263,35 +11269,74 @@ var ninjaPixel;
             return this;
         };
 
+        Lollipop.prototype.headFill = function (_x) {
+            if (!arguments.length)
+                return this._headFill;
+            this._headFill = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headStroke = function (_x) {
+            if (!arguments.length)
+                return this._headStroke;
+            this._headStroke = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headOpacity = function (_x) {
+            if (!arguments.length)
+                return this._headOpacity;
+            this._headOpacity = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headMouseOverItemOpacity = function (_x) {
+            if (!arguments.length)
+                return this._itemFill;
+            this._itemFill = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headMouseOverStroke = function (_x) {
+            if (!arguments.length)
+                return this._headMouseOverStroke;
+            this._headMouseOverStroke = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headToolTip = function (_x) {
+            if (!arguments.length)
+                return this._headToolTip;
+            this._headToolTip = _x;
+            return this;
+        };
         Lollipop.prototype.plot = function (_selection) {
             var _this = this;
             _selection.each(function (_data) {
                 _super.prototype.plot.call(_this, _selection, _this._stickWidth);
-                console.log('yScale(3)', _this._yScale(3));
-                console.log('xScale(Strawberry)', _this._xScale('Strawberry'));
-                var functor = _this._functor;
 
-                var mouseOverOpacity = _this._mouseOverItemOpacity;
-                var mouseOverStroke = _this._mouseOverItemStroke;
-                var itemOpacity = _this._itemOpacity;
+                var functor = _this._functor;
+                var mouseOverOpacity = _this._headMouseOverItemOpacity;
+                var mouseOverStroke = _this._headMouseOverStroke;
+                var itemOpacity = _this._headOpacity;
                 var onMouseover = _this._onMouseover;
                 var onMouseout = _this._onMouseout;
                 var onClick = _this._onClick;
-                var itemStroke = _this._itemStroke;
-                var myToolTip = _this._toolTip;
+                var itemStroke = _this._headStroke;
+                var myToolTip = _this._headToolTip;
 
                 var superXScale = _this._xScaleAdjusted;
-                var nudge = _this._stickWidth / 2;
+                var dx = _this._stickWidth / 2;
                 function xScale(x) {
-                    return superXScale(x) + nudge;
+                    return superXScale(x) + dx;
                 }
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
 
                 var yScale0 = yScale(0);
-                var bubbles = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bubble').data(_data);
+                var bubbles = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.lollipop-head').data(_data);
 
-                bubbles.enter().append('circle').classed('bubble', true).attr({
+                bubbles.enter().append('circle').classed('lollipop-head', true).attr({
                     r: _this._headRadius
                 }).on('mouseover', function (d) {
                     d3.select(this).style({
@@ -11338,7 +11383,7 @@ var ninjaPixel;
                         return functor(itemStroke, d, i);
                     },
                     fill: function (d, i) {
-                        return functor(_this._itemFill, d, i);
+                        return functor(_this._headFill, d, i);
                     }
                 }).attr({
                     cx: function (d) {

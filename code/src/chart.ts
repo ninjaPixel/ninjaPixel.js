@@ -19,7 +19,7 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.4';
+    export var version:string =  '0.0.5';
     
     export enum Category {
         xy = 0,
@@ -76,7 +76,7 @@ module ninjaPixel{
                 return 'Tooltip HTML not defined';
             })
             .direction('n');
-
+        _xAxisTicks: any;
         // internal variables
         _chartHeight: number;
         _chartWidth: number;
@@ -132,14 +132,20 @@ module ninjaPixel{
                 .scale(xScale)
                 .orient('bottom')
                 .outerTickSize(0); // remove that presky final tick
+            
+            if(this._plotVerticalGridTopping){
+                xAxis.tickSize(-this._chartHeight, 0);   
+            }
 
             if(this._xAxisTickFormat != null){
                 xAxis.tickFormat(this._xAxisTickFormat); 
             }
+            
+            if(this._xAxisTicks != null){
+                xAxis.ticks(this._xAxisTicks);   
+            }
 
             this._svg.select('.ninja-xAxisGroup.ninja-axis')
-    //            .transition()
-    //            .ease(this._labelEase)
                 .attr({
                     transform: ()=>{
                         if(this._axesOrigin!=null){ 
@@ -152,14 +158,25 @@ module ninjaPixel{
                 .call(xAxis);   
 
             if (this._xAxisTextTransform != null) {
-                this._svg.select('.ninja-xAxisGroup.ninja-axis')
+            this._svg.select('.ninja-xAxisGroup.ninja-axis')
                 .selectAll('.tick text')
-//                    .text(function (d) {
-//                        return d;
-//                    })
                     .style('text-anchor', 'end')
                     .attr('transform', this._xAxisTextTransform);
                 }
+            
+            if(this._plotVerticalGrid){
+                xAxis.tickSize(-this._chartHeight, 0);   
+
+                this._svg.select('.ninja-verticalGrid')
+                    .attr({
+                        transform: ()=>{
+                            return 'translate(0,' + (this._chartHeight) + ')';                            
+                        }
+                    })
+                    .call(xAxis);   
+
+            }
+
         }
 
         _plotYAxis(xScale:any, yScale: any){
@@ -168,6 +185,10 @@ module ninjaPixel{
                     .orient('left')
                     .outerTickSize(0); // remove that pesky final tick;
 
+                if(this._plotHorizontalGridTopping){
+                    yAxis.tickSize(-this._chartWidth,0);   
+                }
+            
                  this._svg.select('.ninja-yAxisGroup.ninja-axis')
                     .transition()
                     .ease(this._labelEase)
@@ -179,9 +200,28 @@ module ninjaPixel{
                         }
                     })
                     .call(yAxis);
+            
+            if(this._plotHorizontalGrid){
+                yAxis.tickSize(-this._chartWidth,0);   
+            
+                 this._svg.select('.ninja-horizontalGrid')
+                    .transition()
+                    .ease(this._labelEase)
+                    .attr({
+                        transform: ()=>{
+                            if(this._axesOrigin!=null){ 
+                                //return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
+                            }
+                        }
+                    })
+                    .call(yAxis);   
+            }
         }
 
-
+        _plotXYAxes(xScale: any, yScale: any){
+            this._plotXAxis(xScale, yScale);
+            this._plotYAxis(xScale, yScale);
+        }
         _plotLabels(){
             if (this._svg.select('.ninja-chartTitle')[0][0] == null) {
 
@@ -262,12 +302,17 @@ module ninjaPixel{
             return this._height - this._margin.bottom - this._margin.top;   
         }
 
-        _plotGrids(xScale, yScale){
+        _plotGrids_DEPRECATED(xScale, yScale){
+            console.log('WARNING: the -plotGrids methods has been deprecated and will shortly be removed');
             // 'this' won't work inside plotHGrid, so extract the values here.
             var svg = this._svg;
             var chartWidth = this._chartWidth;
             var chartHeight = this._chartHeight;
             var ease = this._labelEase;
+            
+            if(this._xAxisTicks != null){
+                xScale.ticks(this._xAxisTicks);   
+            }
 
             function plotHGrid(yScale,className) {
                     var horizontalLines = svg.select('.'+className)
@@ -545,6 +590,11 @@ module ninjaPixel{
         xAxisTickFormat(_x): any{
            if (!arguments.length) return this._xAxisTickFormat;
             this._xAxisTickFormat = _x;
+            return this; 
+        }
+        xAxisTicks(_x): any{
+           if (!arguments.length) return this._xAxisTicks;
+            this._xAxisTicks = _x;
             return this; 
         }
 

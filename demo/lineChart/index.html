@@ -53,13 +53,19 @@
         top: 100%;
         left: 0;
     }
-    .ninja-horizontalGrid {
+    .ninja-horizontalGrid,
+    .ninja-verticalGrid
+    {
         stroke: lightgrey;
         opacity: 0.7;
     }
-    .ninja-horizontalGridTopping {
-        stroke: #333333;
-        opacity: 0.7;
+    .ninja-horizontalGrid text,
+    .ninja-verticalGrid text{
+           font: 0px sans-serif;
+    }
+    .ninja-xAxisGroup.ninja-axis g.tick line{
+       stroke: #333333;
+        opacity: 0.7; 
     }
 </style>
 
@@ -118,10 +124,16 @@
             right: 30
         })
         .transitionEase('linear')
+        //.plotVerticalGrid(true)
+    .plotVerticalGridTopping(false)
+    .plotHorizontalGridTopping(false)
+    .plotHorizontalGrid(true)
+    .plotVerticalGrid(true)
         .height(500)
         .title('Random Time-Series data')
         .itemFill(function(d){return d.color;})
         .xAxisTickFormat(d3.time.format('%a %e %b'))
+        .xAxisTicks(d3.time.fridays)
         .xAxisTextTransform('rotate(-90) translate(-10,-13)')
         .areaOpacity(0.1)
         .isTimeseries(true);
@@ -138,8 +150,8 @@
     ready();
     setTimeout(function run() { 
          ready();
-        setTimeout(run, 5000); 
-    }, 5000);
+        setTimeout(run, 50000); 
+    }, 50000);
 </script>
 
 </html>

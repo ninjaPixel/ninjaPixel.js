@@ -1,7 +1,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.4';
+    ninjaPixel.version = '0.0.5';
 
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -88,8 +88,16 @@ var ninjaPixel;
             var _this = this;
             var xAxis = d3.svg.axis().scale(xScale).orient('bottom').outerTickSize(0);
 
+            if (this._plotVerticalGridTopping) {
+                xAxis.tickSize(-this._chartHeight, 0);
+            }
+
             if (this._xAxisTickFormat != null) {
                 xAxis.tickFormat(this._xAxisTickFormat);
+            }
+
+            if (this._xAxisTicks != null) {
+                xAxis.ticks(this._xAxisTicks);
             }
 
             this._svg.select('.ninja-xAxisGroup.ninja-axis').attr({
@@ -105,11 +113,25 @@ var ninjaPixel;
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis').selectAll('.tick text').style('text-anchor', 'end').attr('transform', this._xAxisTextTransform);
             }
+
+            if (this._plotVerticalGrid) {
+                xAxis.tickSize(-this._chartHeight, 0);
+
+                this._svg.select('.ninja-verticalGrid').attr({
+                    transform: function () {
+                        return 'translate(0,' + (_this._chartHeight) + ')';
+                    }
+                }).call(xAxis);
+            }
         };
 
         Chart.prototype._plotYAxis = function (xScale, yScale) {
             var _this = this;
             var yAxis = d3.svg.axis().scale(yScale).orient('left').outerTickSize(0);
+
+            if (this._plotHorizontalGridTopping) {
+                yAxis.tickSize(-this._chartWidth, 0);
+            }
 
             this._svg.select('.ninja-yAxisGroup.ninja-axis').transition().ease(this._labelEase).attr({
                 transform: function () {
@@ -118,8 +140,23 @@ var ninjaPixel;
                     }
                 }
             }).call(yAxis);
+
+            if (this._plotHorizontalGrid) {
+                yAxis.tickSize(-this._chartWidth, 0);
+
+                this._svg.select('.ninja-horizontalGrid').transition().ease(this._labelEase).attr({
+                    transform: function () {
+                        if (_this._axesOrigin != null) {
+                        }
+                    }
+                }).call(yAxis);
+            }
         };
 
+        Chart.prototype._plotXYAxes = function (xScale, yScale) {
+            this._plotXAxis(xScale, yScale);
+            this._plotYAxis(xScale, yScale);
+        };
         Chart.prototype._plotLabels = function () {
             if (this._svg.select('.ninja-chartTitle')[0][0] == null) {
                 this._svg.append("g").classed("ninja-chartTitle", true);
@@ -162,11 +199,17 @@ var ninjaPixel;
             return this._height - this._margin.bottom - this._margin.top;
         };
 
-        Chart.prototype._plotGrids = function (xScale, yScale) {
+        Chart.prototype._plotGrids_DEPRECATED = function (xScale, yScale) {
+            console.log('WARNING: the -plotGrids methods has been deprecated and will shortly be removed');
+
             var svg = this._svg;
             var chartWidth = this._chartWidth;
             var chartHeight = this._chartHeight;
             var ease = this._labelEase;
+
+            if (this._xAxisTicks != null) {
+                xScale.ticks(this._xAxisTicks);
+            }
 
             function plotHGrid(yScale, className) {
                 var horizontalLines = svg.select('.' + className).selectAll('hLines').data(yScale.ticks());
@@ -458,6 +501,12 @@ var ninjaPixel;
             this._xAxisTickFormat = _x;
             return this;
         };
+        Chart.prototype.xAxisTicks = function (_x) {
+            if (!arguments.length)
+                return this._xAxisTicks;
+            this._xAxisTicks = _x;
+            return this;
+        };
         return Chart;
     })();
     ninjaPixel.Chart = Chart;
@@ -627,7 +676,6 @@ var ninjaPixel;
                 _this._plotLabels();
                 _this._plotXAxis(xScale, yScale);
                 _this._plotYAxis(xScale, yScale);
-                _this._plotGrids(xScale, yScale);
             });
         };
         return BarChart;
@@ -770,7 +818,6 @@ var ninjaPixel;
                 _this._plotLabels();
                 _this._plotXAxis(xScale, yScale);
                 _this._plotYAxis(xScale, yScale);
-                _this._plotGrids(xScale, yScale);
             });
         };
         return StackedBarChart;
@@ -976,7 +1023,6 @@ var ninjaPixel;
                 _this._plotLabels();
                 _this._plotXAxis(xScale, yScale);
                 _this._plotYAxis(xScale, yScale);
-                _this._plotGrids(xScale, yScale);
             });
         };
         return BubbleChart;
@@ -1217,7 +1263,6 @@ var ninjaPixel;
                 _this._plotLabels();
                 _this._plotXAxis(xScale, yScale);
                 _this._plotYAxis(xScale, yScale);
-                _this._plotGrids(xScale, yScale);
             });
         };
         return LineChart;
@@ -1331,7 +1376,6 @@ var ninjaPixel;
                 _this._plotLabels();
                 _this._plotXAxis(xScale, yScale);
                 _this._plotYAxis(xScale, yScale);
-                _this._plotGrids(xScale, yScale);
             });
         };
         return Histogram;

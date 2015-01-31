@@ -111,7 +111,6 @@ module ninjaPixel{
             this._plotLabels();
             this._plotXAxis(xScale, yScale);
             this._plotYAxis(xScale, yScale); 
-            this._plotGrids(xScale, yScale);
          // end of _data loop
          });
      }

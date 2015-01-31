@@ -107,22 +107,13 @@
     return lineChartData;
 }
     
-    var customTimeFormat = d3.time.format.multi([
-      [".%L", function(d) { return d.getMilliseconds(); }],
-      [":%S", function(d) { return d.getSeconds(); }],
-      ["%I:%M", function(d) { return d.getMinutes(); }],
-      ["%I %p", function(d) { return d.getHours(); }],
-      ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
-      ["%b %d", function(d) { return d.getDate() != 1; }],
-      ["%B", function(d) { return d.getMonth(); }],
-      ["%Y", function() { return true; }]
-    ]);
+
     
     var chart = new ninjaPixel.LineChart();
     chart.transitionDuration(2000)
         .margin({
             top: 50,
-            bottom: 50,
+            bottom: 80,
             left: 60,
             right: 30
         })
@@ -130,7 +121,7 @@
         .height(500)
         .title('Random Time-Series data')
         .itemFill(function(d){return d.color;})
-        .xAxisTickFormat(customTimeFormat)
+        .xAxisTickFormat(d3.time.format('%a %e %b'))
         .xAxisTextTransform('rotate(-90) translate(-10,-13)')
         .areaOpacity(0.1)
         .isTimeseries(true);

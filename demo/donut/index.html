@@ -6,8 +6,11 @@
 </head>
 <style>
     path {
-stroke-width: 5px;
-}
+        stroke-width: 5px;
+    }
+    body {
+        font: 10px sans-serif;
+    }
     text {
         font: 12px sans-serif;
         position: absolute;
@@ -45,14 +48,17 @@ stroke-width: 5px;
 </style>
 
 <body>
+
+    <div id="chart"><span id="chart1"></span><span id="chart2"></span>
+    </div>
+    <div id="message"></div>
+    </br>
     <input type="radio" name="radData" id="rad1" value="data1" checked="checked" onclick='ready(data1);' />
     <label for="rad1">Data1</label>
 
     <input type="radio" name="radData" id="rad2" value="data2" onclick='ready(data2);' />
     <label for="rad2">Data2</label>
-    </br>
-    <div id="chart"><span id="chart1"></span><span id="chart2"></span></div>
-    <div id="message"></div>
+
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script>
@@ -74,12 +80,12 @@ stroke-width: 5px;
         .title('Do I look like Pac Man?')
         .itemStroke('white')
         .itemFill(function (d, i) {
-        return d.data.color;
+            return d.data.color;
         })
         .itemOpacity(1)
         .mouseOverItemOpacity(0.9)
         .mouseOverItemStroke('#333333');
-    
+
     var chart2 = new ninjaPixel.Donut();
     chart2.transitionDuration(1000)
         .margin({
@@ -94,10 +100,10 @@ stroke-width: 5px;
         .height(220)
         .width(200)
         .innerRadius(50)
-        .outerRadius(80)        
+        .outerRadius(80)
         .itemStroke('white')
         .itemFill(function (d, i) {
-        return d.data.color;
+            return d.data.color;
         })
         .itemOpacity(1)
         .mouseOverItemOpacity(0.9)
@@ -113,7 +119,7 @@ stroke-width: 5px;
         {
             x: 'Yes',
             y: 4,
-            color: '#ffde58'//'#99d594'
+            color: '#ffde58' //'#99d594'
                 }
             ];
     var data2 = [
@@ -132,7 +138,7 @@ stroke-width: 5px;
     function ready(data) {
         chart1.plot(d3.select("#chart1")
             .datum(data));
-        
+
         chart2.plot(d3.select("#chart2")
             .datum(data));
     }

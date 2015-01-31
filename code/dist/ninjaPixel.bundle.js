@@ -10279,7 +10279,7 @@ var ninjaPixel;
             return this;
         };
 
-        BarChart.prototype.plot = function (_selection) {
+        BarChart.prototype.plot = function (_selection, barWidth) {
             var _this = this;
             this._init(_selection);
             var functor = this._functor;
@@ -10294,7 +10294,6 @@ var ninjaPixel;
             var barFill = this._itemFill;
 
             _selection.each(function (_data) {
-                var barW = _this._chartWidth / _data.length;
                 var minData = 0;
                 var maxData = 0;
 
@@ -10320,20 +10319,38 @@ var ninjaPixel;
                     }
                 }
 
-                var xScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
+                _this._xScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
                     return d.x;
-                })).rangeRoundBands([0, _this._chartWidth], 0);
+                })).rangeRoundBands([0, _this._chartWidth], 0.1);
 
-                var yScale = d3.scale.linear().domain([minData, maxData]).range([_this._chartHeight, 0]);
+                _this._yScale = d3.scale.linear().domain([minData, maxData]).range([_this._chartHeight, 0]);
 
-                var barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
+                _this._barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
+
+                var xScale = _this._xScale;
+                var yScale = _this._yScale;
+                var barScale = _this._barScale;
+
+                var barW;
+                if (barWidth != null) {
+                    barW = barWidth;
+                } else {
+                    barW = xScale.rangeBand();
+                }
+
+                var barAdjustmentX = (xScale.rangeBand() - barW) / 2;
+
+                function xScaleAdjusted(x) {
+                    return xScale(x) + barAdjustmentX;
+                }
+                _this._xScaleAdjusted = xScaleAdjusted;
 
                 var yScale0 = yScale(0);
                 var bars = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bar').data(_data);
 
                 bars.enter().append('rect').classed('bar', true).attr({
                     x: function (d, i) {
-                        return xScale(d.x);
+                        return xScaleAdjusted(d.x);
                     },
                     width: barW * 0.95,
                     y: yScale0,
@@ -10383,9 +10400,9 @@ var ninjaPixel;
                     }
                 }).attr({
                     x: function (d, i) {
-                        return xScale(d.x);
+                        return xScaleAdjusted(d.x);
                     },
-                    width: barW * 0.9,
+                    width: barW,
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);
@@ -11215,4 +11232,175 @@ var ninjaPixel;
         return Donut;
     })(ninjaPixel.Chart);
     ninjaPixel.Donut = Donut;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Lollipop = (function (_super) {
+        __extends(Lollipop, _super);
+        function Lollipop() {
+            _super.call(this);
+            this._stickWidth = 6;
+            this._headRadius = 20;
+            this._headFill = 'white';
+            this._headStroke = 'none';
+            this._headOpacity = 1;
+            this._headToolTip = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).transitionDuration(300).html(function () {
+                return 'Tooltip HTML not defined';
+            }).direction('n');
+        }
+        Lollipop.prototype.stickWidth = function (_x) {
+            if (!arguments.length)
+                return this._stickWidth;
+            this._stickWidth = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headRadius = function (_x) {
+            if (!arguments.length)
+                return this._headRadius;
+            this._headRadius = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headFill = function (_x) {
+            if (!arguments.length)
+                return this._headFill;
+            this._headFill = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headStroke = function (_x) {
+            if (!arguments.length)
+                return this._headStroke;
+            this._headStroke = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headOpacity = function (_x) {
+            if (!arguments.length)
+                return this._headOpacity;
+            this._headOpacity = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headMouseOverItemOpacity = function (_x) {
+            if (!arguments.length)
+                return this._itemFill;
+            this._itemFill = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headMouseOverStroke = function (_x) {
+            if (!arguments.length)
+                return this._headMouseOverStroke;
+            this._headMouseOverStroke = _x;
+            return this;
+        };
+
+        Lollipop.prototype.headToolTip = function (_x) {
+            if (!arguments.length)
+                return this._headToolTip;
+            this._headToolTip = _x;
+            return this;
+        };
+        Lollipop.prototype.plot = function (_selection) {
+            var _this = this;
+            _selection.each(function (_data) {
+                _super.prototype.plot.call(_this, _selection, _this._stickWidth);
+
+                var functor = _this._functor;
+                var mouseOverOpacity = _this._headMouseOverItemOpacity;
+                var mouseOverStroke = _this._headMouseOverStroke;
+                var itemOpacity = _this._headOpacity;
+                var onMouseover = _this._onMouseover;
+                var onMouseout = _this._onMouseout;
+                var onClick = _this._onClick;
+                var itemStroke = _this._headStroke;
+                var myToolTip = _this._headToolTip;
+
+                var superXScale = _this._xScaleAdjusted;
+                var dx = _this._stickWidth / 2;
+                function xScale(x) {
+                    return superXScale(x) + dx;
+                }
+                var yScale = _this._yScale;
+                var barScale = _this._barScale;
+
+                var yScale0 = yScale(0);
+                var bubbles = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.lollipop-head').data(_data);
+
+                bubbles.enter().append('circle').classed('lollipop-head', true).attr({
+                    r: _this._headRadius
+                }).on('mouseover', function (d) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(mouseOverOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(mouseOverStroke, d, i);
+                        }
+                    });
+                    myToolTip.show(d);
+                    onMouseover(d);
+                }).on('mouseout', function (d) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(itemOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(itemStroke, d, i);
+                        }
+                    });
+                    myToolTip.hide(d);
+                    onMouseout(d);
+                }).on('click', function (d) {
+                    onClick(d);
+                }).attr({
+                    cx: function (d) {
+                        return xScale(d.x);
+                    },
+                    cy: function (d) {
+                        return yScale(0);
+                    },
+                    r: _this._headRadius
+                });
+                ;
+
+                bubbles.transition().duration(_this._transitionDuration).delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                }).ease(_this._transitionEase).style({
+                    opacity: function (d, i) {
+                        return functor(itemOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(itemStroke, d, i);
+                    },
+                    fill: function (d, i) {
+                        return functor(_this._headFill, d, i);
+                    }
+                }).attr({
+                    cx: function (d) {
+                        return xScale(d.x);
+                    },
+                    cy: function (d) {
+                        return yScale(d.y);
+                    },
+                    r: _this._headRadius
+                });
+
+                bubbles.exit().transition().style({
+                    opacity: 0
+                }).remove();
+            });
+        };
+        return Lollipop;
+    })(ninjaPixel.BarChart);
+    ninjaPixel.Lollipop = Lollipop;
 })(ninjaPixel || (ninjaPixel = {}));

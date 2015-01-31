@@ -124,11 +124,10 @@
             right: 30
         })
         .transitionEase('linear')
-        //.plotVerticalGrid(true)
-    .plotVerticalGridTopping(false)
-    .plotHorizontalGridTopping(false)
-    .plotHorizontalGrid(true)
-    .plotVerticalGrid(true)
+        .plotVerticalGridTopping(false)
+        .plotHorizontalGridTopping(false)
+        .plotHorizontalGrid(true)
+        .plotVerticalGrid(true)
         .height(500)
         .title('Random Time-Series data')
         .itemFill(function(d){return d.color;})
@@ -142,7 +141,7 @@
 
     function ready() {
         var data = randomTimeseries();
-        console.log('length',data.length, data);
+//        console.log('length',data.length, data);
         chart.plot(d3.select("#chart")
             .datum(data));
     }

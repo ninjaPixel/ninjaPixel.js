@@ -9896,9 +9896,7 @@ var ninjaPixel;
             }).call(xAxis);
 
             if (this._xAxisTextTransform != null) {
-                this._svg.selectAll('.tick text').text(function (d) {
-                    return d;
-                }).style('text-anchor', 'end').attr('transform', this._xAxisTextTransform);
+                this._svg.select('.ninja-xAxisGroup.ninja-axis').selectAll('.tick text').style('text-anchor', 'end').attr('transform', this._xAxisTextTransform);
             }
         };
 

@@ -53,6 +53,8 @@ module ninjaPixel{
         _svg: any;
         _xAxisTextTransform: string;
         _xAxisTickFormat: any;
+//        _yAxisTextTransform: string;
+        _yAxisTickFormat: any;
         _onMouseover: any = ()=>{};
         _onMouseout: any = ()=>{};
         _onClick: any = ()=>{};
@@ -77,6 +79,7 @@ module ninjaPixel{
             })
             .direction('n');
         _xAxisTicks: any;
+        _yAxisTicks: any;
         // internal variables
         _chartHeight: number;
         _chartWidth: number;
@@ -126,6 +129,13 @@ module ninjaPixel{
 
             this._plotTheBackground();
         }
+        
+//        _translateNinjaContainerGroup(x:number, y:number){
+//                this._svg.select('.ninja-containerGroup')
+//                    .attr({
+//                        transform: 'translate(' + Number(this._margin.left) + x + ',' + Number(this._margin.top) + y + ')'
+//            });
+//        }
 
         _plotXAxis(xScale: any, yScale: any){
             var xAxis = d3.svg.axis()
@@ -187,6 +197,14 @@ module ninjaPixel{
 
                 if(this._plotHorizontalGridTopping){
                     yAxis.tickSize(-this._chartWidth,0);   
+                }
+            
+                if(this._yAxisTickFormat != null){
+                    yAxis.tickFormat(this._yAxisTickFormat); 
+                }
+
+                if(this._yAxisTicks != null){
+                    yAxis.ticks(this._yAxisTicks);   
                 }
             
                  this._svg.select('.ninja-yAxisGroup.ninja-axis')
@@ -595,6 +613,16 @@ module ninjaPixel{
         xAxisTicks(_x): any{
            if (!arguments.length) return this._xAxisTicks;
             this._xAxisTicks = _x;
+            return this; 
+        }
+        yAxisTickFormat(_x): any{
+           if (!arguments.length) return this._yAxisTickFormat;
+            this._yAxisTickFormat = _x;
+            return this; 
+        }
+        yAxisTicks(_x): any{
+           if (!arguments.length) return this._yAxisTicks;
+            this._yAxisTicks = _x;
             return this; 
         }
 

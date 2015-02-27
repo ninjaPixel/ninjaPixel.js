@@ -13,11 +13,18 @@ module ninjaPixel{
         _xScale: any;
         _yScale:any;
         _barScale: any;
-        _xScaleAdjusted: any;
+        _xScaleAdjusted: any;        
 
         cornerRounding(_x: number):any {
             if (!arguments.length) return this._cornerRounding;
             this._cornerRounding = _x;
+            return this;
+        }
+        
+        private _isTimeseries: boolean= false;
+        isTimeseries(_x): any{
+            if (!arguments.length) return this._isTimeseries;
+            this._isTimeseries = _x;
             return this;
         }
         
@@ -37,9 +44,26 @@ module ninjaPixel{
             var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
             var barFill = this._itemFill;
+            function getMinDate(theData) {
+                return d3.min(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
+            }
+
+            function getMaxDate(theData) {
+                return d3.max(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
+            }
             
             _selection.each((_data) => {
 
+                var barW: number;
+                if(barWidth != null){
+                        barW = barWidth;
+                } else {
+                    if(this._isTimeseries){                    
+                        barW= 0.9 * this._chartWidth / _data.length; 
+                    }else{
+                        barW = xScale.rangeBand();
+                    }
+                }
                 var minData:any = 0;
                 var maxData:any = 0;
             
@@ -61,12 +85,30 @@ module ninjaPixel{
                     }
                 }
                 
-            this._xScale = d3.scale.ordinal()
-                .domain(_data.map(function (d, i) {
-                    return d.x;
-                }))
-                .rangeRoundBands([0, this._chartWidth], 0.1);                
+            if (this._isTimeseries) {
+                var minX, maxX;
+                if(this._xMin != null){
+                    minX = new Date(this._xMin).getTime();   
+                } else {
+                 minX = getMinDate(_data);   
+                }
+                if(this._xMax != null){
+                    maxX = new Date(this._xMax).getTime();   
+                } else{
+                    maxX = getMaxDate(_data);
+                }
 
+                this._xScale = d3.time.scale()
+                .domain([minX, maxX])
+                .range([0+barW, this._chartWidth - barW]);                
+            } else{
+                this._xScale = d3.scale.ordinal()
+                    .domain(_data.map(function (d, i) {
+                        return d.x;
+                    }))
+                    .rangeRoundBands([0, this._chartWidth], 0.1);                
+            }
+                
             this._yScale = d3.scale.linear()
                 .domain([minData, maxData])
                 .range([this._chartHeight, 0]);
@@ -74,25 +116,17 @@ module ninjaPixel{
             this._barScale = d3.scale.linear()
                 .domain([Math.abs(maxData - minData), 0])
                 .range([this._chartHeight, 0]);
-                
-//            this._xScale = xScale;
-//            this._yScale = yScale;
-//            this._barScale = barScale;
-                
+                                
             var xScale = this._xScale;
             var yScale = this._yScale;
             var barScale = this._barScale;
                 
-            var barW: number;
-            if(barWidth != null){
-                    barW = barWidth;
-            } else {
-//                    barW= this._chartWidth / _data.length; 
-                barW = xScale.rangeBand();
-            }
                 
-            var barAdjustmentX = (xScale.rangeBand() - barW)/2;
-//            this._barAdjustmentX = barAdjustmentX;
+            var barAdjustmentX = 0; 
+            if(this._isTimeseries){ 
+                barAdjustmentX = -barW/2;
+            }
+
             function xScaleAdjusted(x){
               return xScale(x) + barAdjustmentX;   
             }
@@ -109,7 +143,6 @@ module ninjaPixel{
                 .classed('bar', true)
                 .attr({
                     x: function (d, i) {
-//                        return xScale(d.x)+barAdjustmentX;
                         return xScaleAdjusted(d.x);
                     },
                     width: barW * 0.95,
@@ -152,7 +185,6 @@ module ninjaPixel{
                 })
                 .attr({
                     x: function (d, i) {
-                        //return xScale(d.x) + barAdjustmentX;
                         return xScaleAdjusted(d.x);
                     },
                     width: barW,

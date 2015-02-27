@@ -9926,6 +9926,14 @@ var ninjaPixel;
                 yAxis.tickSize(-this._chartWidth, 0);
             }
 
+            if (this._yAxisTickFormat != null) {
+                yAxis.tickFormat(this._yAxisTickFormat);
+            }
+
+            if (this._yAxisTicks != null) {
+                yAxis.ticks(this._yAxisTicks);
+            }
+
             this._svg.select('.ninja-yAxisGroup.ninja-axis').transition().ease(this._labelEase).attr({
                 transform: function () {
                     if (_this._axesOrigin != null) {
@@ -10300,6 +10308,18 @@ var ninjaPixel;
             this._xAxisTicks = _x;
             return this;
         };
+        Chart.prototype.yAxisTickFormat = function (_x) {
+            if (!arguments.length)
+                return this._yAxisTickFormat;
+            this._yAxisTickFormat = _x;
+            return this;
+        };
+        Chart.prototype.yAxisTicks = function (_x) {
+            if (!arguments.length)
+                return this._yAxisTicks;
+            this._yAxisTicks = _x;
+            return this;
+        };
         return Chart;
     })();
     ninjaPixel.Chart = Chart;
@@ -10318,11 +10338,19 @@ var ninjaPixel;
         function BarChart() {
             _super.call(this);
             this._cornerRounding = 1;
+            this._isTimeseries = false;
         }
         BarChart.prototype.cornerRounding = function (_x) {
             if (!arguments.length)
                 return this._cornerRounding;
             this._cornerRounding = _x;
+            return this;
+        };
+
+        BarChart.prototype.isTimeseries = function (_x) {
+            if (!arguments.length)
+                return this._isTimeseries;
+            this._isTimeseries = _x;
             return this;
         };
 
@@ -10339,8 +10367,29 @@ var ninjaPixel;
             var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
             var barFill = this._itemFill;
+            function getMinDate(theData) {
+                return d3.min(theData, function (d) {
+                    return new Date(d.x).getTime();
+                });
+            }
+
+            function getMaxDate(theData) {
+                return d3.max(theData, function (d) {
+                    return new Date(d.x).getTime();
+                });
+            }
 
             _selection.each(function (_data) {
+                var barW;
+                if (barWidth != null) {
+                    barW = barWidth;
+                } else {
+                    if (_this._isTimeseries) {
+                        barW = 0.9 * _this._chartWidth / _data.length;
+                    } else {
+                        barW = xScale.rangeBand();
+                    }
+                }
                 var minData = 0;
                 var maxData = 0;
 
@@ -10366,9 +10415,25 @@ var ninjaPixel;
                     }
                 }
 
-                _this._xScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
-                    return d.x;
-                })).rangeRoundBands([0, _this._chartWidth], 0.1);
+                if (_this._isTimeseries) {
+                    var minX, maxX;
+                    if (_this._xMin != null) {
+                        minX = new Date(_this._xMin).getTime();
+                    } else {
+                        minX = getMinDate(_data);
+                    }
+                    if (_this._xMax != null) {
+                        maxX = new Date(_this._xMax).getTime();
+                    } else {
+                        maxX = getMaxDate(_data);
+                    }
+
+                    _this._xScale = d3.time.scale().domain([minX, maxX]).range([0 + barW, _this._chartWidth - barW]);
+                } else {
+                    _this._xScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
+                        return d.x;
+                    })).rangeRoundBands([0, _this._chartWidth], 0.1);
+                }
 
                 _this._yScale = d3.scale.linear().domain([minData, maxData]).range([_this._chartHeight, 0]);
 
@@ -10378,14 +10443,10 @@ var ninjaPixel;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
 
-                var barW;
-                if (barWidth != null) {
-                    barW = barWidth;
-                } else {
-                    barW = xScale.rangeBand();
+                var barAdjustmentX = 0;
+                if (_this._isTimeseries) {
+                    barAdjustmentX = -barW / 2;
                 }
-
-                var barAdjustmentX = (xScale.rangeBand() - barW) / 2;
 
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;

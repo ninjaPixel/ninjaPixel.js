@@ -59,7 +59,7 @@ module ninjaPixel{
                         barW = barWidth;
                 } else {
                     if(this._isTimeseries){                    
-                        barW= 0.9 * this._chartWidth / _data.length; 
+                        barW= 0.9 * this._chartWidth / (_data.length + 1); 
                     }else{
                         barW = xScale.rangeBand();
                     }
@@ -137,7 +137,7 @@ module ninjaPixel{
             var bars = this._svg.select('.ninja-chartGroup')
                 .call(myToolTip)
                 .selectAll('.bar')
-                .data(_data);
+                .data(_data, function(d){ return d.x;});
             
             bars.enter().append('rect')
                 .classed('bar', true)
@@ -145,7 +145,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xScaleAdjusted(d.x);
                     },
-                    width: barW * 0.95,
+                    width: barW,
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill, d, i)},
@@ -202,9 +202,24 @@ module ninjaPixel{
                 
             bars.exit()
                 .transition()
-                .style({
-                opacity: 0
+                .duration((d,i) => {return functor(this._removeTransitionDelay, d, i);})
+                .ease(this._transitionEase)
+                .attr({
+                    y: function (d) {
+                        if (d.y > 0) {
+                            return yScale(0);
+                        } else {
+                            return yScale(0);
+                        }
+                    },
+                    height: function (d) {
+                        return Math.abs(barScale(0));
+                    },
                 })
+                .delay((d,i) => {return functor(this._removeDelay, d, i);})
+                // .style({
+                // opacity: 0
+                // })
                 .remove();   
                                 
             this._plotLabels();

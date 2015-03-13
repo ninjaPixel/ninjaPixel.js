@@ -44,6 +44,8 @@ module ninjaPixel{
         _transitionDuration: number = 300; 
         _transitionEase: string = 'linear';
         _transitionDelay:any = 0;// function or value
+        _removeTransitionDelay:any = 0;// function or value
+        _removeDelay:any = 0;// function or value
         _labelEase: string = 'linear';
         _plotHorizontalGrid: boolean = false;
         _plotHorizontalGridTopping: boolean = false;
@@ -473,6 +475,16 @@ module ninjaPixel{
         transitionDelay(_x): any {
             if (!arguments.length) return this._transitionDelay;
             this._transitionDelay = _x;
+            return this;
+        }
+        removeTransitionDelay(_x): any {
+            if (!arguments.length) return this._removeTransitionDelay;
+            this._removeTransitionDelay = _x;
+            return this;
+        }
+        removeDelay(_x): any {
+            if (!arguments.length) return this._removeDelay;
+            this._removeDelay = _x;
             return this;
         }
         y1Max(_x): any {

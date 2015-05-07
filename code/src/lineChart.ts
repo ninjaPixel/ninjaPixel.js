@@ -13,6 +13,7 @@ module ninjaPixel{
         private _isTimeseries: boolean= false;
         private _areaOpacity: number= 0;
         private _lineInterpolation: string = 'basis';
+        private _lineDashArray: any = 'none';
         
         constructor(){super();}
         
@@ -29,6 +30,11 @@ module ninjaPixel{
         lineInterpolation(_x): any{
             if (!arguments.length) return this._lineInterpolation;
             this._lineInterpolation = _x;
+            return this;
+        }
+        lineDashArray(_x): any{
+            if (!arguments.length) return this._lineDashArray;
+            this._lineDashArray = _x;
             return this;
         }
         
@@ -130,9 +136,17 @@ module ninjaPixel{
                         .range([0, this._chartWidth])
                         .domain([minX, maxX]);
                 }            
-                var yScale = d3.scale.linear()
-                    .domain([minY, maxY])
-                    .range([this._chartHeight, 0]);
+                var yScale;
+                if(this._yAxis1LogScale){
+                    yScale = d3.scale.log()
+                        .domain([minY, maxY])
+                        .range([this._chartHeight, 0]);
+                }else {
+                    yScale = d3.scale.linear()
+                        .domain([minY, maxY])
+                        .range([this._chartHeight, 0]);
+                }
+                
 
 
                 // *** CHARTING ***
@@ -201,7 +215,8 @@ module ninjaPixel{
 
                 areaSvg.exit()
                     .transition()
-                    .duration(500)
+//                    .duration(500)
+                    .duration((d, i) => {return functor(this._transitionDuration, d, i);})
                     .ease('linear')
                     .style('opacity', 0)
                     .remove();
@@ -219,7 +234,8 @@ module ninjaPixel{
                         opacity: 0,//       (d, i) => {return functor(this._itemOpacity, d, i);}, // Re-sets the opacity of the circle                    
                         stroke:         (d, i) => {return functor(this._itemFill, d, i);}, // use the same fill as the item (i.e. the line).
                         fill:           'none',
-                        'stroke-width': '2.5px'
+                        'stroke-dasharray': (d, i) => {return functor(this._lineDashArray, d, i);},
+                        'stroke-width': (d, i) => {return functor(this._itemStrokeWidth, d, i);}//'2.5px'
                     })
                     .attr('d', (d) => {return baseLine(d.data);});
 
@@ -230,7 +246,9 @@ module ninjaPixel{
                     .attr('d', (d) => { return singleLine(d.data);})
                     .style({
                         opacity: (d, i) => {return functor(this._itemOpacity, d, i);}, // Re-sets the opacity of the circle                    
-                        stroke:  (d, i) => {return functor(this._itemFill, d, i);} // use the same fill as the item (i.e. the line).
+                        stroke:  (d, i) => {return functor(this._itemFill, d, i);}, // use the same fill as the item (i.e. the line).
+                        'stroke-dasharray': (d, i) => {return functor(this._lineDashArray, d, i);},
+                        'stroke-width': (d, i) => {return functor(this._itemStrokeWidth, d, i);}
                     });    
 
                 lineSvg.exit()

@@ -10139,6 +10139,7 @@ var ninjaPixel;
             this._yAxis1Title = '';
             this._yAxis2Title = '';
             this._xAxisTitle = '';
+            this._yAxis1LogScale = false;
             this._transitionDuration = 300;
             this._transitionEase = 'linear';
             this._transitionDelay = 0;
@@ -10162,6 +10163,7 @@ var ninjaPixel;
             this._itemOpacity = 1;
             this._itemStroke = 'none';
             this._itemFill = '#A7EBCA';
+            this._itemStrokeWidth = '3px';
             this._toolTip = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).transitionDuration(300).html(function () {
                 return 'Tooltip HTML not defined';
             }).direction('n');
@@ -10441,6 +10443,12 @@ var ninjaPixel;
             this._itemStroke = _x;
             return this;
         };
+        Chart.prototype.itemStrokeWidth = function (_x) {
+            if (!arguments.length)
+                return this._itemStrokeWidth;
+            this._itemStrokeWidth = _x;
+            return this;
+        };
         Chart.prototype.itemOpacity = function (_x) {
             if (!arguments.length)
                 return this._itemOpacity;
@@ -10571,6 +10579,12 @@ var ninjaPixel;
             if (!arguments.length)
                 return this._plotHorizontalGrid;
             this._plotHorizontalGrid = _x;
+            return this;
+        };
+        Chart.prototype.yAxis1LogScale = function (_x) {
+            if (!arguments.length)
+                return this._yAxis1LogScale;
+            this._yAxis1LogScale = _x;
             return this;
         };
         Chart.prototype.transitionEase = function (_x) {
@@ -11251,6 +11265,7 @@ var ninjaPixel;
             this._isTimeseries = false;
             this._areaOpacity = 0;
             this._lineInterpolation = 'basis';
+            this._lineDashArray = 'none';
         }
         LineChart.prototype.isTimeseries = function (_x) {
             if (!arguments.length)
@@ -11268,6 +11283,12 @@ var ninjaPixel;
             if (!arguments.length)
                 return this._lineInterpolation;
             this._lineInterpolation = _x;
+            return this;
+        };
+        LineChart.prototype.lineDashArray = function (_x) {
+            if (!arguments.length)
+                return this._lineDashArray;
+            this._lineDashArray = _x;
             return this;
         };
 
@@ -11367,7 +11388,12 @@ var ninjaPixel;
                 } else {
                     xScale = d3.scale.linear().range([0, _this._chartWidth]).domain([minX, maxX]);
                 }
-                var yScale = d3.scale.linear().domain([minY, maxY]).range([_this._chartHeight, 0]);
+                var yScale;
+                if (_this._yAxis1LogScale) {
+                    yScale = d3.scale.log().domain([minY, maxY]).range([_this._chartHeight, 0]);
+                } else {
+                    yScale = d3.scale.linear().domain([minY, maxY]).range([_this._chartHeight, 0]);
+                }
 
                 var singleLine = d3.svg.line().x(function (d) {
                     return xScale(d.x);
@@ -11430,7 +11456,9 @@ var ninjaPixel;
                     }
                 });
 
-                areaSvg.exit().transition().duration(500).ease('linear').style('opacity', 0).remove();
+                areaSvg.exit().transition().duration(function (d, i) {
+                    return functor(_this._transitionDuration, d, i);
+                }).ease('linear').style('opacity', 0).remove();
 
                 var lineSvg = _this._svg.select('.ninja-chartGroup').selectAll('path.line').data(_data, function (d) {
                     return d.name;
@@ -11442,7 +11470,12 @@ var ninjaPixel;
                         return functor(_this._itemFill, d, i);
                     },
                     fill: 'none',
-                    'stroke-width': '2.5px'
+                    'stroke-dasharray': function (d, i) {
+                        return functor(_this._lineDashArray, d, i);
+                    },
+                    'stroke-width': function (d, i) {
+                        return functor(_this._itemStrokeWidth, d, i);
+                    }
                 }).attr('d', function (d) {
                     return baseLine(d.data);
                 });
@@ -11459,6 +11492,12 @@ var ninjaPixel;
                     },
                     stroke: function (d, i) {
                         return functor(_this._itemFill, d, i);
+                    },
+                    'stroke-dasharray': function (d, i) {
+                        return functor(_this._lineDashArray, d, i);
+                    },
+                    'stroke-width': function (d, i) {
+                        return functor(_this._itemStrokeWidth, d, i);
                     }
                 });
 

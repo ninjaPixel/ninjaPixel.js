@@ -41,6 +41,7 @@ module ninjaPixel{
         _yAxis1Title: string = '';
         _yAxis2Title: string = '';
         _xAxisTitle: string = '';
+        _yAxis1LogScale: boolean = false;
         _transitionDuration: number = 300; 
         _transitionEase: string = 'linear';
         _transitionDelay:any = 0;// function or value
@@ -72,6 +73,7 @@ module ninjaPixel{
         _itemOpacity: any = 1;// function or value
         _itemStroke: any = 'none'; // function or value
         _itemFill: any = '#A7EBCA'; // function or value
+        _itemStrokeWidth: any = '3px'; // function or value
         _toolTip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
@@ -457,6 +459,11 @@ module ninjaPixel{
             this._itemStroke = _x;
             return this;
         }
+        itemStrokeWidth(_x): any {
+            if (!arguments.length) return this._itemStrokeWidth;
+            this._itemStrokeWidth = _x;
+            return this;
+        }
         itemOpacity(_x): any {
             if (!arguments.length) return this._itemOpacity;
             this._itemOpacity = _x;
@@ -565,6 +572,11 @@ module ninjaPixel{
         plotHorizontalGrid(_x): any {
             if (!arguments.length) return this._plotHorizontalGrid;
             this._plotHorizontalGrid = _x;
+            return this;
+        }        
+        yAxis1LogScale(_x): any {
+            if (!arguments.length) return this._yAxis1LogScale;
+            this._yAxis1LogScale = _x;
             return this;
         }
         transitionEase(_x): any {

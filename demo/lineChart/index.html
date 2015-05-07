@@ -84,7 +84,7 @@
         
 
     for (var i = 0; i < numberOfLines; i++) {
-        var currentValue = 0,
+        var currentValue = 1,
             name = 'Line Series ' + i,
             colour = colours[i];
         timeseries = [];
@@ -100,7 +100,8 @@
             if (Math.random() > 0.5) {
                 posNeg = 1;
             }
-            currentValue += ~~(Math.random() * 10 * posNeg);
+//            currentValue += ~~(Math.random() * 10 * posNeg);
+            currentValue += ~~(Math.random() * 10 );
         }
 
         lineChartData.push({
@@ -135,6 +136,9 @@
         .xAxisTicks(d3.time.fridays)
         .xAxisTextTransform('rotate(-90) translate(-10,-13)')
         .areaOpacity(0.1)
+        .yAxis1LogScale(false)   
+        .itemStrokeWidth('5px')
+        .lineDashArray('2,6,2')
         .isTimeseries(true);
 
     

@@ -19,11 +19,12 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.5';
+    export var version:string =  '0.0.6';
     
     export enum Category {
         xy = 0,
-        donut = 1 
+        donut = 1 ,
+        treemap =2
     }
     
     export class Chart {
@@ -98,19 +99,29 @@ module ninjaPixel{
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
 
-             if(!this._svg){           
-                this._svg = _selection //d3.select(selection)
-                    .append('svg')
-                    .classed('ninja-chart', true);
-                var container = this._svg.append('g').classed('ninja-containerGroup', true);
-                container.append('g').classed('ninja-horizontalGrid', true);
-                container.append('g').classed('ninja-verticalGrid', true);
-                container.append('g').classed('ninja-chartGroup', true);
-                container.append('g').classed('ninja-horizontalGridTopping', true);
-                container.append('g').classed('ninja-verticalGridTopping', true);
-                container.append('g').classed('ninja-xAxisGroup ninja-axis', true);
-                container.append('g').classed('ninja-yAxisGroup ninja-axis', true);
-            } 
+            
+
+             if(!this._svg){
+                 
+                 if(this._category == Category.treemap){
+                     this._svg = _selection
+                        .append('div')
+                        .classed('ninja-treemap', true);
+                     var container = this._svg.append('div').classed('ninja-containerGroup', true);
+                } else{
+                    this._svg = _selection
+                        .append('svg')
+                        .classed('ninja-chart', true);
+                    var container = this._svg.append('g').classed('ninja-containerGroup', true);
+                    container.append('g').classed('ninja-horizontalGrid', true);
+                    container.append('g').classed('ninja-verticalGrid', true);
+                    container.append('g').classed('ninja-chartGroup', true);
+                    container.append('g').classed('ninja-horizontalGridTopping', true);
+                    container.append('g').classed('ninja-verticalGridTopping', true);
+                    container.append('g').classed('ninja-xAxisGroup ninja-axis', true);
+                    container.append('g').classed('ninja-yAxisGroup ninja-axis', true);
+                } 
+             }
 
             this._svg.transition().attr({
                 width: this._width,
@@ -122,7 +133,7 @@ module ninjaPixel{
                     .attr({
                         transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth/2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight/2)) + ')'
                 });
-            } else if (this._category == Category.xy) {
+            } else if (this._category == Category.xy || this._category == Category.treemap) {
             this._svg.select('.ninja-containerGroup')
                 .attr({
                     transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'

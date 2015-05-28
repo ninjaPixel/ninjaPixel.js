@@ -101,6 +101,7 @@ var localeFormatter = d3.locale({
     .onMouseover(function (d, i) {
             d3.select('#message').text(d.x);
         })
+    .mouseOverItemStroke('red')
     .height(500)
     .plotHorizontalGridTopping(true)
     .cornerRounding(0)
@@ -109,13 +110,19 @@ var localeFormatter = d3.locale({
     .yAxisTickFormat(localeFormatter.numberFormat('$s'))
     .mouseOverItemOpacity(function(d,i){return d.opacity;});
 
+    var toolTip = barChart.toolTip();
+    toolTip.html(function (d) {
+        return d.y;
+    });
+    barChart.toolTip(toolTip);
+    
     ready();
 
     function ready(error) {
         var timeseries = [];
         var startDate = new moment('1-12-2014', "DD-MM-YYYY");
         var thisDate = new moment(startDate);
-        for (var i2 = 0; i2 < 800; i2++) {
+        for (var i2 = 0; i2 < 40; i2++) {
             timeseries.push({
                 x: thisDate.toDate(),
                 y: (i2+1)*1000

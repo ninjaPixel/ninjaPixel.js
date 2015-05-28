@@ -107,7 +107,8 @@
         lineChartData.push({
             name: name,
             color: colour,
-            data: timeseries
+            data: timeseries,
+            dashArray: '6,6'
         });
     }
 
@@ -138,9 +139,15 @@
         .areaOpacity(0.1)
         .yAxis1LogScale(false)   
         .itemStrokeWidth('5px')
-        .lineDashArray('2,6,2')
+        .lineInterpolation('monotone')
+        .lineDashArray(function(d){return d.dashArray;})
         .isTimeseries(true);
 
+    var toolTip = chart.toolTip();
+    toolTip.html(function (d) {
+        return d.name;
+    });
+    chart.toolTip(toolTip);
     
 
     function ready() {

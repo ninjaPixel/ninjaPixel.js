@@ -12,7 +12,7 @@ module ninjaPixel{
     export class LineChart extends ninjaPixel.Chart{
         private _isTimeseries: boolean= false;
         private _areaOpacity: number= 0;
-        private _lineInterpolation: string = 'basis';
+        private _lineInterpolation: any = 'basis';
         private _lineDashArray: any = 'none';
         
         constructor(){super();}
@@ -42,6 +42,9 @@ module ninjaPixel{
         plot(_selection){
             var functor = this._functor;
             this._init(_selection);
+            var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
             
             // just creating simple function to get the min and max values for each line (correct practice to do this outside the loop)
             function getMinDate(theData) {
@@ -222,7 +225,9 @@ module ninjaPixel{
                     .remove();
 
                 // draw line
-                var lineSvg = this._svg.select('.ninja-chartGroup').selectAll('path.line')
+                var lineSvg = this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .selectAll('path.line')
                     .data(_data, function (d) {
                         return d.name;
                     });
@@ -230,6 +235,14 @@ module ninjaPixel{
                 lineSvg.enter()
                     .append('svg:path')
                     .attr('class', 'line')
+                    .on('mouseover', function(d){
+                        myToolTip.show(d); 
+                        onMouseover(d);
+                    })
+                    .on('mouseout', function(d){
+                        myToolTip.hide(d); 
+                        onMouseout(d);
+                    })
                     .style({
                         opacity: 0,//       (d, i) => {return functor(this._itemOpacity, d, i);}, // Re-sets the opacity of the circle                    
                         stroke:         (d, i) => {return functor(this._itemFill, d, i);}, // use the same fill as the item (i.e. the line).

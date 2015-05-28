@@ -10117,11 +10117,12 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.5';
+    ninjaPixel.version = '0.0.6';
 
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
+        Category[Category["treemap"] = 2] = "treemap";
     })(ninjaPixel.Category || (ninjaPixel.Category = {}));
     var Category = ninjaPixel.Category;
 
@@ -10175,15 +10176,20 @@ var ninjaPixel;
             this._chartWidth = this._getChartWidth();
 
             if (!this._svg) {
-                this._svg = _selection.append('svg').classed('ninja-chart', true);
-                var container = this._svg.append('g').classed('ninja-containerGroup', true);
-                container.append('g').classed('ninja-horizontalGrid', true);
-                container.append('g').classed('ninja-verticalGrid', true);
-                container.append('g').classed('ninja-chartGroup', true);
-                container.append('g').classed('ninja-horizontalGridTopping', true);
-                container.append('g').classed('ninja-verticalGridTopping', true);
-                container.append('g').classed('ninja-xAxisGroup ninja-axis', true);
-                container.append('g').classed('ninja-yAxisGroup ninja-axis', true);
+                if (this._category == 2 /* treemap */) {
+                    this._svg = _selection.append('div').classed('ninja-treemap', true);
+                    var container = this._svg.append('div').classed('ninja-containerGroup', true);
+                } else {
+                    this._svg = _selection.append('svg').classed('ninja-chart', true);
+                    var container = this._svg.append('g').classed('ninja-containerGroup', true);
+                    container.append('g').classed('ninja-horizontalGrid', true);
+                    container.append('g').classed('ninja-verticalGrid', true);
+                    container.append('g').classed('ninja-chartGroup', true);
+                    container.append('g').classed('ninja-horizontalGridTopping', true);
+                    container.append('g').classed('ninja-verticalGridTopping', true);
+                    container.append('g').classed('ninja-xAxisGroup ninja-axis', true);
+                    container.append('g').classed('ninja-yAxisGroup ninja-axis', true);
+                }
             }
 
             this._svg.transition().attr({
@@ -10195,7 +10201,7 @@ var ninjaPixel;
                 this._svg.select('.ninja-containerGroup').attr({
                     transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth / 2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight / 2)) + ')'
                 });
-            } else if (this._category == 0 /* xy */) {
+            } else if (this._category == 0 /* xy */ || this._category == 2 /* treemap */) {
                 this._svg.select('.ninja-containerGroup').attr({
                     transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
                 });
@@ -11296,6 +11302,9 @@ var ninjaPixel;
             var _this = this;
             var functor = this._functor;
             this._init(_selection);
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
 
             function getMinDate(theData) {
                 return d3.min(theData, function (d) {
@@ -11460,11 +11469,17 @@ var ninjaPixel;
                     return functor(_this._transitionDuration, d, i);
                 }).ease('linear').style('opacity', 0).remove();
 
-                var lineSvg = _this._svg.select('.ninja-chartGroup').selectAll('path.line').data(_data, function (d) {
+                var lineSvg = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('path.line').data(_data, function (d) {
                     return d.name;
                 });
 
-                lineSvg.enter().append('svg:path').attr('class', 'line').style({
+                lineSvg.enter().append('svg:path').attr('class', 'line').on('mouseover', function (d) {
+                    myToolTip.show(d);
+                    onMouseover(d);
+                }).on('mouseout', function (d) {
+                    myToolTip.hide(d);
+                    onMouseout(d);
+                }).style({
                     opacity: 0,
                     stroke: function (d, i) {
                         return functor(_this._itemFill, d, i);
@@ -11897,4 +11912,60 @@ var ninjaPixel;
         return Lollipop;
     })(ninjaPixel.BarChart);
     ninjaPixel.Lollipop = Lollipop;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Treemap = (function (_super) {
+        __extends(Treemap, _super);
+        function Treemap() {
+            _super.call(this);
+        }
+        Treemap.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection, 2 /* treemap */);
+
+            function position() {
+                this.style('left', function (d) {
+                    return d.x + 'px';
+                }).style('top', function (d) {
+                    return d.y + 'px';
+                }).style('width', function (d) {
+                    return Math.max(0, d.dx - 1) + 'px';
+                }).style('height', function (d) {
+                    return Math.max(0, d.dy - 1) + 'px';
+                });
+            }
+            var color = d3.scale.category20c();
+
+            _selection.each(function (_data) {
+                var treemapLayout = d3.layout.treemap().size([_this._chartWidth, _this._chartHeight]).sticky(true).value(function (d) {
+                    return d.size;
+                });
+
+                var treemap = _this._svg.select('.ninja-containerGroup').append('div').style('position', 'relative').datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
+
+                treemap.enter().append('div').attr('class', 'treemap-node').call(position).style('background', function (d) {
+                    var bgColor = d.children ? color(d.name) : null;
+                    return bgColor;
+                }).text(function (d) {
+                    return d.children ? null : d.name;
+                });
+
+                var value = function (d) {
+                    return d.size;
+                };
+
+                treemap.transition().duration(_this._transitionDuration).call(position);
+            });
+        };
+        return Treemap;
+    })(ninjaPixel.Chart);
+    ninjaPixel.Treemap = Treemap;
 })(ninjaPixel || (ninjaPixel = {}));

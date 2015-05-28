@@ -2211,18 +2211,15 @@ var ninjaPixel;
             var _this = this;
             this._init(_selection, 2 /* treemap */);
             var functor = this._functor;
-            function position() {
-                this.style('left', function (d) {
-                    return d.x + 'px';
-                }).style('top', function (d) {
-                    return d.y + 'px';
-                }).style('width', function (d) {
-                    return Math.max(0, d.dx - 1) + 'px';
-                }).style('height', function (d) {
-                    return Math.max(0, d.dy - 1) + 'px';
-                });
-            }
-            var color = d3.scale.category20c();
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            var onClick = this._onClick;
+            var mouseOverOpacity = this._mouseOverItemOpacity;
+            var defaultOpacity = this._itemOpacity;
+            var mouseOverStroke = this._mouseOverItemStroke;
+            var defaultStroke = this._itemStroke;
+            var barFill = this._itemFill;
 
             _selection.each(function (_data) {
                 var treemapLayout = d3.layout.treemap().size([_this._chartWidth, _this._chartHeight]).sticky(true).value(function (d) {
@@ -2231,7 +2228,32 @@ var ninjaPixel;
 
                 var treemap = _this._svg.select('.ninja-chartGroup').datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
 
-                treemap.enter().append('rect').attr('class', 'treemap-node').call(position).attr({
+                treemap.enter().append('rect').attr('class', 'treemap-node').attr({
+                    x: function (d) {
+                        return d.x;
+                    },
+                    width: function (d) {
+                        return Math.max(0, d.dx - 1);
+                    },
+                    y: function (d) {
+                        return d.y;
+                    },
+                    height: 0,
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    }
+                }).style({
+                    opacity: function (d, i) {
+                        return functor(defaultOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(defaultStroke, d, i);
+                    }
+                }).text(function (d) {
+                    return d.children ? null : d.name;
+                });
+
+                treemap.transition().duration(_this._transitionDuration).attr({
                     x: function (d) {
                         return d.x;
                     },
@@ -2247,14 +2269,14 @@ var ninjaPixel;
                     fill: function (d, i) {
                         return functor(_this._itemFill, d, i);
                     }
-                }).style('fill', function (d) {
-                    var bgColor = d.children ? color(d.name) : null;
-                    return bgColor;
-                }).text(function (d) {
-                    return d.children ? null : d.name;
+                }).style({
+                    opacity: function (d, i) {
+                        return functor(defaultOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(defaultStroke, d, i);
+                    }
                 });
-
-                treemap.transition().duration(_this._transitionDuration).call(position);
             });
         };
         return Treemap;

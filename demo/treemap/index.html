@@ -75,6 +75,7 @@ form {
             right: 40
         })
     .transitionEase('linear')
+    .itemStroke('white')
     .height(500)    
     .width(800);
     
@@ -852,7 +853,7 @@ ready();
                     }]
                 };
 
-
+        var color = d3.scale.category20c();
         chart.plot(d3.select("#chart")
             .datum(data));
     }

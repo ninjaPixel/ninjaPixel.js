@@ -11,22 +11,18 @@ module ninjaPixel{
         plot(_selection) {
             this._init(_selection, Category.treemap);
             var functor = this._functor;
-            function position() {
-                
-                this.style('left', function(d) {
-                        return d.x + 'px';
-                    })
-                    .style('top', function(d) {
-                        return d.y + 'px';
-                    })
-                    .style('width', function(d) {
-                        return Math.max(0, d.dx - 1) + 'px';
-                    })
-                    .style('height', function(d) {
-                        return Math.max(0, d.dy - 1) + 'px';
-                    });
-            }
-            var color = d3.scale.category20c();
+            var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            var onClick = this._onClick;
+            var mouseOverOpacity: any = this._mouseOverItemOpacity;
+            var defaultOpacity: any = this._itemOpacity;
+            var mouseOverStroke = this._mouseOverItemStroke;
+            var defaultStroke = this._itemStroke;
+            var barFill = this._itemFill;
+
+
+            
 
             _selection.each((_data) => {
                 
@@ -49,17 +45,17 @@ module ninjaPixel{
         
                 treemap.enter().append('rect')
                     .attr('class', 'treemap-node')
-                    .call(position)
+//                    .call(position)
                     .attr({
                         x: (d) => { return d.x;},
                         width: (d) => { return Math.max(0, d.dx - 1);},
                         y: (d) => { return d.y;},
-                        height: (d) => { return Math.max(0, d.dy - 1);},
+                        height: 0,
                         fill: (d, i) => {return functor(this._itemFill, d, i);}
                     })
-                    .style('fill', function(d) {
-                        var bgColor =  d.children ? color(d.name) : null;
-                        return bgColor;
+                    .style({
+                        opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
+                        stroke:  (d,i) => {return functor(defaultStroke, d, i);}
                     })
                     .text(function(d) {
                         return d.children ? null : d.name;
@@ -67,7 +63,18 @@ module ninjaPixel{
 
                 treemap.transition()
                     .duration(this._transitionDuration)
-                    .call(position);
+                    .attr({
+                        x: (d) => { return d.x;},
+                        width: (d) => { return Math.max(0, d.dx - 1);},
+                        y: (d) => { return d.y;},
+                        height: (d) => { return Math.max(0, d.dy - 1);},
+                        fill: (d, i) => {return functor(this._itemFill, d, i);}
+                    })
+                    .style({
+                        opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
+                        stroke:  (d,i) => {return functor(defaultStroke, d, i);}
+                    })
+//                    .call(position);
                 
             });
         }

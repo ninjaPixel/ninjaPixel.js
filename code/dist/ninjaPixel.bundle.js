@@ -9518,7 +9518,7 @@
       var content = html.apply(this, args),
           poffset = offset.apply(this, args),
           dir     = direction.apply(this, args),
-          nodel   = d3.select(node),
+          nodel   = getNodeEl(),
           i       = directions.length,
           coords,
           scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
@@ -9543,7 +9543,7 @@
     //
     // Returns a tip
     tip.hide = function() {
-      var nodel = d3.select(node)
+      var nodel = getNodeEl()
       nodel.transition()
         .duration(transitionDuration)
         .style({ opacity: 0, 'pointer-events': 'none' });
@@ -9559,10 +9559,10 @@
     // Returns tip or attribute value
     tip.attr = function(n, v) {
       if (arguments.length < 2 && typeof n === 'string') {
-        return d3.select(node).attr(n)
+        return getNodeEl().attr(n)
       } else {
         var args =  Array.prototype.slice.call(arguments)
-        d3.selection.prototype.attr.apply(d3.select(node), args)
+        d3.selection.prototype.attr.apply(getNodeEl(), args)
       }
 
       return tip
@@ -9576,10 +9576,10 @@
     // Returns tip or style property value
     tip.style = function(n, v) {
       if (arguments.length < 2 && typeof n === 'string') {
-        return d3.select(node).style(n)
+        return getNodeEl().style(n)
       } else {
         var args =  Array.prototype.slice.call(arguments)
-        d3.selection.prototype.style.apply(d3.select(node), args)
+        d3.selection.prototype.style.apply(getNodeEl(), args)
       }
 
       return tip
@@ -9632,6 +9632,17 @@
       transitionDuration = v 
 
       return tip
+    }
+
+    // Public: destroys the tooltip and removes it from the DOM
+    //
+    // Returns a tip
+    tip.destroy = function() {
+      if(node) {
+        getNodeEl().remove();
+        node = null;
+      }
+      return tip;
     }
     
     function d3_tip_direction() { return 'n' }
@@ -9734,6 +9745,15 @@
         return el
 
       return el.ownerSVGElement
+    }
+
+    function getNodeEl() {
+      if(node === null) {
+        node = initNode();
+        // re-add node to DOM
+        document.body.appendChild(node);
+      };
+      return d3.select(node);
     }
 
     // Private - gets the screen coordinates of a shape
@@ -9841,7 +9861,7 @@
       var content = html.apply(this, args),
           poffset = offset.apply(this, args),
           dir     = direction.apply(this, args),
-          nodel   = d3.select(node),
+          nodel   = getNodeEl(),
           i       = directions.length,
           coords,
           scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
@@ -9866,7 +9886,7 @@
     //
     // Returns a tip
     tip.hide = function() {
-      var nodel = d3.select(node)
+      var nodel = getNodeEl()
       nodel.transition()
         .duration(transitionDuration)
         .style({ opacity: 0, 'pointer-events': 'none' });
@@ -9882,10 +9902,10 @@
     // Returns tip or attribute value
     tip.attr = function(n, v) {
       if (arguments.length < 2 && typeof n === 'string') {
-        return d3.select(node).attr(n)
+        return getNodeEl().attr(n)
       } else {
         var args =  Array.prototype.slice.call(arguments)
-        d3.selection.prototype.attr.apply(d3.select(node), args)
+        d3.selection.prototype.attr.apply(getNodeEl(), args)
       }
 
       return tip
@@ -9899,10 +9919,10 @@
     // Returns tip or style property value
     tip.style = function(n, v) {
       if (arguments.length < 2 && typeof n === 'string') {
-        return d3.select(node).style(n)
+        return getNodeEl().style(n)
       } else {
         var args =  Array.prototype.slice.call(arguments)
-        d3.selection.prototype.style.apply(d3.select(node), args)
+        d3.selection.prototype.style.apply(getNodeEl(), args)
       }
 
       return tip
@@ -9955,6 +9975,17 @@
       transitionDuration = v 
 
       return tip
+    }
+
+    // Public: destroys the tooltip and removes it from the DOM
+    //
+    // Returns a tip
+    tip.destroy = function() {
+      if(node) {
+        getNodeEl().remove();
+        node = null;
+      }
+      return tip;
     }
     
     function d3_tip_direction() { return 'n' }
@@ -10059,6 +10090,15 @@
       return el.ownerSVGElement
     }
 
+    function getNodeEl() {
+      if(node === null) {
+        node = initNode();
+        // re-add node to DOM
+        document.body.appendChild(node);
+      };
+      return d3.select(node);
+    }
+
     // Private - gets the screen coordinates of a shape
     //
     // Given a shape on the screen, will return an SVGPoint for the directions
@@ -10123,6 +10163,7 @@ var ninjaPixel;
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
         Category[Category["treemap"] = 2] = "treemap";
+        Category[Category["simpleTreemap"] = 3] = "simpleTreemap";
     })(ninjaPixel.Category || (ninjaPixel.Category = {}));
     var Category = ninjaPixel.Category;
 
@@ -10176,7 +10217,7 @@ var ninjaPixel;
             this._chartWidth = this._getChartWidth();
 
             if (!this._svg) {
-                if (this._category == 2 /* treemap */) {
+                if (this._category == 3 /* simpleTreemap */) {
                     this._svg = _selection.append('div').classed('ninja-treemap', true);
                     var container = this._svg.append('div').classed('ninja-containerGroup', true);
                 } else {
@@ -10201,7 +10242,7 @@ var ninjaPixel;
                 this._svg.select('.ninja-containerGroup').attr({
                     transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth / 2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight / 2)) + ')'
                 });
-            } else if (this._category == 0 /* xy */ || this._category == 2 /* treemap */) {
+            } else if (this._category == 0 /* xy */ || this._category == 2 /* treemap */ || this._category == 3 /* simpleTreemap */) {
                 this._svg.select('.ninja-containerGroup').attr({
                     transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
                 });
@@ -11922,14 +11963,14 @@ var __extends = this.__extends || function (d, b) {
 };
 var ninjaPixel;
 (function (ninjaPixel) {
-    var Treemap = (function (_super) {
-        __extends(Treemap, _super);
-        function Treemap() {
+    var SimpleTreemap = (function (_super) {
+        __extends(SimpleTreemap, _super);
+        function SimpleTreemap() {
             _super.call(this);
         }
-        Treemap.prototype.plot = function (_selection) {
+        SimpleTreemap.prototype.plot = function (_selection) {
             var _this = this;
-            this._init(_selection, 2 /* treemap */);
+            this._init(_selection, 3 /* simpleTreemap */);
 
             function position() {
                 this.style('left', function (d) {
@@ -11958,9 +11999,73 @@ var ninjaPixel;
                     return d.children ? null : d.name;
                 });
 
-                var value = function (d) {
+                treemap.transition().duration(_this._transitionDuration).call(position);
+            });
+        };
+        return SimpleTreemap;
+    })(ninjaPixel.Chart);
+    ninjaPixel.SimpleTreemap = SimpleTreemap;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Treemap = (function (_super) {
+        __extends(Treemap, _super);
+        function Treemap() {
+            _super.call(this);
+        }
+        Treemap.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection, 2 /* treemap */);
+            var functor = this._functor;
+            function position() {
+                this.style('left', function (d) {
+                    return d.x + 'px';
+                }).style('top', function (d) {
+                    return d.y + 'px';
+                }).style('width', function (d) {
+                    return Math.max(0, d.dx - 1) + 'px';
+                }).style('height', function (d) {
+                    return Math.max(0, d.dy - 1) + 'px';
+                });
+            }
+            var color = d3.scale.category20c();
+
+            _selection.each(function (_data) {
+                var treemapLayout = d3.layout.treemap().size([_this._chartWidth, _this._chartHeight]).sticky(true).value(function (d) {
                     return d.size;
-                };
+                });
+
+                var treemap = _this._svg.select('.ninja-chartGroup').datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
+
+                treemap.enter().append('rect').attr('class', 'treemap-node').call(position).attr({
+                    x: function (d) {
+                        return d.x;
+                    },
+                    width: function (d) {
+                        return Math.max(0, d.dx - 1);
+                    },
+                    y: function (d) {
+                        return d.y;
+                    },
+                    height: function (d) {
+                        return Math.max(0, d.dy - 1);
+                    },
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    }
+                }).style('fill', function (d) {
+                    var bgColor = d.children ? color(d.name) : null;
+                    return bgColor;
+                }).text(function (d) {
+                    return d.children ? null : d.name;
+                });
 
                 treemap.transition().duration(_this._transitionDuration).call(position);
             });

@@ -48,7 +48,7 @@
       var content = html.apply(this, args),
           poffset = offset.apply(this, args),
           dir     = direction.apply(this, args),
-          nodel   = d3.select(node),
+          nodel   = getNodeEl(),
           i       = directions.length,
           coords,
           scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
@@ -73,7 +73,7 @@
     //
     // Returns a tip
     tip.hide = function() {
-      var nodel = d3.select(node)
+      var nodel = getNodeEl()
       nodel.transition()
         .duration(transitionDuration)
         .style({ opacity: 0, 'pointer-events': 'none' });
@@ -89,10 +89,10 @@
     // Returns tip or attribute value
     tip.attr = function(n, v) {
       if (arguments.length < 2 && typeof n === 'string') {
-        return d3.select(node).attr(n)
+        return getNodeEl().attr(n)
       } else {
         var args =  Array.prototype.slice.call(arguments)
-        d3.selection.prototype.attr.apply(d3.select(node), args)
+        d3.selection.prototype.attr.apply(getNodeEl(), args)
       }
 
       return tip
@@ -106,10 +106,10 @@
     // Returns tip or style property value
     tip.style = function(n, v) {
       if (arguments.length < 2 && typeof n === 'string') {
-        return d3.select(node).style(n)
+        return getNodeEl().style(n)
       } else {
         var args =  Array.prototype.slice.call(arguments)
-        d3.selection.prototype.style.apply(d3.select(node), args)
+        d3.selection.prototype.style.apply(getNodeEl(), args)
       }
 
       return tip
@@ -162,6 +162,17 @@
       transitionDuration = v 
 
       return tip
+    }
+
+    // Public: destroys the tooltip and removes it from the DOM
+    //
+    // Returns a tip
+    tip.destroy = function() {
+      if(node) {
+        getNodeEl().remove();
+        node = null;
+      }
+      return tip;
     }
     
     function d3_tip_direction() { return 'n' }
@@ -264,6 +275,15 @@
         return el
 
       return el.ownerSVGElement
+    }
+
+    function getNodeEl() {
+      if(node === null) {
+        node = initNode();
+        // re-add node to DOM
+        document.body.appendChild(node);
+      };
+      return d3.select(node);
     }
 
     // Private - gets the screen coordinates of a shape

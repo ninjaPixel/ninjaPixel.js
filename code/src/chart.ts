@@ -24,7 +24,8 @@ module ninjaPixel{
     export enum Category {
         xy = 0,
         donut = 1 ,
-        treemap =2
+        treemap =2,
+        simpleTreemap =3
     }
     
     export class Chart {
@@ -103,7 +104,7 @@ module ninjaPixel{
 
              if(!this._svg){
                  
-                 if(this._category == Category.treemap){
+                 if(this._category == Category.simpleTreemap){
                      this._svg = _selection
                         .append('div')
                         .classed('ninja-treemap', true);
@@ -133,7 +134,7 @@ module ninjaPixel{
                     .attr({
                         transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth/2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight/2)) + ')'
                 });
-            } else if (this._category == Category.xy || this._category == Category.treemap) {
+            } else if (this._category == Category.xy || this._category == Category.treemap || this._category == Category.simpleTreemap) {
             this._svg.select('.ninja-containerGroup')
                 .attr({
                     transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'

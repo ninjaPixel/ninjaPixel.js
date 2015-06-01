@@ -14,7 +14,7 @@
         color: #fff;
         border-radius: 2px;
         font: 12px sans-serif;
-        width: 100px;
+/*        width: 100px;*/
     }
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
@@ -37,16 +37,9 @@
     
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin: auto;
-  position: relative;
-  width: 960px;
 }
 
-form {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
+
 
 .treemap-node {
   border: solid 1px white;
@@ -77,14 +70,38 @@ form {
     .transitionEase('linear')
     .itemStroke('white')
     .height(500)    
-    .width(800);
+    .width(800)
     
-//    .mouseOverItemOpacity(function(d,i){return d.opacity;});
+    .nodeText(function(d,i){
+        var text = '';
+        text = d.children ? null : d.name;
+        if(d.size < 18000){
+            text = '';
+        }
+        return text;
+    })
+    .itemFill(function(d, i){
+        
+        var parentColor = function(d){
+         if(d.itemColor){
+          return d.itemColor;   
+         } else if(d.parent){
+          return parentColor(d.parent);   
+         } else {
+             return 'gray';
+         }
+        }
+        
+        return parentColor(d);
+
+    })
+    .itemTextLabelColor('white');
+
     
-//    var toolTip = chart.toolTip();
-//    toolTip.html(function(d){return '<i>'+d.name + '</i><br/>'+ d.size})
-//        .offset([-40,0]);
-//    chart.toolTip(toolTip);
+    var toolTip = chart.toolTip();
+    toolTip.html(function(d){return '<i>'+d.name + '</i><br/> Size: '+ d.size})
+        .offset([0,0]);
+    chart.toolTip(toolTip);
     
     
 
@@ -854,6 +871,15 @@ ready();
                 };
 
         var color = d3.scale.category20c();
+        
+        // color the groups
+        var i=0;
+        data.children.forEach(function(d){
+            var thisColour = color(i);
+            i++;
+            d.itemColor = thisColour;
+        });
+        
         chart.plot(d3.select("#chart")
             .datum(data));
     }

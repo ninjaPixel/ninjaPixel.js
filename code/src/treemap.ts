@@ -8,6 +8,33 @@ module ninjaPixel{
             super();
         }
         
+        private _nodeText: any = '';
+        nodeText(_x): any{
+            if (!arguments.length) return this._nodeText;
+            this._nodeText = _x;
+            return this;
+        }    
+        
+        private _itemFontSize: any = '8px';
+        itemFontSize(_x): any{
+            if (!arguments.length) return this._itemFontSize;
+            this._itemFontSize = _x;
+            return this;
+        } 
+        
+        private _itemTextOffsetLeft: any = 1;
+        itemTextOffsetLeft(_x): any{
+            if (!arguments.length) return this._itemTextOffsetLeft;
+            this._itemTextOffsetLeft = _x;
+            return this;
+        } 
+    private _itemTextOffsetTop:any = 10;
+        itemTextOffsetTop(_x): any{
+            if (!arguments.length) return this._itemTextOffsetTop;
+            this._itemTextOffsetTop = _x;
+            return this;
+        } 
+        
         plot(_selection) {
             this._init(_selection, Category.treemap);
             var functor = this._functor;
@@ -19,8 +46,11 @@ module ninjaPixel{
             var defaultOpacity: any = this._itemOpacity;
             var mouseOverStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;
-
+            var nodeFill = this._itemFill;
+            var nodeText = this._nodeText;
+            var fontSize = this._itemFontSize;
+            var nodeTextOffsetLeft = this._itemTextOffsetLeft;
+            var nodeTextOffsetTop = this._itemTextOffsetTop;
 
             
 
@@ -34,34 +64,49 @@ module ninjaPixel{
                         return d.size;
                     });
                 
-                var treemap = this._svg.select('.ninja-chartGroup')
-//                    .append('div')
-//                    .style('position', 'relative')
-//                    .call(myToolTip)
+                var treemapNode = this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
                     .datum(_data)
                     .selectAll('.treemap-node')                        
                     .data(treemapLayout.nodes);
                 
         
-                treemap.enter().append('rect')
+                treemapNode.enter().append('rect')
                     .attr('class', 'treemap-node')
-//                    .call(position)
                     .attr({
                         x: (d) => { return d.x;},
                         width: (d) => { return Math.max(0, d.dx - 1);},
                         y: (d) => { return d.y;},
                         height: 0,
-                        fill: (d, i) => {return functor(this._itemFill, d, i);}
+                        fill: (d, i) => {return functor(nodeFill, d, i);}
                     })
                     .style({
                         opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
                         stroke:  (d,i) => {return functor(defaultStroke, d, i);}
                     })
-                    .text(function(d) {
-                        return d.children ? null : d.name;
+                    .on('mouseover', function (d, i) {
+                        d3.select(this)
+                            .style({
+                                opacity: (d, i) => { return functor(mouseOverOpacity, d, i);},
+                                stroke:  (d,i) => {return functor(mouseOverStroke, d, i);}
+                            });
+                        myToolTip.show(d); 
+                        onMouseover(d);
+                    })
+                    .on('mouseout', function (d, i) {
+                        d3.select(this)
+                            .style({
+                                opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
+                                stroke:  (d,i) => {return functor(defaultStroke, d, i);}
+                            });
+                        myToolTip.hide();
+                        onMouseout(d);
+                    })
+                    .on('click', function (d, i) {
+                        onClick(d);
                     });
 
-                treemap.transition()
+                treemapNode.transition()
                     .duration(this._transitionDuration)
                     .attr({
                         x: (d) => { return d.x;},
@@ -73,8 +118,56 @@ module ninjaPixel{
                     .style({
                         opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
                         stroke:  (d,i) => {return functor(defaultStroke, d, i);}
+                    });                
+                
+                
+                                var treemapNode = this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .datum(_data)
+                    .selectAll('.treemap-node')                        
+                    .data(treemapLayout.nodes);
+                
+        
+                
+                var treemapText = this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .datum(_data)
+                    .selectAll('.treemap-text')                        
+                    .data(treemapLayout.nodes);
+                
+                treemapText.enter().append('text')
+                    .attr('class', 'treemap-text')
+                    .attr({
+                        fill: (d, i) => {return functor(this._itemTextLabelColor, d, i);},
                     })
-//                    .call(position);
+                    .style({
+                        opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
+                    })
+                    .on('mouseover', function (d, i) {
+                        d3.select(this)
+                        myToolTip.show(d); 
+                        onMouseover(d);
+                    })
+                    .on('mouseout', function (d, i) {
+                        d3.select(this)
+                        myToolTip.hide();
+                        onMouseout(d);
+                    })
+                    .on('click', function (d, i) {
+                        onClick(d);
+                    });
+
+                treemapText.transition()
+                    .duration(this._transitionDuration)
+                    .attr({
+                        x: (d, i) => { return d.x + functor(nodeTextOffsetLeft, d, i);},
+                        y: (d, i) => { return d.y + functor(nodeTextOffsetTop, d, i);},
+                        'font-size': (d, i) => { return functor(fontSize, d, i);}
+                    })
+                    .text(function(d, i) {
+                        return functor(nodeText, d, i);
+                    }); 
+                
                 
             });
         }

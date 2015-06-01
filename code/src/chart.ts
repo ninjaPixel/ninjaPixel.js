@@ -90,6 +90,7 @@ module ninjaPixel{
         _chartHeight: number;
         _chartWidth: number;
         _category: Category;
+        _itemTextLabelColor: any;
 
         constructor() {
 
@@ -469,6 +470,11 @@ module ninjaPixel{
         itemStroke(_x): any {
             if (!arguments.length) return this._itemStroke;
             this._itemStroke = _x;
+            return this;
+        }        
+        itemTextLabelColor(_x): any {
+            if (!arguments.length) return this._itemTextLabelColor;
+            this._itemTextLabelColor = _x;
             return this;
         }
         itemStrokeWidth(_x): any {

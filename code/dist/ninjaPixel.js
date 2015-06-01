@@ -677,6 +677,12 @@ var ninjaPixel;
             this._itemStroke = _x;
             return this;
         };
+        Chart.prototype.itemTextLabelColor = function (_x) {
+            if (!arguments.length)
+                return this._itemTextLabelColor;
+            this._itemTextLabelColor = _x;
+            return this;
+        };
         Chart.prototype.itemStrokeWidth = function (_x) {
             if (!arguments.length)
                 return this._itemStrokeWidth;
@@ -2206,7 +2212,39 @@ var ninjaPixel;
         __extends(Treemap, _super);
         function Treemap() {
             _super.call(this);
+            this._nodeText = '';
+            this._itemFontSize = '8px';
+            this._itemTextOffsetLeft = 1;
+            this._itemTextOffsetTop = 10;
         }
+        Treemap.prototype.nodeText = function (_x) {
+            if (!arguments.length)
+                return this._nodeText;
+            this._nodeText = _x;
+            return this;
+        };
+
+        Treemap.prototype.itemFontSize = function (_x) {
+            if (!arguments.length)
+                return this._itemFontSize;
+            this._itemFontSize = _x;
+            return this;
+        };
+
+        Treemap.prototype.itemTextOffsetLeft = function (_x) {
+            if (!arguments.length)
+                return this._itemTextOffsetLeft;
+            this._itemTextOffsetLeft = _x;
+            return this;
+        };
+
+        Treemap.prototype.itemTextOffsetTop = function (_x) {
+            if (!arguments.length)
+                return this._itemTextOffsetTop;
+            this._itemTextOffsetTop = _x;
+            return this;
+        };
+
         Treemap.prototype.plot = function (_selection) {
             var _this = this;
             this._init(_selection, 2 /* treemap */);
@@ -2219,16 +2257,20 @@ var ninjaPixel;
             var defaultOpacity = this._itemOpacity;
             var mouseOverStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;
+            var nodeFill = this._itemFill;
+            var nodeText = this._nodeText;
+            var fontSize = this._itemFontSize;
+            var nodeTextOffsetLeft = this._itemTextOffsetLeft;
+            var nodeTextOffsetTop = this._itemTextOffsetTop;
 
             _selection.each(function (_data) {
                 var treemapLayout = d3.layout.treemap().size([_this._chartWidth, _this._chartHeight]).sticky(true).value(function (d) {
                     return d.size;
                 });
 
-                var treemap = _this._svg.select('.ninja-chartGroup').datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
+                var treemapNode = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
 
-                treemap.enter().append('rect').attr('class', 'treemap-node').attr({
+                treemapNode.enter().append('rect').attr('class', 'treemap-node').attr({
                     x: function (d) {
                         return d.x;
                     },
@@ -2240,7 +2282,7 @@ var ninjaPixel;
                     },
                     height: 0,
                     fill: function (d, i) {
-                        return functor(_this._itemFill, d, i);
+                        return functor(nodeFill, d, i);
                     }
                 }).style({
                     opacity: function (d, i) {
@@ -2249,11 +2291,33 @@ var ninjaPixel;
                     stroke: function (d, i) {
                         return functor(defaultStroke, d, i);
                     }
-                }).text(function (d) {
-                    return d.children ? null : d.name;
+                }).on('mouseover', function (d, i) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(mouseOverOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(mouseOverStroke, d, i);
+                        }
+                    });
+                    myToolTip.show(d);
+                    onMouseover(d);
+                }).on('mouseout', function (d, i) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(defaultOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(defaultStroke, d, i);
+                        }
+                    });
+                    myToolTip.hide();
+                    onMouseout(d);
+                }).on('click', function (d, i) {
+                    onClick(d);
                 });
 
-                treemap.transition().duration(_this._transitionDuration).attr({
+                treemapNode.transition().duration(_this._transitionDuration).attr({
                     x: function (d) {
                         return d.x;
                     },
@@ -2276,6 +2340,44 @@ var ninjaPixel;
                     stroke: function (d, i) {
                         return functor(defaultStroke, d, i);
                     }
+                });
+
+                var treemapNode = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
+
+                var treemapText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
+
+                treemapText.enter().append('text').attr('class', 'treemap-text').attr({
+                    fill: function (d, i) {
+                        return functor(_this._itemTextLabelColor, d, i);
+                    }
+                }).style({
+                    opacity: function (d, i) {
+                        return functor(defaultOpacity, d, i);
+                    }
+                }).on('mouseover', function (d, i) {
+                    d3.select(this);
+                    myToolTip.show(d);
+                    onMouseover(d);
+                }).on('mouseout', function (d, i) {
+                    d3.select(this);
+                    myToolTip.hide();
+                    onMouseout(d);
+                }).on('click', function (d, i) {
+                    onClick(d);
+                });
+
+                treemapText.transition().duration(_this._transitionDuration).attr({
+                    x: function (d, i) {
+                        return d.x + functor(nodeTextOffsetLeft, d, i);
+                    },
+                    y: function (d, i) {
+                        return d.y + functor(nodeTextOffsetTop, d, i);
+                    },
+                    'font-size': function (d, i) {
+                        return functor(fontSize, d, i);
+                    }
+                }).text(function (d, i) {
+                    return functor(nodeText, d, i);
                 });
             });
         };

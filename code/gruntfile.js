@@ -3,6 +3,12 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        watch: {
+          typescript: {
+              files: ['src/*.ts', '!src/*.d.ts'],
+              tasks: ['default'],
+          }  
+        },
         concat: {
             options: {
                 //                separator: ';',

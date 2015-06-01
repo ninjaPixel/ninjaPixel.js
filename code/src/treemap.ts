@@ -28,7 +28,7 @@ module ninjaPixel{
             this._itemTextOffsetLeft = _x;
             return this;
         } 
-    private _itemTextOffsetTop:any = 10;
+        private _itemTextOffsetTop:any = 10;
         itemTextOffsetTop(_x): any{
             if (!arguments.length) return this._itemTextOffsetTop;
             this._itemTextOffsetTop = _x;
@@ -121,11 +121,7 @@ module ninjaPixel{
                     });                
                 
                 
-                                var treemapNode = this._svg.select('.ninja-chartGroup')
-                    .call(myToolTip)
-                    .datum(_data)
-                    .selectAll('.treemap-node')                        
-                    .data(treemapLayout.nodes);
+                treemapNode.exit().transition().remove();
                 
         
                 
@@ -168,7 +164,7 @@ module ninjaPixel{
                         return functor(nodeText, d, i);
                     }); 
                 
-                
+                treemapText.exit().transition().remove();
             });
         }
     }

@@ -2342,7 +2342,7 @@ var ninjaPixel;
                     }
                 });
 
-                treemapNode.exit().transition().remove();
+                var treemapNode = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
 
                 var treemapText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
 
@@ -2379,8 +2379,6 @@ var ninjaPixel;
                 }).text(function (d, i) {
                     return functor(nodeText, d, i);
                 });
-
-                treemapText.exit().transition().remove();
             });
         };
         return Treemap;

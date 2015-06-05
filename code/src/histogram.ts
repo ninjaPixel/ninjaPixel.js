@@ -69,7 +69,6 @@ module ninjaPixel{
             var bar = this._svg.select('.ninja-chartGroup')
                 .call(myToolTip)
                 .selectAll('.bars')
-//                .selectAll('.bars')
                 .data(_data);
             
             bar.enter().append('rect')

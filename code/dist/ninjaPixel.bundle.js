@@ -10182,6 +10182,7 @@ var ninjaPixel;
             this._yAxis2Title = '';
             this._xAxisTitle = '';
             this._yAxis1LogScale = false;
+            this._xAxisLogScale = false;
             this._transitionDuration = 300;
             this._transitionEase = 'linear';
             this._transitionDelay = 0;
@@ -10638,6 +10639,12 @@ var ninjaPixel;
             if (!arguments.length)
                 return this._yAxis1LogScale;
             this._yAxis1LogScale = _x;
+            return this;
+        };
+        Chart.prototype.xAxisLogScale = function (_x) {
+            if (!arguments.length)
+                return this._xAxisLogScale;
+            this._xAxisLogScale = _x;
             return this;
         };
         Chart.prototype.transitionEase = function (_x) {
@@ -11157,7 +11164,14 @@ var ninjaPixel;
                     return b.r - a.r;
                 });
 
-                var xScale = d3.scale.linear().domain([minX, maxX]).range([0, _this._chartWidth]);
+                var xScale;
+                if (_this._xAxisLogScale) {
+                    console.log('x log scale');
+                    xScale = d3.scale.log().domain([minX, maxX]);
+                } else {
+                    xScale = d3.scale.linear().domain([minX, maxX]);
+                }
+                xScale.range([0, _this._chartWidth]);
 
                 var yScale = d3.scale.linear().domain([minY, maxY]).range([_this._chartHeight, 0]);
 
@@ -12155,7 +12169,7 @@ var ninjaPixel;
                     }
                 });
 
-                var treemapNode = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
+                treemapNode.exit().transition().remove();
 
                 var treemapText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
 
@@ -12192,6 +12206,8 @@ var ninjaPixel;
                 }).text(function (d, i) {
                     return functor(nodeText, d, i);
                 });
+
+                treemapText.exit().transition().remove();
             });
         };
         return Treemap;

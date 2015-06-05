@@ -59,11 +59,17 @@ module ninjaPixel{
             _data.sort(function (a, b) {
                 return b.r - a.r;
             });  
-                
-            // create the X Y scaling functions
-            var xScale = d3.scale.linear()
-                .domain([minX, maxX])
-                .range([0, this._chartWidth]);
+                                
+            var xScale;
+                if(this._xAxisLogScale){
+                console.log('x log scale');
+                    xScale = d3.scale.log()
+                        .domain([minX, maxX]);
+                }else {
+                    xScale = d3.scale.linear()
+                        .domain([minX, maxX]);
+                }
+                xScale.range([0, this._chartWidth]);
 
             var yScale = d3.scale.linear()
                 .domain([minY, maxY])

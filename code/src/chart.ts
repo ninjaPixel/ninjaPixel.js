@@ -44,6 +44,7 @@ module ninjaPixel{
         _yAxis2Title: string = '';
         _xAxisTitle: string = '';
         _yAxis1LogScale: boolean = false;
+        _xAxisLogScale: boolean = false;
         _transitionDuration: number = 300; 
         _transitionEase: string = 'linear';
         _transitionDelay:any = 0;// function or value
@@ -595,6 +596,11 @@ module ninjaPixel{
         yAxis1LogScale(_x): any {
             if (!arguments.length) return this._yAxis1LogScale;
             this._yAxis1LogScale = _x;
+            return this;
+        }
+        xAxisLogScale(_x): any {
+            if (!arguments.length) return this._xAxisLogScale;
+            this._xAxisLogScale = _x;
             return this;
         }
         transitionEase(_x): any {

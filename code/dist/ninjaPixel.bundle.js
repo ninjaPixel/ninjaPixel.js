@@ -10157,7 +10157,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.6';
+    ninjaPixel.version = '0.0.7';
 
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -10260,12 +10260,18 @@ var ninjaPixel;
                 xAxis.tickSize(-this._chartHeight, 0);
             }
 
-            if (this._xAxisTickFormat != null) {
-                xAxis.tickFormat(this._xAxisTickFormat);
-            }
-
-            if (this._xAxisTicks != null) {
-                xAxis.ticks(this._xAxisTicks);
+            if (!this._xAxisLogScale) {
+                if (this._xAxisTickFormat != null) {
+                    xAxis.tickFormat(this._xAxisTickFormat);
+                }
+                if (this._xAxisTicks != null) {
+                    xAxis.ticks(this._xAxisTicks);
+                }
+            } else {
+                if (this._xAxisTicks === null) {
+                    this._xAxisTicks = 10;
+                }
+                xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
 
             this._svg.select('.ninja-xAxisGroup.ninja-axis').attr({
@@ -10734,6 +10740,41 @@ var ninjaPixel;
         return Chart;
     })();
     ninjaPixel.Chart = Chart;
+    var formatBillionsWithB = function () {
+        var d3_formatPrefixes = ["e-24", "e-21", "e-18", "e-15", "e-12", "e-9", "e-6", "e-3", "", "K", "M", "B", "T", "P", "E", "Z", "Y"].map(d3_formatPrefix);
+
+        d3.formatPrefix = function (value, precision) {
+            var i = 0;
+            if (value) {
+                if (value < 0) {
+                    value *= -1;
+                }
+                if (precision) {
+                    value = d3.round(value, d3_format_precision(value, precision));
+                }
+                i = 1 + Math.floor(1e-12 + Math.log(value) / Math.LN10);
+                i = Math.max(-24, Math.min(24, Math.floor((i - 1) / 3) * 3));
+            }
+            return d3_formatPrefixes[8 + i / 3];
+        };
+
+        function d3_formatPrefix(d, i) {
+            var k = Math.pow(10, Math.abs(8 - i) * 3);
+            return {
+                scale: i > 8 ? function (d) {
+                    return d / k;
+                } : function (d) {
+                    return d * k;
+                },
+                symbol: d
+            };
+        }
+
+        function d3_format_precision(x, p) {
+            return p - (x ? Math.ceil(Math.log(x) / Math.LN10) : 1);
+        }
+    };
+    formatBillionsWithB();
 })(ninjaPixel || (ninjaPixel = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -11139,18 +11180,35 @@ var ninjaPixel;
 
             _selection.each(function (_data) {
                 var minX, maxX, minY, maxY, minR, maxR;
-                minX = d3.min(_data, function (d) {
-                    return d.x;
-                });
-                maxX = d3.max(_data, function (d) {
-                    return d.x;
-                });
-                minY = d3.min(_data, function (d) {
-                    return d.y;
-                });
-                maxY = d3.max(_data, function (d) {
-                    return d.y;
-                });
+                if (_this._xMin) {
+                    minX = _this._xMin;
+                } else {
+                    minX = d3.min(_data, function (d) {
+                        return d.x;
+                    });
+                }
+                if (_this._xMax) {
+                    maxX = _this._xMax;
+                } else {
+                    maxX = d3.max(_data, function (d) {
+                        return d.x;
+                    });
+                }
+                if (_this._y1Min) {
+                    minY = _this._y1Min;
+                } else {
+                    minY = d3.min(_data, function (d) {
+                        return d.y;
+                    });
+                }
+                if (_this._y1Max) {
+                    maxY = _this._y1Max;
+                } else {
+                    maxY = d3.max(_data, function (d) {
+                        return d.y;
+                    });
+                }
+
                 minR = d3.min(_data, function (d) {
                     return d.r;
                 });
@@ -11166,7 +11224,6 @@ var ninjaPixel;
 
                 var xScale;
                 if (_this._xAxisLogScale) {
-                    console.log('x log scale');
                     xScale = d3.scale.log().domain([minX, maxX]);
                 } else {
                     xScale = d3.scale.linear().domain([minX, maxX]);

@@ -32,10 +32,27 @@ module ninjaPixel{
             
             _selection.each((_data) => {
                 var minX, maxX, minY, maxY, minR, maxR;
-                minX = d3.min(_data, (d:bubbleChartDataItem) => {return d.x;});
-                maxX = d3.max(_data, (d:bubbleChartDataItem) => {return d.x;});
-                minY = d3.min(_data, (d:bubbleChartDataItem) => {return d.y;});
-                maxY = d3.max(_data, (d:bubbleChartDataItem) => {return d.y;});
+                if(this._xMin){
+                    minX = this._xMin;   
+                }else{
+                    minX = d3.min(_data, (d:bubbleChartDataItem) => {return d.x;});
+                }
+                if(this._xMax){
+                    maxX = this._xMax;
+                } else{
+                    maxX = d3.max(_data, (d:bubbleChartDataItem) => {return d.x;});   
+                }
+                if(this._y1Min){
+                    minY = this._y1Min;   
+                } else{
+                    minY = d3.min(_data, (d:bubbleChartDataItem) => {return d.y;});
+                }
+                if(this._y1Max){
+                    maxY = this._y1Max;
+                } else {
+                    maxY = d3.max(_data, (d:bubbleChartDataItem) => {return d.y;});
+                }
+                
                 minR = d3.min(_data, (d:bubbleChartDataItem) => {return d.r;});
                 maxR = d3.max(_data, (d:bubbleChartDataItem) => {return d.r;});
             
@@ -62,7 +79,6 @@ module ninjaPixel{
                                 
             var xScale;
                 if(this._xAxisLogScale){
-                console.log('x log scale');
                     xScale = d3.scale.log()
                         .domain([minX, maxX]);
                 }else {

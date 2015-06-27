@@ -159,11 +159,17 @@
         .itemStroke('white')  
         .itemFill(function(d){return d.color;})
         .allowBubblesToSpillOffChart(true)
+        .y1Max(120)
+        .y1Min(0)
+        .xMin(1)
+        .xMax(3000000)
         .itemOpacity(0.5)
         .mouseOverItemOpacity(0.9)
         .mouseOverItemStroke('#333333')
         //.axesOrigin({x:0, y:0})
         .xAxisLogScale(true)
+        .xAxisTickFormat(d3.format('s'))
+        .xAxisTicks(20)
         .xAxisTextTransform('rotate(-90) translate(-10,-13)');
 
     var toolTip = bubbleChart.toolTip();

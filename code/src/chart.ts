@@ -19,7 +19,7 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.6';
+    export var version:string =  '0.0.7';
     
     export enum Category {
         xy = 0,
@@ -165,12 +165,20 @@ module ninjaPixel{
                 xAxis.tickSize(-this._chartHeight, 0);   
             }
 
-            if(this._xAxisTickFormat != null){
-                xAxis.tickFormat(this._xAxisTickFormat); 
-            }
-            
-            if(this._xAxisTicks != null){
-                xAxis.ticks(this._xAxisTicks);   
+            if(!this._xAxisLogScale){
+                if(this._xAxisTickFormat != null){
+                    xAxis.tickFormat(this._xAxisTickFormat); 
+                }            
+                if(this._xAxisTicks != null){
+                    xAxis.ticks(this._xAxisTicks);   
+                }
+            } else{            
+                // NOTE
+                // When using a log scale in conjunction with an axis, you typically want to use axis.ticks rather than axis.tickFormat to take advantage of the log scale’s custom tick format, as in bl.ocks.org/5537697. https://github.com/mbostock/d3/wiki/Quantitative-Scales#linear_tickFormat
+                if(this._xAxisTicks === null){
+                    this._xAxisTicks = 10;
+                }
+                xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
 
             this._svg.select('.ninja-xAxisGroup.ninja-axis')
@@ -675,6 +683,45 @@ module ninjaPixel{
         }
 
     }
-}
+    var formatBillionsWithB = function(){
+        // Change D3's SI prefix to more business friendly units
+        //      K = thousands
+        //      M = millions
+        //      B = billions (not G!)
+        //      T = trillion
+        //      P = quadrillion
+        //      E = quintillion
+        // small decimals are handled with e-n formatting. e-3 rather than 'm' - which looks like a million
+        var d3_formatPrefixes = ["e-24","e-21","e-18","e-15","e-12","e-9","e-6","e-3","","K","M","B","T","P","E","Z","Y"].map(d3_formatPrefix);
 
+        // Override d3's formatPrefix function
+        d3.formatPrefix = function(value, precision) {
+            var i = 0;
+            if (value) {
+                if (value < 0) {
+                    value *= -1;
+                }
+                if (precision) {
+                    value = d3.round(value, d3_format_precision(value, precision));
+                }
+                i = 1 + Math.floor(1e-12 + Math.log(value) / Math.LN10);
+                i = Math.max(-24, Math.min(24, Math.floor((i - 1) / 3) * 3));
+            }
+            return d3_formatPrefixes[8 + i / 3];
+        };
+
+        function d3_formatPrefix(d, i) {
+            var k = Math.pow(10, Math.abs(8 - i) * 3);
+            return {
+                scale: i > 8 ? function(d) { return d / k; } : function(d) { return d * k; },
+                symbol: d
+            };
+        }
+
+        function d3_format_precision(x, p) {
+            return p - (x ? Math.ceil(Math.log(x) / Math.LN10) : 1);
+        }
+    }
+    formatBillionsWithB();
+}
 

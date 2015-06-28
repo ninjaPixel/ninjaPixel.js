@@ -12154,6 +12154,14 @@ var ninjaPixel;
 
                 var treemapNode = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
 
+                var treemapText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
+
+                var drawEmptyTreemap = false;
+                if (_data.area == 0) {
+                    console.log('The data area is 0. Cannot draw a treemap.');
+                    drawEmptyTreemap = true;
+                }
+
                 treemapNode.enter().append('rect').attr('class', 'treemap-node').attr({
                     x: function (d) {
                         return d.x;
@@ -12206,12 +12214,18 @@ var ninjaPixel;
                         return d.x;
                     },
                     width: function (d) {
+                        if (drawEmptyTreemap) {
+                            return 0;
+                        }
                         return Math.max(0, d.dx - 1);
                     },
                     y: function (d) {
                         return d.y;
                     },
                     height: function (d) {
+                        if (drawEmptyTreemap) {
+                            return 0;
+                        }
                         return Math.max(0, d.dy - 1);
                     },
                     fill: function (d, i) {
@@ -12227,8 +12241,6 @@ var ninjaPixel;
                 });
 
                 treemapNode.exit().transition().remove();
-
-                var treemapText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
 
                 treemapText.enter().append('text').attr('class', 'treemap-text').attr({
                     fill: function (d, i) {
@@ -12258,6 +12270,9 @@ var ninjaPixel;
                         return d.y + functor(nodeTextOffsetTop, d, i);
                     },
                     'font-size': function (d, i) {
+                        if (drawEmptyTreemap) {
+                            return 0;
+                        }
                         return functor(fontSize, d, i);
                     }
                 }).text(function (d, i) {

@@ -4,3 +4,4 @@ code/.tscache/
 code/node_modules
 code/src/.baseDir.ts
 code/src/js/
+.settings

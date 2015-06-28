@@ -40,6 +40,7 @@ body {
     <h3>Top Selling Albums</h3>
     <div id="chart"></div>
     <div id="message"></div>
+    <input type="checkbox" id="useNullData" onclick="ready();">Try drawing an empty treemap</input>
     <p>Data from <a href="http://en.wikipedia.org/wiki/List_of_best-selling_albums">wikipedia</a>.</p>
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
@@ -78,8 +79,7 @@ body {
         }        
         return parentColor(d);
     })
-    .itemTextLabelColor('white')
-    .itemTextLabelColor('white')
+    .itemTextLabelColor('light-gray')
     .itemStroke('white')
     .itemStrokeWidth('1px')
     .itemOpacity(1)
@@ -168,7 +168,7 @@ ready();
                 .interpolate(d3.interpolateLab)));
         
         var treemapData = [];
-
+        var useNulls = d3.select('#useNullData').property('checked');
         genres.forEach(function(d) {
             var thisGenre = rawData.filter(function(e) {
                 return e.Genre === d;
@@ -176,6 +176,9 @@ ready();
 
             thisGenre.forEach(function(f) {
                 f.itemColor = color(f.Genre);
+                if(useNulls){
+                    f.size = 0; //testing
+                }
             });
 
             treemapData.push({
@@ -183,6 +186,7 @@ ready();
                 'children': thisGenre
             });
         });
+        
 
         var albumData = {
             'name': 'albums',

@@ -69,13 +69,24 @@ module ninjaPixel{
                     .datum(_data)
                     .selectAll('.treemap-node')                        
                     .data(treemapLayout.nodes);
+
+                var treemapText = this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .datum(_data)
+                    .selectAll('.treemap-text')                        
+                    .data(treemapLayout.nodes);
                 
+                var drawEmptyTreemap = false;
+                if(_data.area==0){
+                    console.log('The data area is 0. Cannot draw a treemap.');
+                    drawEmptyTreemap = true;
+                } 
         
                 treemapNode.enter().append('rect')
                     .attr('class', 'treemap-node')
                     .attr({
                         x: (d) => { return d.x;},
-                        width: (d) => { return Math.max(0, d.dx - 1);},
+                        width: (d) => { return Math.max(0, d.dx - 1);},                  
                         y: (d) => { return d.y;},
                         height: 0,
                         fill: (d, i) => {return functor(nodeFill, d, i);}
@@ -110,9 +121,19 @@ module ninjaPixel{
                     .duration(this._transitionDuration)
                     .attr({
                         x: (d) => { return d.x;},
-                        width: (d) => { return Math.max(0, d.dx - 1);},
+                        width: (d) => { 
+                                if(drawEmptyTreemap){
+                                    return 0;
+                                }
+                                return Math.max(0, d.dx - 1);
+                            },
                         y: (d) => { return d.y;},
-                        height: (d) => { return Math.max(0, d.dy - 1);},
+                        height: (d) => { 
+                                if(drawEmptyTreemap){
+                                    return 0;
+                                }
+                                return Math.max(0, d.dy - 1);
+                        },                        
                         fill: (d, i) => {return functor(this._itemFill, d, i);}
                     })
                     .style({
@@ -125,11 +146,6 @@ module ninjaPixel{
                 
         
                 
-                var treemapText = this._svg.select('.ninja-chartGroup')
-                    .call(myToolTip)
-                    .datum(_data)
-                    .selectAll('.treemap-text')                        
-                    .data(treemapLayout.nodes);
                 
                 treemapText.enter().append('text')
                     .attr('class', 'treemap-text')
@@ -158,13 +174,19 @@ module ninjaPixel{
                     .attr({
                         x: (d, i) => { return d.x + functor(nodeTextOffsetLeft, d, i);},
                         y: (d, i) => { return d.y + functor(nodeTextOffsetTop, d, i);},
-                        'font-size': (d, i) => { return functor(fontSize, d, i);}
+                        'font-size': (d, i) => { 
+                                if(drawEmptyTreemap){
+                                    return 0;
+                                }
+                                return functor(fontSize, d, i);
+                        }
                     })
                     .text(function(d, i) {
                         return functor(nodeText, d, i);
                     }); 
                 
                 treemapText.exit().transition().remove();
+                
             });
         }
     }

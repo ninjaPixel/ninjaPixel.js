@@ -19,7 +19,7 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.7';
+    export var version:string =  '0.0.8';
     
     export enum Category {
         xy = 0,
@@ -38,6 +38,7 @@ module ninjaPixel{
             left: 40,
             right: 5
         };
+        _internalXAxisMargin: number;
         _axesOrigin: axesOriginObject;
         _title: string = '';
         _yAxis1Title: string = '';
@@ -681,8 +682,15 @@ module ninjaPixel{
             this._yAxisTicks = _x;
             return this; 
         }
+        internalXAxisMargin(_x): any{
+           if (!arguments.length) return this._internalXAxisMargin;
+            this._internalXAxisMargin = _x;
+            return this; 
+        }
 
     }
+    
+    
     var formatBillionsWithB = function(){
         // Change D3's SI prefix to more business friendly units
         //      K = thousands

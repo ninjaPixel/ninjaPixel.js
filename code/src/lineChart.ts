@@ -131,14 +131,20 @@ module ninjaPixel{
                 // create the scaling functions
                 var xScale;
                 if (this._isTimeseries) {
-                    xScale = d3.time.scale()
-                        .range([0, this._chartWidth])
-                        .domain([minX, maxX]);
+                    xScale = d3.time.scale();
+//                        .range([0, this._chartWidth])
+//                        .domain([minX, maxX]);
                 } else {
-                    xScale = d3.scale.linear()
-                        .range([0, this._chartWidth])
-                        .domain([minX, maxX]);
-                }            
+                    xScale = d3.scale.linear();
+//                        .range([0, this._chartWidth])
+//                        .domain([minX, maxX]);
+                }                                   
+                if(this._internalXAxisMargin){
+                    xScale.range([0 + this._internalXAxisMargin, this._chartWidth - this._internalXAxisMargin]);
+                } else{
+                    xScale.range([0, this._chartWidth]);
+                }
+                xScale.domain([minX, maxX]);
                 var yScale;
                 if(this._yAxis1LogScale){
                     yScale = d3.scale.log()

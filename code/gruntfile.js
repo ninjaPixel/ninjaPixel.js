@@ -4,10 +4,10 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         watch: {
-          typescript: {
-              files: ['src/*.ts', '!src/*.d.ts'],
-              tasks: ['default'],
-          }  
+            typescript: {
+                files: ['src/*.ts', '!src/*.d.ts'],
+                tasks: ['default'],
+            }
         },
         concat: {
             options: {
@@ -27,24 +27,32 @@ module.exports = function (grunt) {
                 src: ['src/*.ts', '!src/*.d.ts'],
                 options: {
                     declaration: false, // set to true to crete .d.ts files
-                    sourceMap:   false // set to true to create map files
+                    sourceMap: false // set to true to create map files
                 },
                 outDir: 'src/js'
             }
         },
         rename: {
             moveDefinitions: {
-                src:  'src/js/*.d.ts',
+                src: 'src/js/*.d.ts',
                 dest: 'src/typescript_definitions/'
             }
-        }
+        },
+        uglify: {
+            my_target: {
+                files: {
+                    'dist/ninjapixel.bundle.min.js': ['dist/ninjapixel.bundle.js']
+      }
+    }
+  }
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-rename');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task(s).
-    grunt.registerTask('default', ['ts', 'concat']);
+    grunt.registerTask('default', ['ts', 'concat', 'uglify']);
 };

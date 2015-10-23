@@ -28,6 +28,13 @@ module ninjaPixel{
             return this;
         }
         
+        private _barWidth: number;
+        barWidth(_x): any{
+            if (!arguments.length) return this._barWidth;
+            this._barWidth = _x;
+            return this;
+        }
+        
         constructor() {             
             super(); 
         }
@@ -43,7 +50,7 @@ module ninjaPixel{
             var defaultBarOpacity: any = this._itemOpacity;
             var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;
+            var barFill = this._itemFill;            
             function getMinDate(theData) {
                 return d3.min(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
             }
@@ -56,26 +63,23 @@ module ninjaPixel{
 
                 var barW: number;
                 if(barWidth != null){
+                        // set by other functions e.g. lollipop chart
                         barW = barWidth;
-                } else {
+                }
+                if(this._barWidth){
+                    // set by the user
+                    barW = this._barWidth;
+                }
+                else {
                     if(this._isTimeseries){                    
                         barW= 0.9 * this._chartWidth / (_data.length + 1); 
                     }else{
-                        barW = xScale.rangeBand();
+                        barW = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
                     }
                 }
                 var minData:any = 0;
                 var maxData:any = 0;
-            
-                if(this._y1Max != null){
-                  maxData = this._y1Max;  
-                } else{
-                    var d3MaxY = d3.max(_data, (d:barChartDataItem) => d.y);                
-                    if(d3MaxY > 0){
-                        maxData = d3MaxY;   
-                    }
-                }
-                
+                            
                 if(this._y1Min != null){
                     minData = this._y1Min;
                 } else {
@@ -84,6 +88,24 @@ module ninjaPixel{
                         minData = d3MinY;   
                     }
                 }
+                if(this._y1Max != null){
+                  maxData = this._y1Max;  
+                } else{
+                    var d3MaxY = d3.max(_data, (d:barChartDataItem) => d.y);                
+                    if(d3MaxY > 0){
+                        maxData = d3MaxY;   
+                    }
+                    
+                    // if the max and min are the same value, then there is no range for us to plot with.
+                    // only do this when the user hasn't specified the max.
+                    if(maxData === minData){
+                        maxData +=1;
+                    }                                       
+                }
+                
+
+                
+                
                 
             if (this._isTimeseries) {
                 var minX, maxX;
@@ -100,7 +122,7 @@ module ninjaPixel{
 
                 this._xScale = d3.time.scale()
                 .domain([minX, maxX])
-                .range([0+barW, this._chartWidth - barW]);                
+                .range([0+barW, this._chartWidth - barW]);                   
             } else{
                 this._xScale = d3.scale.ordinal()
                     .domain(_data.map(function (d, i) {
@@ -108,6 +130,15 @@ module ninjaPixel{
                     }))
                     .rangeRoundBands([0, this._chartWidth], 0.1);                
             }
+                
+//            if(useEntireXAxis){
+//                // if we are plotting other types of char below this one
+//                // then we will want the x labels to line up
+//                // the bar chart has a buffer at each edge, so that bars don't get cropped
+//                // but this means that the date alignment is different to other chart types
+//                // Fix this with the _useEntireXAxis flag.
+//                this._xScale.range([0, this._chartWidth]);  
+//            }
                 
             this._yScale = d3.scale.linear()
                 .domain([minData, maxData])
@@ -121,10 +152,18 @@ module ninjaPixel{
             var yScale = this._yScale;
             var barScale = this._barScale;
                 
+            if(barW <= 0){    
+                barW = xScale.rangeBand();
+            }
+                
                 
             var barAdjustmentX = 0; 
             if(this._isTimeseries){ 
                 barAdjustmentX = -barW/2;
+            }
+                
+            var calculateBarWidth = function(d, i){
+                return barW;   
             }
 
             function xScaleAdjusted(x){
@@ -145,7 +184,8 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xScaleAdjusted(d.x);
                     },
-                    width: barW,
+//                    width: barW,
+                width: function(d,i){return calculateBarWidth(d,i);},
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill, d, i)},
@@ -187,7 +227,8 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xScaleAdjusted(d.x);
                     },
-                    width: barW,
+//                    width: barW,
+                    width: function(d,i){return calculateBarWidth(d,i);},
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);

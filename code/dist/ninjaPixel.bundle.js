@@ -10157,7 +10157,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.7';
+    ninjaPixel.version = '0.0.8';
 
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -10737,9 +10737,16 @@ var ninjaPixel;
             this._yAxisTicks = _x;
             return this;
         };
+        Chart.prototype.internalXAxisMargin = function (_x) {
+            if (!arguments.length)
+                return this._internalXAxisMargin;
+            this._internalXAxisMargin = _x;
+            return this;
+        };
         return Chart;
     })();
     ninjaPixel.Chart = Chart;
+
     var formatBillionsWithB = function () {
         var d3_formatPrefixes = ["e-24", "e-21", "e-18", "e-15", "e-12", "e-9", "e-6", "e-3", "", "K", "M", "B", "T", "P", "E", "Z", "Y"].map(d3_formatPrefix);
 
@@ -10806,6 +10813,13 @@ var ninjaPixel;
             return this;
         };
 
+        BarChart.prototype.barWidth = function (_x) {
+            if (!arguments.length)
+                return this._barWidth;
+            this._barWidth = _x;
+            return this;
+        };
+
         BarChart.prototype.plot = function (_selection, barWidth) {
             var _this = this;
             this._init(_selection);
@@ -10835,26 +10849,18 @@ var ninjaPixel;
                 var barW;
                 if (barWidth != null) {
                     barW = barWidth;
+                }
+                if (_this._barWidth) {
+                    barW = _this._barWidth;
                 } else {
                     if (_this._isTimeseries) {
                         barW = 0.9 * _this._chartWidth / (_data.length + 1);
                     } else {
-                        barW = xScale.rangeBand();
+                        barW = 0;
                     }
                 }
                 var minData = 0;
                 var maxData = 0;
-
-                if (_this._y1Max != null) {
-                    maxData = _this._y1Max;
-                } else {
-                    var d3MaxY = d3.max(_data, function (d) {
-                        return d.y;
-                    });
-                    if (d3MaxY > 0) {
-                        maxData = d3MaxY;
-                    }
-                }
 
                 if (_this._y1Min != null) {
                     minData = _this._y1Min;
@@ -10864,6 +10870,20 @@ var ninjaPixel;
                     });
                     if (d3MinY < 0) {
                         minData = d3MinY;
+                    }
+                }
+                if (_this._y1Max != null) {
+                    maxData = _this._y1Max;
+                } else {
+                    var d3MaxY = d3.max(_data, function (d) {
+                        return d.y;
+                    });
+                    if (d3MaxY > 0) {
+                        maxData = d3MaxY;
+                    }
+
+                    if (maxData === minData) {
+                        maxData += 1;
                     }
                 }
 
@@ -10895,10 +10915,18 @@ var ninjaPixel;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
 
+                if (barW <= 0) {
+                    barW = xScale.rangeBand();
+                }
+
                 var barAdjustmentX = 0;
                 if (_this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
+
+                var calculateBarWidth = function (d, i) {
+                    return barW;
+                };
 
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;
@@ -10914,7 +10942,9 @@ var ninjaPixel;
                     x: function (d, i) {
                         return xScaleAdjusted(d.x);
                     },
-                    width: barW,
+                    width: function (d, i) {
+                        return calculateBarWidth(d, i);
+                    },
                     y: yScale0,
                     height: 0,
                     fill: function (d, i) {
@@ -10964,7 +10994,9 @@ var ninjaPixel;
                     x: function (d, i) {
                         return xScaleAdjusted(d.x);
                     },
-                    width: barW,
+                    width: function (d, i) {
+                        return calculateBarWidth(d, i);
+                    },
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);
@@ -11511,10 +11543,16 @@ var ninjaPixel;
 
                 var xScale;
                 if (_this._isTimeseries) {
-                    xScale = d3.time.scale().range([0, _this._chartWidth]).domain([minX, maxX]);
+                    xScale = d3.time.scale();
                 } else {
-                    xScale = d3.scale.linear().range([0, _this._chartWidth]).domain([minX, maxX]);
+                    xScale = d3.scale.linear();
                 }
+                if (_this._internalXAxisMargin) {
+                    xScale.range([0 + _this._internalXAxisMargin, _this._chartWidth - _this._internalXAxisMargin]);
+                } else {
+                    xScale.range([0, _this._chartWidth]);
+                }
+                xScale.domain([minX, maxX]);
                 var yScale;
                 if (_this._yAxis1LogScale) {
                     yScale = d3.scale.log().domain([minY, maxY]).range([_this._chartHeight, 0]);

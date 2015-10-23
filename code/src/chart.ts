@@ -332,11 +332,13 @@ module ninjaPixel{
                 .duration(this._transitionDuration)
                 .remove();
             // transition
+            var xPos = (this._chartWidth / 2) + Number(this._margin.left);
             xTitleSvg.transition()
                 .duration(this._transitionDuration)
                 .text(this._xAxisTitle)
                 .attr('y', this._chartHeight + this._margin.top + this._margin.bottom/2)
-                .attr('x', (this._chartWidth / 2) + this._margin.left);
+                .attr('x', xPos);
+                
         }
 
         

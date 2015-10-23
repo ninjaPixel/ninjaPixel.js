@@ -99,7 +99,7 @@ module ninjaPixel{
                     // if the max and min are the same value, then there is no range for us to plot with.
                     // only do this when the user hasn't specified the max.
                     if(maxData === minData){
-                        maxData +=1;
+                        maxData +=10;
                     }                                       
                 }
                 

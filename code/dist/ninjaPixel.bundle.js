@@ -10371,7 +10371,12 @@ var ninjaPixel;
 
             xTitleSvg.exit().transition().duration(this._transitionDuration).remove();
 
-            xTitleSvg.transition().duration(this._transitionDuration).text(this._xAxisTitle).attr('y', this._chartHeight + this._margin.top + this._margin.bottom / 2).attr('x', (this._chartWidth / 2) + this._margin.left);
+            var xPos = (this._chartWidth / 2) + Number(this._margin.left);
+            console.log(this._chartWidth / 2 + this._margin.left);
+            console.log(this._chartWidth, this._margin.left);
+            xTitleSvg.transition().duration(this._transitionDuration).text(this._xAxisTitle).attr('y', this._chartHeight + this._margin.top + this._margin.bottom / 2).attr('x', xPos);
+
+            console.log('xPos', xPos);
         };
 
         Chart.prototype._getChartWidth = function () {
@@ -10883,7 +10888,7 @@ var ninjaPixel;
                     }
 
                     if (maxData === minData) {
-                        maxData += 1;
+                        maxData += 10;
                     }
                 }
 

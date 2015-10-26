@@ -10363,7 +10363,11 @@ var ninjaPixel;
 
             yTitleSvg1.exit().transition().duration(this._transitionDuration).remove();
 
-            yTitleSvg1.transition().duration(this._transitionDuration).text(this._yAxis1Title).attr('x', -(this._chartHeight / 2) - this._margin.top).attr('y', (this._margin.left * 0.4));
+            var horizontalOffset = this._margin.left * 0.4;
+            if (this._yTitleHorizontalOffset) {
+                horizontalOffset = this._yTitleHorizontalOffset;
+            }
+            yTitleSvg1.transition().duration(this._transitionDuration).text(this._yAxis1Title).attr('x', -(this._chartHeight / 2) - this._margin.top).attr('y', horizontalOffset);
 
             var xTitleSvg = this._svg.select('.ninja-xTitle').selectAll('text.ninja-xTitle').data(arr);
 
@@ -10372,11 +10376,12 @@ var ninjaPixel;
             xTitleSvg.exit().transition().duration(this._transitionDuration).remove();
 
             var xPos = (this._chartWidth / 2) + Number(this._margin.left);
-            console.log(this._chartWidth / 2 + this._margin.left);
-            console.log(this._chartWidth, this._margin.left);
-            xTitleSvg.transition().duration(this._transitionDuration).text(this._xAxisTitle).attr('y', this._chartHeight + this._margin.top + this._margin.bottom / 2).attr('x', xPos);
-
-            console.log('xPos', xPos);
+            var verticalOffset = this._margin.bottom / 1.5;
+            if (this._xTitleVerticalOffset) {
+                verticalOffset = this._xTitleVerticalOffset;
+            }
+            var yPos = this._chartHeight + this._margin.top + verticalOffset;
+            xTitleSvg.transition().duration(this._transitionDuration).text(this._xAxisTitle).attr('y', yPos).attr('x', xPos);
         };
 
         Chart.prototype._getChartWidth = function () {
@@ -10716,6 +10721,18 @@ var ninjaPixel;
             if (!arguments.length)
                 return this._xAxisTextTransform;
             this._xAxisTextTransform = _x;
+            return this;
+        };
+        Chart.prototype.xTitleVerticalOffset = function (_x) {
+            if (!arguments.length)
+                return this._xTitleVerticalOffset;
+            this._xTitleVerticalOffset = Number(_x);
+            return this;
+        };
+        Chart.prototype.yTitleHorizontalOffset = function (_x) {
+            if (!arguments.length)
+                return this._yTitleHorizontalOffset;
+            this._yTitleHorizontalOffset = Number(_x);
             return this;
         };
         Chart.prototype.xAxisTickFormat = function (_x) {

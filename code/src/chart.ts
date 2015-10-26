@@ -60,6 +60,8 @@ module ninjaPixel{
         _svg: any;
         _xAxisTextTransform: string;
         _xAxisTickFormat: any;
+        _xTitleVerticalOffset: number;
+        _yTitleHorizontalOffset: number;
 //        _yAxisTextTransform: string;
         _yAxisTickFormat: any;
         _onMouseover: any = ()=>{};
@@ -314,11 +316,15 @@ module ninjaPixel{
                 .duration(this._transitionDuration)
                 .remove();
             // transition
+            var horizontalOffset = this._margin.left * 0.4;
+            if(this._yTitleHorizontalOffset){
+                horizontalOffset = this._yTitleHorizontalOffset;
+            }
             yTitleSvg1.transition()
                 .duration(this._transitionDuration)
                 .text(this._yAxis1Title)
                 .attr('x', -(this._chartHeight / 2)-this._margin.top)
-                .attr('y', (this._margin.left * 0.4));
+                .attr('y', horizontalOffset);
 
             // x title
             var xTitleSvg = this._svg.select('.ninja-xTitle')
@@ -333,10 +339,15 @@ module ninjaPixel{
                 .remove();
             // transition
             var xPos = (this._chartWidth / 2) + Number(this._margin.left);
+            var verticalOffset = this._margin.bottom/1.5;
+            if(this._xTitleVerticalOffset){
+                verticalOffset = this._xTitleVerticalOffset;
+            }
+            var yPos = this._chartHeight + this._margin.top + verticalOffset;
             xTitleSvg.transition()
                 .duration(this._transitionDuration)
                 .text(this._xAxisTitle)
-                .attr('y', this._chartHeight + this._margin.top + this._margin.bottom/2)
+                .attr('y', yPos)
                 .attr('x', xPos);
                 
         }
@@ -662,6 +673,16 @@ module ninjaPixel{
         xAxisTextTransform(_x): any{
            if (!arguments.length) return this._xAxisTextTransform;
             this._xAxisTextTransform = _x;
+            return this; 
+        }
+        xTitleVerticalOffset(_x): any{
+           if (!arguments.length) return this._xTitleVerticalOffset;
+            this._xTitleVerticalOffset = Number(_x);
+            return this; 
+        }
+        yTitleHorizontalOffset(_x): any{
+           if (!arguments.length) return this._yTitleHorizontalOffset;
+            this._yTitleHorizontalOffset = Number(_x);
             return this; 
         }
         xAxisTickFormat(_x): any{

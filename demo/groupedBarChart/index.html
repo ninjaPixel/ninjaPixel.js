@@ -99,6 +99,10 @@
     barChart.toolTip(toolTip);
     
     ready();
+        setTimeout(function run() { 
+         ready();
+        setTimeout(run, 3000); 
+    }, 3000);
 
     function menWomenData(sex, color){
         return {group: sex, y: Math.random() * (10), color: color};

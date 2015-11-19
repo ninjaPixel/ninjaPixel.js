@@ -1327,10 +1327,13 @@ var ninjaPixel;
                 }
                 _this._xScaleAdjusted = xScaleAdjusted;
                 var yScale0 = yScale(0);
-                var barsRoot = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bar').data(_data).enter().append("g").attr("class", "g").attr("transform", function (d) {
+                var barsRoot = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.g').data(_data, function (d) {
+                    return d.x;
+                });
+                barsRoot.enter().append("g").attr("class", "g").attr("transform", function (d) {
                     return "translate(" + xScaleAdjusted(d.x) + ",0)";
                 });
-                var bars = barsRoot.selectAll("rect").data(function (d) {
+                var bars = barsRoot.selectAll(".bar").data(function (d) {
                     return d.data;
                 });
                 bars.enter().append('rect').classed('bar', true).attr({

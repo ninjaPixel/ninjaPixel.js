@@ -2,11 +2,14 @@
 /// <reference path="chart.ts" />
 //declare var d3: D3.Base;
 module ninjaPixel{
-    interface groupedBarChartDataItem {
-        color?: string;
-        x: string;
+    interface singleItem{
         y: number;    
 		group: string;    
+        color?: string;
+    }
+    interface groupedBarChartDataItem {
+        x: any; //string or datetime
+        data: Array<singleItem>;  
     }
 
     export class GroupedBarChart extends ninjaPixel.Chart {
@@ -51,7 +54,8 @@ module ninjaPixel{
             var defaultBarOpacity: any = this._itemOpacity;
             var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;            
+            var barFill = this._itemFill;   
+            
             function getMinDate(theData) {
                 return d3.min(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
             }
@@ -61,9 +65,18 @@ module ninjaPixel{
             }
             
             _selection.each((_data) => {
+                // find the unique groups
+                var distinctGroups=[];
+                _data.forEach(function(d:groupedBarChartDataItem){
+                d.data.forEach(function(e:singleItem){
+                    if(distinctGroups.indexOf(e.group)<0){
+                        distinctGroups.push(e.group);                        
+                    }                           
+                    });
+                });
 
-                var groupCount = d3.map(_data, function(d:groupedBarChartDataItem){return d.group;}).keys();
-                console.log('groupCount:', groupCount);
+
+
                 var barW: number;
                 if(barWidth != null){
                         // set by other functions e.g. lollipop chart
@@ -86,30 +99,30 @@ module ninjaPixel{
                 if(this._y1Min != null){
                     minData = this._y1Min;
                 } else {
-                    var d3MinY = d3.min(_data, (d:groupedBarChartDataItem) => d.y);
-                    if(d3MinY < 0){
-                        minData = d3MinY;   
-                    }
+                    _data.forEach(function(dd:groupedBarChartDataItem){
+                        var d3MinY = d3.min(dd.data, (d:singleItem) => d.y);
+                        if(d3MinY < minData){
+                            minData = d3MinY;   
+                        }
+                    });
                 }
                 if(this._y1Max != null){
                   maxData = this._y1Max;  
                 } else{
-                    var d3MaxY = d3.max(_data, (d:groupedBarChartDataItem) => d.y);                
-                    if(d3MaxY > 0){
-                        maxData = d3MaxY;   
-                    }
                     
+                    _data.forEach(function(dd:groupedBarChartDataItem){
+                        var d3MaxY = d3.max(dd.data, (d:singleItem) => d.y);                
+                            if(d3MaxY > maxData){
+                                maxData = d3MaxY;   
+                        }
+                    });
                     // if the max and min are the same value, then there is no range for us to plot with.
                     // only do this when the user hasn't specified the max.
                     if(maxData === minData){
                         maxData +=10;
                     }                                       
                 }
-                
-
-                
-                
-                
+                                                              
             if (this._isTimeseries) {
                 var minX, maxX;
                 if(this._xMin != null){
@@ -146,10 +159,15 @@ module ninjaPixel{
             var xScale = this._xScale;
             var yScale = this._yScale;
             var barScale = this._barScale;
+            var xGroupScale = d3.scale.ordinal();
+
                 
             if(barW <= 0){    
                 barW = xScale.rangeBand();
             }
+            xGroupScale.domain(distinctGroups).rangeRoundBands([0, barW]);
+
+            
                 
                 
             var barAdjustmentX = 0; 
@@ -158,7 +176,7 @@ module ninjaPixel{
             }
                 
             var calculateBarWidth = function(d, i){
-                return barW;   
+                return xGroupScale(d.group)  
             }
 
             function xScaleAdjusted(x){
@@ -168,19 +186,24 @@ module ninjaPixel{
                 
             // Enter, Update, Exit on bars
             var yScale0 = yScale(0);
-            var bars = this._svg.select('.ninja-chartGroup')
+            var barsRoot = this._svg.select('.ninja-chartGroup')
                 .call(myToolTip)
                 .selectAll('.bar')
-                .data(_data, function(d){ return d.x;});
+                .data(_data)
+                .enter().append("g")
+                .attr("class", "g")
+                .attr("transform", function(d) { return "translate(" + xScaleAdjusted(d.x) + ",0)"});
             
-            bars.enter().append('rect')
+                var bars = barsRoot.selectAll("rect")
+                .data(function(d) { return d.data; });
+                
+                bars.enter().append('rect')
                 .classed('bar', true)
                 .attr({
                     x: function (d, i) {
-                        return xScaleAdjusted(d.x);
+                        return xGroupScale(d.group);
                     },
-//                    width: barW,
-                width: function(d,i){return calculateBarWidth(d,i);},
+                    width: function(d,i){return xGroupScale.rangeBand();},
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill, d, i)},
@@ -219,11 +242,6 @@ module ninjaPixel{
                     fill:       (d,i) => {return functor(barFill,d,i);}
                 })
                 .attr({
-                    x: function (d, i) {
-                        return xScaleAdjusted(d.x);
-                    },
-//                    width: barW,
-                    width: function(d,i){return calculateBarWidth(d,i);},
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);

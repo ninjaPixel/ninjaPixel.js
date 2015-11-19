@@ -68,24 +68,7 @@
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
 <script>
-//    var currency = d3.requote('$');
-  
-    var currency = '£';
-var localeFormatter = d3.locale({
-  "decimal": ".",
-  "thousands": ",",
-  "grouping": [3],
-  "currency": [currency, ""],
-  "dateTime": "%a %b %e %X %Y",
-  "date": "%d/%m/%Y",
-  "time": "%H:%M:%S",
-  "periods": ["AM", "PM"],
-  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-  "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-  "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-  "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-});
     
     var barChart = new ninjaPixel.GroupedBarChart();
     barChart.transitionDuration(2000)
@@ -105,9 +88,9 @@ var localeFormatter = d3.locale({
     .height(500)
     .plotHorizontalGridTopping(true)
     .cornerRounding(0)
-    .isTimeseries(true)
-//    .xMax('2015-Jan-20')
-    .yAxisTickFormat(localeFormatter.numberFormat('$s'))
+    .isTimeseries(false)
+    // .y1Max(11).y1Min(0)
+    .itemFill(function(d,i){return d.color;})
     .mouseOverItemOpacity(function(d,i){return d.opacity;});
 
     var toolTip = barChart.toolTip();
@@ -118,26 +101,18 @@ var localeFormatter = d3.locale({
     
     ready();
 
+    function menWomenData(sex, color){
+        return {group: sex, y: Math.random() * (10), color: color};
+    }
     function ready(error) {
-        var timeseries = [];
-        var startDate = new moment('1-12-2014', "DD-MM-YYYY");
-        var thisDate = new moment(startDate);
-        for (var i2 = 0; i2 < 40; i2++) {
-            timeseries.push({
-                x: thisDate.toDate(),
-                y: (i2+1)*1000
-            });
-            thisDate = new moment(thisDate).add(1, 'days');
-        }
-
-        var filteredData = [];
-        for(var i=0; i<11; i++){
-            var yVal = (i+1)*1000000*i;
-         filteredData.push({x:i, y: yVal });   
-        }
+        var data = [
+            {x:'Jersey', data:[menWomenData('men', '#fc8d59'), menWomenData('women','#91cf60')]},
+            {x:'Guernsey', data:[menWomenData('men', '#fc8d59'), menWomenData('women','#91cf60')]},
+            {x:'Sark', data:[menWomenData('men', '#fc8d59'), menWomenData('women','#91cf60')]}
+                  ];
 
         barChart.plot(d3.select("#chart")
-            .datum(timeseries));
+            .datum(data));
     }
 </script>
 

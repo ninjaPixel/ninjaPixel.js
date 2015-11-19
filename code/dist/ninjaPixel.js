@@ -1234,10 +1234,14 @@ var ninjaPixel;
                 });
             }
             _selection.each(function (_data) {
-                var groupCount = d3.map(_data, function (d) {
-                    return d.group;
-                }).keys();
-                console.log('groupCount:', groupCount);
+                var distinctGroups = [];
+                _data.forEach(function (d) {
+                    d.data.forEach(function (e) {
+                        if (distinctGroups.indexOf(e.group) < 0) {
+                            distinctGroups.push(e.group);
+                        }
+                    });
+                });
                 var barW;
                 if (barWidth != null) {
                     barW = barWidth;
@@ -1259,19 +1263,23 @@ var ninjaPixel;
                     minData = _this._y1Min;
                 }
                 else {
-                    var d3MinY = d3.min(_data, function (d) { return d.y; });
-                    if (d3MinY < 0) {
-                        minData = d3MinY;
-                    }
+                    _data.forEach(function (dd) {
+                        var d3MinY = d3.min(dd.data, function (d) { return d.y; });
+                        if (d3MinY < minData) {
+                            minData = d3MinY;
+                        }
+                    });
                 }
                 if (_this._y1Max != null) {
                     maxData = _this._y1Max;
                 }
                 else {
-                    var d3MaxY = d3.max(_data, function (d) { return d.y; });
-                    if (d3MaxY > 0) {
-                        maxData = d3MaxY;
-                    }
+                    _data.forEach(function (dd) {
+                        var d3MaxY = d3.max(dd.data, function (d) { return d.y; });
+                        if (d3MaxY > maxData) {
+                            maxData = d3MaxY;
+                        }
+                    });
                     if (maxData === minData) {
                         maxData += 10;
                     }
@@ -1302,30 +1310,35 @@ var ninjaPixel;
                 var xScale = _this._xScale;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
+                var xGroupScale = d3.scale.ordinal();
                 if (barW <= 0) {
                     barW = xScale.rangeBand();
                 }
+                xGroupScale.domain(distinctGroups).rangeRoundBands([0, barW]);
                 var barAdjustmentX = 0;
                 if (_this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
                 var calculateBarWidth = function (d, i) {
-                    return barW;
+                    return xGroupScale(d.group);
                 };
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;
                 }
                 _this._xScaleAdjusted = xScaleAdjusted;
                 var yScale0 = yScale(0);
-                var bars = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bar').data(_data, function (d) {
-                    return d.x;
+                var barsRoot = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bar').data(_data).enter().append("g").attr("class", "g").attr("transform", function (d) {
+                    return "translate(" + xScaleAdjusted(d.x) + ",0)";
+                });
+                var bars = barsRoot.selectAll("rect").data(function (d) {
+                    return d.data;
                 });
                 bars.enter().append('rect').classed('bar', true).attr({
                     x: function (d, i) {
-                        return xScaleAdjusted(d.x);
+                        return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return calculateBarWidth(d, i);
+                        return xGroupScale.rangeBand();
                     },
                     y: yScale0,
                     height: 0,
@@ -1372,12 +1385,6 @@ var ninjaPixel;
                         return functor(barFill, d, i);
                     }
                 }).attr({
-                    x: function (d, i) {
-                        return xScaleAdjusted(d.x);
-                    },
-                    width: function (d, i) {
-                        return calculateBarWidth(d, i);
-                    },
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);

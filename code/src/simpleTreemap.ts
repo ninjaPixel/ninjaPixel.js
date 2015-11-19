@@ -30,11 +30,11 @@ module ninjaPixel{
 
             _selection.each((_data) => {
                 
-                
-                var treemapLayout = d3.layout.treemap()
+                var myTreemap: any = d3.layout.treemap()
+                var treemapLayout = myTreemap 
                     .size([this._chartWidth, this._chartHeight])
                     .sticky(true)
-                    .value(function(d) {
+                    .value(function(d:any) {
                         return d.size;
                     });
                 

@@ -1,10 +1,21 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
-declare var d3: D3.Base;
-declare module D3 {
-    export interface Base{
-        tip: any;
-    }
-}
+/// <reference path="typescript_definitions/d3-tip.d.ts" />
+
+//declare var d3: D3.Base;
+//declare module d3 {
+////    export interface Base{
+////        tip: any;
+////    }
+//    interface Tip {
+//        offest: any;
+//        top: number;
+//        bottom: number;
+//        left: number;        
+//        right: number;
+//    }
+//    export function tip<T>(): Tip<T>;
+//}
+
 interface marginObject {
         top: number;
         bottom: number;
@@ -17,9 +28,10 @@ interface axesOriginObject {
     }
 
 
+
 module ninjaPixel{
     
-    export var version:string =  '0.0.8';
+    export var version:string =  '0.0.9';
     
     export enum Category {
         xy = 0,
@@ -140,10 +152,10 @@ module ninjaPixel{
                         transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth/2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight/2)) + ')'
                 });
             } else if (this._category == Category.xy || this._category == Category.treemap || this._category == Category.simpleTreemap) {
-            this._svg.select('.ninja-containerGroup')
-                .attr({
-                    transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
-            });
+                this._svg.select('.ninja-containerGroup')
+                    .attr({
+                        transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
+                });
             }
             
 

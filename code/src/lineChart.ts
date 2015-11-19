@@ -161,21 +161,21 @@ module ninjaPixel{
                 // *** CHARTING ***
                 // create line and area functions
                 var singleLine = d3.svg.line()
-                    .x(function (d) {
+                    .x(function (d:any) {
                         return xScale(d.x);
                     })
-                    .y(function (d) {
+                    .y(function (d:any) {
                         return yScale(d.y);
                     });
                 singleLine.interpolate(this._lineInterpolation);
                 
                 var baseLine = d3.svg.line()
-                    .x(function (d) { return xScale(d.x);})
-                    .y(function (d) { return yScale(0);});
+                    .x(function (d:any) { return xScale(d.x);})
+                .y(function (d:any) { return yScale(0);});
                 baseLine.interpolate(this._lineInterpolation);
 
                 var area = d3.svg.area()
-                    .x((d) => {return xScale(d.x);})
+                    .x((d:any) => {return xScale(d.x);})
                     .y0((d) => {
                         if (minY > 0) {
                             return yScale(minY);
@@ -185,11 +185,11 @@ module ninjaPixel{
                             return yScale(0);
                         }
                     })
-                    .y1((d) => {return yScale(d.y);});
+                    .y1((d:any) => {return yScale(d.y);});
                 area.interpolate(this._lineInterpolation);
                 
                 var baseArea = d3.svg.area()
-                    .x((d) => {return xScale(d.x);})
+                    .x((d:any) => {return xScale(d.x);})
                     .y0((d) => {return yScale(0);})
                     .y1((d) => {return yScale(0);});
                 baseArea.interpolate(this._lineInterpolation);
@@ -246,7 +246,8 @@ module ninjaPixel{
                         onMouseover(d);
                     })
                     .on('mouseout', function(d){
-                        myToolTip.hide(d); 
+                        //myToolTip.hide(d); typescript not happy
+                        myToolTip.hide(); 
                         onMouseout(d);
                     })
                     .style({

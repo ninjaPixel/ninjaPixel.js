@@ -215,7 +215,7 @@ module ninjaPixel{
                             opacity: (d, i) => {return functor(itemOpacity, d, i);}, // Re-sets the opacity of the circle
                             stroke: (d, i) => {return functor(itemStroke, d, i);}
                         });
-                    myToolTip.hide(d);
+                    myToolTip.hide();
                     onMouseout(d);
                 })
                 .on('click', function (d) {

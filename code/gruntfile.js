@@ -14,7 +14,7 @@ module.exports = function (grunt) {
                 //                separator: ';',
             },
             basic: {
-                src: ['src/js/d3.tip.js', 'src/js/chart.js', 'src/js/barChart.js', 'src/js/stackedBarChart.js', 'src/js/bubbleChart.js', 'src/js/lineChart.js', 'src/js/histogram.js', 'src/js/donut.js', 'src/js/lollipop.js', 'src/js/simpleTreemap.js', 'src/js/treemap.js'],
+                src: ['src/js/d3.tip.js', 'src/js/chart.js', 'src/js/barChart.js','src/js/groupedBarChart.js', 'src/js/stackedBarChart.js', 'src/js/bubbleChart.js', 'src/js/lineChart.js', 'src/js/histogram.js', 'src/js/donut.js', 'src/js/lollipop.js', 'src/js/simpleTreemap.js', 'src/js/treemap.js'],
                 dest: 'dist/ninjaPixel.js',
             },
             bundle: {

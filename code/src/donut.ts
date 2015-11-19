@@ -1,6 +1,11 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
 module ninjaPixel{
+    interface donutDataItem {
+        color?: string;
+        x: string;
+        y: number;        
+    }
  export class Donut extends ninjaPixel.Chart{
  
      private _outerRadius: number = 80;
@@ -17,6 +22,8 @@ module ninjaPixel{
         return this;
     }
      
+
+     
     constructor(){super();}
      
     plot(_selection){        
@@ -29,7 +36,7 @@ module ninjaPixel{
 
             var pie = d3.layout.pie()
                 .sort(null)
-                .value(function(d) {
+                .value(function(d: any) {
                     return d.y;
                 });
           
@@ -72,7 +79,7 @@ module ninjaPixel{
                 var i = d3.interpolate(this._current, a);
                 this._current = i(0);
                 return function(t) {
-                    return arc(i(t));
+                    return arc(<any>i(t));
                 };}
             
             function plotDonutLabels(that){
@@ -93,7 +100,7 @@ module ninjaPixel{
 
                 labels.exit()
                     .transition()
-                    .duration(this._transitionDuration)
+                    .duration(that._transitionDuration)
                     .remove();
             }
             

@@ -3,25 +3,35 @@
 //declare var d3: D3.Base;
 module ninjaPixel{
     interface singleItem{
-        y: number;    
+        yMax: number;    
+        yMed: number;    
+        yMin: number;    
 		group: string;    
         color?: string;
+        medColor?: string;
     }
     interface groupedBarChartDataItem {
         x: any; //string or datetime
         data: Array<singleItem>;  
     }
 
-    export class GroupedBarChart extends ninjaPixel.Chart {
+    export class GroupedInterquartileChart extends ninjaPixel.Chart {
         _cornerRounding: number = 1;
         _xScale: any;
         _yScale:any;
         _barScale: any;
-        _xScaleAdjusted: any;        
+        _xScaleAdjusted: any;  
+        _medianWidth: number = 8;      
 
         cornerRounding(_x: number):any {
             if (!arguments.length) return this._cornerRounding;
             this._cornerRounding = _x;
+            return this;
+        }
+        
+        medianWidth(_x: number):any {
+            if (!arguments.length) return this._medianWidth;
+            this._medianWidth = _x;
             return this;
         }
         
@@ -55,6 +65,8 @@ module ninjaPixel{
             var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
             var barFill = this._itemFill;   
+            var barFill2 = this._itemFill2;   
+            var medianWidth = this._medianWidth;
             
             function getMinDate(theData) {
                 return d3.min(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
@@ -95,12 +107,13 @@ module ninjaPixel{
                 }
                 var minData:any = 0;
                 var maxData:any = 0;
-                            
+                
+                // TODO: check if yMed is the max or min value                            
                 if(this._y1Min != null){
                     minData = this._y1Min;
                 } else {
                     _data.forEach(function(dd:groupedBarChartDataItem){
-                        var d3MinY = d3.min(dd.data, (d:singleItem) => d.y);
+                        var d3MinY = d3.min(dd.data, (d:singleItem) => d.yMin);
                         if(d3MinY < minData){
                             minData = d3MinY;   
                         }
@@ -111,7 +124,7 @@ module ninjaPixel{
                 } else{
                     
                     _data.forEach(function(dd:groupedBarChartDataItem){
-                        var d3MaxY = d3.max(dd.data, (d:singleItem) => d.y);                
+                        var d3MaxY = d3.max(dd.data, (d:singleItem) => d.yMax);                
                             if(d3MaxY > maxData){
                                 maxData = d3MaxY;   
                         }
@@ -204,6 +217,8 @@ module ninjaPixel{
                 .transition()
                 .remove()
             
+            
+            // interquartile range bar
                 var bars = barsRoot.selectAll(".bar")
                 .data(function(d) { return d.data; });
                 
@@ -253,14 +268,15 @@ module ninjaPixel{
                 })
                 .attr({
                     y: function (d) {
-                        if (d.y > 0) {
-                            return yScale(d.y);
+                        if (d.yMax > 0) {
+                            return yScale(d.yMax);
                         } else {
                             return yScale(0);
                         }
                     },
                     height: function (d) {
-                        return Math.abs(barScale(d.y));
+                        var height = Math.abs(barScale(d.yMax) - barScale(d.yMin)); 
+                        return height;
                     },
                 });
                 
@@ -270,7 +286,7 @@ module ninjaPixel{
                 .ease(this._transitionEase)
                 .attr({
                     y: function (d) {
-                        if (d.y > 0) {
+                        if (d.yMax > 0) {
                             return yScale(0);
                         } else {
                             return yScale(0);
@@ -281,10 +297,89 @@ module ninjaPixel{
                     },
                 })
                 .delay((d,i) => {return functor(this._removeDelay, d, i);})
-                // .style({
-                // opacity: 0
-                // })
                 .remove();   
+                
+            // median line/bar
+            var medianBar = barsRoot.selectAll(".bar-median")
+                .data(function(d) { return d.data; });
+                
+                medianBar.enter().append('rect')
+                .classed('bar-median', true)
+                .attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function(d,i){return xGroupScale.rangeBand();},
+                    y: yScale0,
+                    height: 0,
+                    fill: (d, i) => {return functor(this._itemFill2, d, i)},
+                    rx: this._cornerRounding,
+                    ry: this._cornerRounding
+                })
+                .on('mouseover', function (d, i) {
+                    d3.select(this)
+                        .style({
+                            opacity: (d, i) => { return functor(mouseOverBarOpacity, d, i);},
+                            stroke:  (d,i) => {return functor(mouseOverBarStroke, d, i);}
+                        });
+                    myToolTip.show(d); 
+                    onMouseover(d);
+                })
+                .on('mouseout', function (d, i) {
+                    d3.select(this)
+                        .style({
+                            opacity: (d, i) => {return functor(defaultBarOpacity,d, i);}, // Re-sets the opacity
+                            stroke:  (d,i) => {return functor(defaultStroke, d, i);}
+                        });
+                    myToolTip.hide();
+                    onMouseout(d);
+                })
+                .on('click', function (d, i) {
+                    onClick(d);
+                });
+
+            medianBar.transition()
+                .duration(this._transitionDuration)
+                .delay((d,i) => {return functor(this._transitionDelay, d, i);})
+                .ease(this._transitionEase)
+                .style({
+                    opacity:    (d,i) => {return functor(defaultBarOpacity, d, i);} ,
+                    stroke:     (d,i) => {return functor(defaultStroke, d, i);},
+                    fill:       (d,i) => {return functor(barFill2,d,i);}
+                })
+                .attr({
+                    y: function (d) {
+                        if (d.yMax > 0) {
+                            return yScale(d.yMed);
+                        } else {
+                            return yScale(0);
+                        }
+                    },
+                    height: function (d) { 
+                        return medianWidth;
+                    },
+                });
+                
+            medianBar.exit()
+                .transition()
+                .duration((d,i) => {return functor(this._removeTransitionDelay, d, i);})
+                .ease(this._transitionEase)
+                .attr({
+                    y: function (d) {
+                        if (d.yMax > 0) {
+                            return yScale(0);
+                        } else {
+                            return yScale(0);
+                        }
+                    },
+                    height: function (d) {
+                        return Math.abs(barScale(0));
+                    },
+                })
+                .delay((d,i) => {return functor(this._removeDelay, d, i);})
+                .remove(); 
+            
+            
                                 
             this._plotLabels();
             this._plotXAxis(xScale, yScale);

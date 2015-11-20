@@ -91,6 +91,7 @@ module ninjaPixel{
         _itemOpacity: any = 1;// function or value
         _itemStroke: any = 'none'; // function or value
         _itemFill: any = '#A7EBCA'; // function or value
+        _itemFill2: any = 'lightgray'; // function or value
         _itemStrokeWidth: any = '3px'; // function or value
         _toolTip = d3.tip()
             .attr('class', 'd3-tip')
@@ -500,6 +501,11 @@ module ninjaPixel{
         itemFill(_x): any {
             if (!arguments.length) return this._itemFill;
             this._itemFill = _x;
+            return this;
+        }
+        itemFill2(_x): any {
+            if (!arguments.length) return this._itemFill2;
+            this._itemFill2 = _x;
             return this;
         }
         itemStroke(_x): any {

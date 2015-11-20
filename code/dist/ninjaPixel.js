@@ -1749,7 +1749,7 @@ var ninjaPixel;
                 }).attr({
                     y: function (d) {
                         if (d.yMax > 0) {
-                            return yScale(d.yMed);
+                            return yScale(d.yMed) - medianWidth / 2;
                         }
                         else {
                             return yScale(0);

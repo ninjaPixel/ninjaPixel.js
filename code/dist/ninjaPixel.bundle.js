@@ -9472,6 +9472,7 @@
 // Copyright (c) 2013 Justin Palmer
 //
 // Tooltips for d3.js SVG visualizations
+// this has been modified by ninjaPixel, so be weary of updating it from the original author's repo
 
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -9508,6 +9509,20 @@
       document.body.appendChild(node)
     }
 
+    tip.getBoundingBox = function () { //ninjaPixel
+
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop,
+          scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+      var bbox = getScreenBBox();
+      var bbox_w = (bbox.e.x - bbox.w.x);
+      return {
+        top: Math.floor(bbox.n.y) + scrollTop,
+        left: Math.floor(bbox.n.x + scrollLeft - bbox_w / 2),
+        width: Math.floor(bbox.e.x - bbox.w.x),
+        height: Math.floor(bbox.s.y - bbox.n.y)
+      }
+    };
+
     // Public - show the tooltip on the screen
     //
     // Returns a tip
@@ -9524,18 +9539,19 @@
           scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
           scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
 
-      nodel.html(content)
-        .transition()
-        .duration(transitionDuration)
-        .style({ opacity: 1, 'pointer-events': 'all' })
+      if (content != null) { //ninjaPixel
+        nodel.html(content)
+            .transition()
+            .duration(transitionDuration)
+            .style({opacity: 1, 'pointer-events': 'all'})
 
-      while(i--) nodel.classed(directions[i], false)
-      coords = direction_callbacks.get(dir).apply(this)
-      nodel.classed(dir, true).style({
-        top: (coords.top +  poffset[0]) + scrollTop + 'px',
-        left: (coords.left + poffset[1]) + scrollLeft + 'px'
-      })
-
+        while (i--) nodel.classed(directions[i], false)
+        coords = direction_callbacks.get(dir).apply(this)
+        nodel.classed(dir, true).style({
+          top: (coords.top + poffset[0]) + scrollTop + 'px',
+          left: (coords.left + poffset[1]) + scrollLeft + 'px'
+        })
+      }
       return tip
     }
 
@@ -9815,6 +9831,7 @@
 // Copyright (c) 2013 Justin Palmer
 //
 // Tooltips for d3.js SVG visualizations
+// this has been modified by ninjaPixel, so be weary of updating it from the original author's repo
 
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -9851,6 +9868,20 @@
       document.body.appendChild(node)
     }
 
+    tip.getBoundingBox = function () { //ninjaPixel
+
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop,
+          scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+      var bbox = getScreenBBox();
+      var bbox_w = (bbox.e.x - bbox.w.x);
+      return {
+        top: Math.floor(bbox.n.y) + scrollTop,
+        left: Math.floor(bbox.n.x + scrollLeft - bbox_w / 2),
+        width: Math.floor(bbox.e.x - bbox.w.x),
+        height: Math.floor(bbox.s.y - bbox.n.y)
+      }
+    };
+
     // Public - show the tooltip on the screen
     //
     // Returns a tip
@@ -9867,18 +9898,19 @@
           scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
           scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
 
-      nodel.html(content)
-        .transition()
-        .duration(transitionDuration)
-        .style({ opacity: 1, 'pointer-events': 'all' })
+      if (content != null) { //ninjaPixel
+        nodel.html(content)
+            .transition()
+            .duration(transitionDuration)
+            .style({opacity: 1, 'pointer-events': 'all'})
 
-      while(i--) nodel.classed(directions[i], false)
-      coords = direction_callbacks.get(dir).apply(this)
-      nodel.classed(dir, true).style({
-        top: (coords.top +  poffset[0]) + scrollTop + 'px',
-        left: (coords.left + poffset[1]) + scrollLeft + 'px'
-      })
-
+        while (i--) nodel.classed(directions[i], false)
+        coords = direction_callbacks.get(dir).apply(this)
+        nodel.classed(dir, true).style({
+          top: (coords.top + poffset[0]) + scrollTop + 'px',
+          left: (coords.left + poffset[1]) + scrollLeft + 'px'
+        })
+      }
       return tip
     }
 
@@ -10156,7 +10188,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.9';
+    ninjaPixel.version = '0.0.10';
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
@@ -10190,7 +10222,6 @@ var ninjaPixel;
             this._plotHorizontalGridTopping = false;
             this._plotVerticalGrid = false;
             this._plotVerticalGridTopping = false;
-            this._showToolTip = false;
             this._onMouseover = function () {
             };
             this._onMouseout = function () {
@@ -10206,7 +10237,7 @@ var ninjaPixel;
             this._itemFill2 = 'lightgray';
             this._itemStrokeWidth = '3px';
             this._toolTip = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).transitionDuration(300).html(function () {
-                return 'Tooltip HTML not defined';
+                return null;
             }).direction('n');
         }
         Chart.prototype._init = function (_selection, category) {
@@ -10580,12 +10611,6 @@ var ninjaPixel;
             this._toolTip = _x;
             return this;
         };
-        Chart.prototype.showToolTip = function (_x) {
-            if (!arguments.length)
-                return this._showToolTip;
-            this._showToolTip = _x;
-            return this;
-        };
         Chart.prototype.plotVerticalGridTopping = function (_x) {
             if (!arguments.length)
                 return this._plotVerticalGridTopping;
@@ -10924,7 +10949,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -11181,7 +11206,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -11450,7 +11475,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -11541,7 +11566,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -11687,7 +11712,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -11903,7 +11928,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -12163,7 +12188,7 @@ var ninjaPixel;
                 });
                 lineSvg.enter().append('svg:path').attr('class', 'line').on('mouseover', function (d) {
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d) {
                     myToolTip.hide();
                     onMouseout(d);
@@ -12511,7 +12536,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -12715,7 +12740,7 @@ var ninjaPixel;
                         }
                     });
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this).style({
                         opacity: function (d, i) {
@@ -12772,7 +12797,7 @@ var ninjaPixel;
                 }).on('mouseover', function (d, i) {
                     d3.select(this);
                     myToolTip.show(d);
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
                     d3.select(this);
                     myToolTip.hide();

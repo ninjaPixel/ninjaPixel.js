@@ -242,8 +242,8 @@ module ninjaPixel{
                     .append('svg:path')
                     .attr('class', 'line')
                     .on('mouseover', function(d){
-                        myToolTip.show(d); 
-                        onMouseover(d);
+                        myToolTip.show(d);
+                        onMouseover(d, myToolTip.getBoundingBox());
                     })
                     .on('mouseout', function(d){
                         //myToolTip.hide(d); typescript not happy

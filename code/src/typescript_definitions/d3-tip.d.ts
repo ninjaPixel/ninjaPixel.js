@@ -25,6 +25,7 @@ declare module d3 {
         direction(type: string): Superformula<T>;
         show(type: any);
         hide();
+        getBoundingBox();
         (datum: T, index: number): string;
 
         

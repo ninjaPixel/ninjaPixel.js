@@ -31,7 +31,7 @@ interface axesOriginObject {
 
 module ninjaPixel{
     
-    export var version:string =  '0.0.9';
+    export var version:string =  '0.0.10';
     
     export enum Category {
         xy = 0,
@@ -68,7 +68,6 @@ module ninjaPixel{
         _plotHorizontalGridTopping: boolean = false;
         _plotVerticalGrid: boolean = false;
         _plotVerticalGridTopping: boolean = false;
-        _showToolTip: boolean = false;
         _svg: any;
         _xAxisTextTransform: string;
         _xAxisTickFormat: any;
@@ -98,7 +97,7 @@ module ninjaPixel{
             .offset([-10, 0])
             .transitionDuration(300)
             .html(function () {
-                return 'Tooltip HTML not defined';
+                return null;
             })
             .direction('n');
         _xAxisTicks: any;
@@ -606,11 +605,6 @@ module ninjaPixel{
         toolTip(_x): any {
             if (!arguments.length) return this._toolTip;
             this._toolTip = _x;
-            return this;
-        }
-        showToolTip(_x): any {
-            if (!arguments.length) return this._showToolTip;
-            this._showToolTip = _x;
             return this;
         }
         plotVerticalGridTopping(_x): any {

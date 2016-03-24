@@ -2,6 +2,7 @@
 // Copyright (c) 2013 Justin Palmer
 //
 // Tooltips for d3.js SVG visualizations
+// this has been modified by ninjaPixel, so be weary of updating it from the original author's repo
 
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -38,6 +39,20 @@
       document.body.appendChild(node)
     }
 
+    tip.getBoundingBox = function () { //ninjaPixel
+
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop,
+          scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+      var bbox = getScreenBBox();
+      var bbox_w = (bbox.e.x - bbox.w.x);
+      return {
+        top: Math.floor(bbox.n.y) + scrollTop,
+        left: Math.floor(bbox.n.x + scrollLeft - bbox_w / 2),
+        width: Math.floor(bbox.e.x - bbox.w.x),
+        height: Math.floor(bbox.s.y - bbox.n.y)
+      }
+    };
+
     // Public - show the tooltip on the screen
     //
     // Returns a tip
@@ -54,18 +69,19 @@
           scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
           scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
 
-      nodel.html(content)
-        .transition()
-        .duration(transitionDuration)
-        .style({ opacity: 1, 'pointer-events': 'all' })
+      if (content != null) { //ninjaPixel
+        nodel.html(content)
+            .transition()
+            .duration(transitionDuration)
+            .style({opacity: 1, 'pointer-events': 'all'})
 
-      while(i--) nodel.classed(directions[i], false)
-      coords = direction_callbacks.get(dir).apply(this)
-      nodel.classed(dir, true).style({
-        top: (coords.top +  poffset[0]) + scrollTop + 'px',
-        left: (coords.left + poffset[1]) + scrollLeft + 'px'
-      })
-
+        while (i--) nodel.classed(directions[i], false)
+        coords = direction_callbacks.get(dir).apply(this)
+        nodel.classed(dir, true).style({
+          top: (coords.top + poffset[0]) + scrollTop + 'px',
+          left: (coords.left + poffset[1]) + scrollLeft + 'px'
+        })
+      }
       return tip
     }
 

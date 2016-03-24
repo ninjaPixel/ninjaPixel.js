@@ -95,7 +95,7 @@ module ninjaPixel{
                             stroke:  (d,i) => {return functor(mouseOverBarStroke, d, i);}
                         });
                     myToolTip.show(d); 
-                    onMouseover(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 })
                 .on('mouseout', function (d, i) {
                     d3.select(this)

@@ -267,6 +267,10 @@ module ninjaPixel{
                     fill:       (d,i) => {return functor(barFill,d,i);}
                 })
                 .attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function(d,i){return xGroupScale.rangeBand();},
                     y: function (d) {
                         if (d.yMax > 0) {
                             return yScale(d.yMax);
@@ -348,6 +352,10 @@ module ninjaPixel{
                     fill:       (d,i) => {return functor(barFill2,d,i);}
                 })
                 .attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function(d,i){return xGroupScale.rangeBand();},
                     y: function (d) {
                         if (d.yMax > 0) {
                             return yScale(d.yMed) - medianWidth/2;

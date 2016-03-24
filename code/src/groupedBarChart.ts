@@ -165,19 +165,19 @@ module ninjaPixel{
             if(barW <= 0){    
                 barW = xScale.rangeBand();
             }
+            
             xGroupScale.domain(distinctGroups).rangeRoundBands([0, barW]);
 
             
-                
-                
+                               
             var barAdjustmentX = 0; 
             if(this._isTimeseries){ 
                 barAdjustmentX = -barW/2;
             }
                 
-            var calculateBarWidth = function(d, i){
-                return xGroupScale(d.group)  
-            }
+            // var calculateBarWidth = function(d, i){
+            //     return xGroupScale(d.group)  
+            // }
 
             function xScaleAdjusted(x){
               return xScale(x) + barAdjustmentX;   
@@ -202,9 +202,9 @@ module ninjaPixel{
                 
                 barsRoot.exit()
                 .transition()
-                .remove()
+                .remove();
             
-                var bars = barsRoot.selectAll(".bar")
+            var bars = barsRoot.selectAll(".bar")
                 .data(function(d) { return d.data; });
                 
                 bars.enter().append('rect')
@@ -252,6 +252,10 @@ module ninjaPixel{
                     fill:       (d,i) => {return functor(barFill,d,i);}
                 })
                 .attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function(d,i){return xGroupScale.rangeBand();},
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);

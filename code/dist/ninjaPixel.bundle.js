@@ -11139,9 +11139,6 @@ var ninjaPixel;
                 if (_this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
-                var calculateBarWidth = function (d, i) {
-                    return xGroupScale(d.group);
-                };
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;
                 }
@@ -11212,6 +11209,12 @@ var ninjaPixel;
                         return functor(barFill, d, i);
                     }
                 }).attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function (d, i) {
+                        return xGroupScale.rangeBand();
+                    },
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);
@@ -11475,6 +11478,12 @@ var ninjaPixel;
                         return functor(barFill, d, i);
                     }
                 }).attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function (d, i) {
+                        return xGroupScale.rangeBand();
+                    },
                     y: function (d) {
                         if (d.yMax > 0) {
                             return yScale(d.yMax);
@@ -11560,6 +11569,12 @@ var ninjaPixel;
                         return functor(barFill2, d, i);
                     }
                 }).attr({
+                    x: function (d, i) {
+                        return xGroupScale(d.group);
+                    },
+                    width: function (d, i) {
+                        return xGroupScale.rangeBand();
+                    },
                     y: function (d) {
                         if (d.yMax > 0) {
                             return yScale(d.yMed) - medianWidth / 2;

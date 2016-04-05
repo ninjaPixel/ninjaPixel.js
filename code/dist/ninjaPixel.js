@@ -1350,6 +1350,7 @@ var ninjaPixel;
                     return "translate(" + xScaleAdjusted(d.x) + ",0)";
                 });
                 barsRoot.exit().transition().remove();
+                var widthFactor = 0.95;
                 var bars = barsRoot.selectAll(".bar").data(function (d) {
                     return d.data;
                 });
@@ -1358,7 +1359,7 @@ var ninjaPixel;
                         return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return xGroupScale.rangeBand();
+                        return widthFactor * xGroupScale.rangeBand();
                     },
                     y: yScale0,
                     height: 0,
@@ -1409,7 +1410,7 @@ var ninjaPixel;
                         return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return xGroupScale.rangeBand();
+                        return widthFactor * xGroupScale.rangeBand();
                     },
                     y: function (d) {
                         if (d.y > 0) {
@@ -1604,6 +1605,7 @@ var ninjaPixel;
                 var calculateBarWidth = function (d, i) {
                     return xGroupScale(d.group);
                 };
+                var widthFactor = 0.95;
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;
                 }
@@ -1627,7 +1629,7 @@ var ninjaPixel;
                         return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return xGroupScale.rangeBand();
+                        return widthFactor * xGroupScale.rangeBand();
                     },
                     y: yScale0,
                     height: 0,
@@ -1678,7 +1680,7 @@ var ninjaPixel;
                         return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return xGroupScale.rangeBand();
+                        return widthFactor * xGroupScale.rangeBand();
                     },
                     y: function (d) {
                         if (d.yMax > 0) {
@@ -1718,7 +1720,7 @@ var ninjaPixel;
                         return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return xGroupScale.rangeBand();
+                        return widthFactor * xGroupScale.rangeBand();
                     },
                     y: yScale0,
                     height: 0,
@@ -1769,7 +1771,7 @@ var ninjaPixel;
                         return xGroupScale(d.group);
                     },
                     width: function (d, i) {
-                        return xGroupScale.rangeBand();
+                        return widthFactor * xGroupScale.rangeBand();
                     },
                     y: function (d) {
                         if (d.yMax > 0) {

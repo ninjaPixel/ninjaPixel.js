@@ -203,7 +203,8 @@ module ninjaPixel{
                 barsRoot.exit()
                 .transition()
                 .remove();
-            
+
+                var widthFactor = 0.95;
             var bars = barsRoot.selectAll(".bar")
                 .data(function(d) { return d.data; });
                 
@@ -213,7 +214,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
-                    width: function(d,i){return xGroupScale.rangeBand();},
+                    width: function(d,i){return widthFactor *xGroupScale.rangeBand();},
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill, d, i)},
@@ -255,7 +256,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
-                    width: function(d,i){return xGroupScale.rangeBand();},
+                    width: function(d,i){return widthFactor * xGroupScale.rangeBand();},
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(d.y);

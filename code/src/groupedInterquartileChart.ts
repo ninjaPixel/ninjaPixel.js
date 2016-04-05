@@ -190,7 +190,8 @@ module ninjaPixel{
                 
             var calculateBarWidth = function(d, i){
                 return xGroupScale(d.group)  
-            }
+            };
+                var widthFactor = 0.95;
 
             function xScaleAdjusted(x){
               return xScale(x) + barAdjustmentX;   
@@ -228,7 +229,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
-                    width: function(d,i){return xGroupScale.rangeBand();},
+                    width: function(d,i){return widthFactor * xGroupScale.rangeBand();},
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill, d, i)},
@@ -270,7 +271,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
-                    width: function(d,i){return xGroupScale.rangeBand();},
+                    width: function(d,i){return widthFactor * xGroupScale.rangeBand();},
                     y: function (d) {
                         if (d.yMax > 0) {
                             return yScale(d.yMax);
@@ -313,7 +314,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
-                    width: function(d,i){return xGroupScale.rangeBand();},
+                    width: function(d,i){return widthFactor * xGroupScale.rangeBand();},
                     y: yScale0,
                     height: 0,
                     fill: (d, i) => {return functor(this._itemFill2, d, i)},
@@ -355,7 +356,7 @@ module ninjaPixel{
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
-                    width: function(d,i){return xGroupScale.rangeBand();},
+                    width: function(d,i){return widthFactor * xGroupScale.rangeBand();},
                     y: function (d) {
                         if (d.yMax > 0) {
                             return yScale(d.yMed) - medianWidth/2;

@@ -359,7 +359,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.10';
+    ninjaPixel.version = '0.0.11';
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
@@ -1018,7 +1018,7 @@ var ninjaPixel;
                 if (barWidth != null) {
                     barW = barWidth;
                 }
-                if (_this._barWidth) {
+                else if (_this._barWidth) {
                     barW = _this._barWidth;
                 }
                 else {
@@ -1084,6 +1084,9 @@ var ninjaPixel;
                 var barAdjustmentX = 0;
                 if (_this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
+                }
+                if (barWidth != null) {
+                    barAdjustmentX = (xScale.rangeBand() - barW) / 2;
                 }
                 var calculateBarWidth = function (d, i) {
                     return barW;
@@ -1191,6 +1194,227 @@ var ninjaPixel;
         return BarChart;
     })(ninjaPixel.Chart);
     ninjaPixel.BarChart = BarChart;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ninjaPixel;
+(function (ninjaPixel) {
+    var HorizontalBarChart = (function (_super) {
+        __extends(HorizontalBarChart, _super);
+        function HorizontalBarChart() {
+            _super.call(this);
+            this._cornerRounding = 1;
+            this._isTimeseries = false;
+        }
+        HorizontalBarChart.prototype.cornerRounding = function (_x) {
+            if (!arguments.length)
+                return this._cornerRounding;
+            this._cornerRounding = _x;
+            return this;
+        };
+        HorizontalBarChart.prototype.isTimeseries = function (_x) {
+            if (!arguments.length)
+                return this._isTimeseries;
+            this._isTimeseries = _x;
+            return this;
+        };
+        HorizontalBarChart.prototype.barWidth = function (_x) {
+            if (!arguments.length)
+                return this._barWidth;
+            this._barWidth = _x;
+            return this;
+        };
+        HorizontalBarChart.prototype.plot = function (_selection, barHeight) {
+            var _this = this;
+            this._init(_selection);
+            var functor = this._functor;
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            var onClick = this._onClick;
+            var mouseOverBarOpacity = this._mouseOverItemOpacity;
+            var defaultBarOpacity = this._itemOpacity;
+            var mouseOverBarStroke = this._mouseOverItemStroke;
+            var defaultStroke = this._itemStroke;
+            var barFill = this._itemFill;
+            function getMinDate(theData) {
+                return d3.min(theData, function (d) {
+                    return new Date(d.y).getTime();
+                });
+            }
+            function getMaxDate(theData) {
+                return d3.max(theData, function (d) {
+                    return new Date(d.y).getTime();
+                });
+            }
+            _selection.each(function (_data) {
+                var barH;
+                if (barHeight != null) {
+                    barH = barHeight;
+                }
+                else if (_this._barWidth) {
+                    barH = _this._barWidth;
+                }
+                else {
+                    if (_this._isTimeseries) {
+                        barH = 0.9 * _this._chartWidth / (_data.length + 1);
+                    }
+                    else {
+                        barH = 0;
+                    }
+                }
+                var minData = 0;
+                var maxData = 0;
+                if (_this._xMin != null) {
+                    minData = _this._xMin;
+                }
+                else {
+                    var d3MinX = d3.min(_data, function (d) { return d.x; });
+                    if (d3MinX < 0) {
+                        minData = d3MinX;
+                    }
+                }
+                if (_this._xMax != null) {
+                    maxData = _this._xMax;
+                }
+                else {
+                    var d3MaxX = d3.max(_data, function (d) { return d.x; });
+                    if (d3MaxX > 0) {
+                        maxData = d3MaxX;
+                    }
+                    if (maxData === minData) {
+                        maxData += 10;
+                    }
+                }
+                if (_this._isTimeseries) {
+                    console.warn('The timeseries option is untested.');
+                    var minY, maxY;
+                    if (_this._xMin != null) {
+                        minY = new Date(_this._y1Min).getTime();
+                    }
+                    else {
+                        minY = getMinDate(_data);
+                    }
+                    if (_this._xMax != null) {
+                        maxY = new Date(_this._y1Max).getTime();
+                    }
+                    else {
+                        maxY = getMaxDate(_data);
+                    }
+                    _this._yScale = d3.time.scale().domain([minY, maxY]).range([0 + barH, _this._chartHeight - barH]);
+                }
+                else {
+                    _this._yScale = d3.scale.ordinal().domain(_data.map(function (d, i) {
+                        return d.y;
+                    })).rangeRoundBands([0, _this._chartHeight], 0.1);
+                }
+                _this._xScale = d3.scale.linear().domain([minData, maxData]).range([0, _this._chartWidth]);
+                _this._barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
+                var xScale = _this._xScale;
+                var yScale = _this._yScale;
+                var barScale = _this._barScale;
+                if (barH <= 0) {
+                    barH = yScale.rangeBand();
+                }
+                var barAdjustmentY = 0;
+                if (_this._isTimeseries) {
+                    barAdjustmentY = -barH / 2;
+                }
+                if (barHeight != null) {
+                    barAdjustmentY = (yScale.rangeBand() - barH) / 2;
+                }
+                function yScaleAdjusted(y) {
+                    return yScale(y) + barAdjustmentY;
+                }
+                _this._yScaleAdjusted = yScaleAdjusted;
+                var xScale0 = xScale(0);
+                var bars = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.bar').data(_data, function (d) {
+                    return d.y;
+                });
+                bars.enter().append('rect').classed('bar', true).attr({
+                    y: function (d, i) {
+                        return yScaleAdjusted(d.y);
+                    },
+                    width: 0,
+                    x: xScale0,
+                    height: barH,
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    },
+                    rx: _this._cornerRounding,
+                    ry: _this._cornerRounding
+                }).on('mouseover', function (d, i) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(mouseOverBarOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(mouseOverBarStroke, d, i);
+                        }
+                    });
+                    myToolTip.show(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
+                }).on('mouseout', function (d, i) {
+                    d3.select(this).style({
+                        opacity: function (d, i) {
+                            return functor(defaultBarOpacity, d, i);
+                        },
+                        stroke: function (d, i) {
+                            return functor(defaultStroke, d, i);
+                        }
+                    });
+                    myToolTip.hide();
+                    onMouseout(d);
+                }).on('click', function (d, i) {
+                    onClick(d);
+                });
+                bars.transition().duration(_this._transitionDuration).delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                }).ease(_this._transitionEase).style({
+                    opacity: function (d, i) {
+                        return functor(defaultBarOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(defaultStroke, d, i);
+                    },
+                    fill: function (d, i) {
+                        return functor(barFill, d, i);
+                    }
+                }).attr({
+                    y: function (d, i) {
+                        return yScaleAdjusted(d.y);
+                    },
+                    height: barH,
+                    x: xScale(0),
+                    width: function (d) {
+                        if (d.x > 0) {
+                            return xScale(d.x);
+                        }
+                        else {
+                            return xScale(0);
+                        }
+                    }
+                });
+                bars.exit().transition().duration(function (d, i) {
+                    return functor(_this._removeTransitionDelay, d, i);
+                }).ease(_this._transitionEase).attr({
+                    x: 0
+                }).delay(function (d, i) {
+                    return functor(_this._removeDelay, d, i);
+                }).remove();
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+            });
+        };
+        return HorizontalBarChart;
+    })(ninjaPixel.Chart);
+    ninjaPixel.HorizontalBarChart = HorizontalBarChart;
 })(ninjaPixel || (ninjaPixel = {}));
 
 var __extends = this.__extends || function (d, b) {

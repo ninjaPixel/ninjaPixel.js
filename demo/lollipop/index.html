@@ -11,24 +11,30 @@
         stroke: black;
         shape-rendering: crispEdges;
     }
-    .ninja-background{
+
+    .ninja-background {
         fill: #333333;
         stroke: black;
     }
-    .lollipop-head{
-        stroke-width: 3px;   
+
+    .lollipop-head {
+        stroke-width: 3px;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -38,6 +44,7 @@
         font: 12px sans-serif;
         width: 100px;
     }
+
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
         box-sizing: border-box;
@@ -50,16 +57,19 @@
         position: absolute;
         text-align: center;
     }
+
     /* Style northward tooltips differently */
     .d3-tip.n:after {
         margin: -1px 0 0 0;
         top: 100%;
         left: 0;
     }
+
     .ninja-horizontalGrid {
         stroke: lightgrey;
         opacity: 0.7;
     }
+
     .ninja-horizontalGridTopping {
         stroke: #333333;
         opacity: 0.7;
@@ -67,62 +77,66 @@
 </style>
 
 <body>
-    <div id="chart"></div>
-    <div id="message"></div>
+<div id="chart"></div>
+<div id="message"></div>
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
 <script>
     var barChart = new ninjaPixel.Lollipop();
     barChart.transitionDuration(800)
-        .margin({
-            top: 40,
-            bottom: 50,
-            left: 60,
-            right: 30
-        })
-    .headFill('#333333')
-    .headStroke('white')
-    .headMouseOverStroke('#ededed')
-    .headRadius(30)
-    .y1Max(12)
-    .plotBackground(false)
-//    .itemOpacity(0.5)
-    .itemStroke('none')
-    .itemFill('#333333')
-    .transitionEase('linear')
-    .transitionDelay(function(d,i){return i*100;})
-    .height(500)    
-    .cornerRounding(0)
-    .title('Lollipop Sales')
-    .yAxis1Title('Items Sold')
-    .mouseOverItemOpacity(function(d,i){return d.opacity;})
-    
+            .margin({
+                top: 40,
+                bottom: 50,
+                left: 60,
+                right: 30
+            })
+            .headFill('#333333')
+            .headStroke('white')
+            .headMouseOverStroke('#ededed')
+            .headRadius(30)
+            .y1Max(12)
+            .plotBackground(false)
+            //    .itemOpacity(0.5)
+            .itemStroke('none')
+            .itemFill('#333333')
+            .transitionEase('linear')
+            .transitionDelay(function (d, i) {
+                return i * 100;
+            })
+            .height(500)
+            .cornerRounding(0)
+            .title('Lollipop Sales')
+            .yAxis1Title('Items Sold')
+            .stickWidth(10)
+            .mouseOverItemOpacity(function (d, i) {
+                return d.opacity;
+            })
+
     var toolTip = barChart.toolTip();
-    toolTip.html(function(d){return '<i>'+d.x + '</i><br/>'+ d.y})
-        .offset([-40,0]);
+    toolTip.html(function (d) {
+                return '<i>' + d.x + '</i><br/>' + d.y
+            })
+            .offset([-40, 0]);
     barChart.toolTip(toolTip);
-    
-//    var headToolTip = barChart.headToolTip();
-//    headToolTip.html(function(d){return '<i>'+d.x + '</i><br/>'+ d.y})
-//        .offset([-10, 0]);
-//    barChart.headToolTip(headToolTip);
-//    
+
+    //    var headToolTip = barChart.headToolTip();
+    //    headToolTip.html(function(d){return '<i>'+d.x + '</i><br/>'+ d.y})
+    //        .offset([-10, 0]);
+    //    barChart.headToolTip(headToolTip);
+    //
     var headToolTip = toolTip; // need to make a copy of this object
     headToolTip.offset([-10, 0]);
     barChart.headToolTip(headToolTip);
-    
 
 
-    
-
-ready();
+    ready();
 
     function ready() {
         var data = [{x: 'Strawberry', y: 6}, {x: 'Bubblegum', y: 3}, {x: 'Apple', y: 7}, {x: 'Cola', y: 10}]
 
         barChart.plot(d3.select("#chart")
-            .datum(data));
+                .datum(data));
     }
 </script>
 

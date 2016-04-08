@@ -2,18 +2,18 @@
 /// <reference path="chart.ts" />
 //declare var d3: D3.Base;
 module ninjaPixel {
-    interface barChartDataItem {
+    interface horizontalBarChartDataItem {
         color?:string;
-        x:string;
-        y:number;
+        y:string;
+        x:number;
     }
 
-    export class BarChart extends ninjaPixel.Chart {
+    export class HorizontalBarChart extends ninjaPixel.Chart {
         _cornerRounding:number = 1;
         _xScale:any;
         _yScale:any;
         _barScale:any;
-        _xScaleAdjusted:any;
+        _yScaleAdjusted:any;
 
         cornerRounding(_x:number):any {
             if (!arguments.length) return this._cornerRounding;
@@ -41,7 +41,7 @@ module ninjaPixel {
             super();
         }
 
-        plot(_selection, barWidth?:number) {
+        plot(_selection, barHeight?:number) {
             this._init(_selection);
             var functor = this._functor;
             var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
@@ -55,52 +55,52 @@ module ninjaPixel {
             var barFill = this._itemFill;
 
             function getMinDate(theData) {
-                return d3.min(theData, (d:{x:number}) => {
-                    return new Date(d.x).getTime();
+                return d3.min(theData, (d:{y:number}) => {
+                    return new Date(d.y).getTime();
                 });
             }
 
             function getMaxDate(theData) {
-                return d3.max(theData, (d:{x:number}) => {
-                    return new Date(d.x).getTime();
+                return d3.max(theData, (d:{y:number}) => {
+                    return new Date(d.y).getTime();
                 });
             }
 
             _selection.each((_data) => {
 
-                var barW:number;
-                if (barWidth != null) {
+                var barH:number;
+                if (barHeight != null) {
                     // set by other functions e.g. lollipop chart
-                    barW = barWidth;
+                    barH = barHeight;
                 }
                 else if (this._barWidth) {
                     // set by the user
-                    barW = this._barWidth;
+                    barH = this._barWidth;
                 }
                 else {
                     if (this._isTimeseries) {
-                        barW = 0.9 * this._chartWidth / (_data.length + 1);
+                        barH = 0.9 * this._chartWidth / (_data.length + 1);
                     } else {
-                        barW = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
+                        barH = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
                     }
                 }
                 var minData:any = 0;
                 var maxData:any = 0;
 
-                if (this._y1Min != null) {
-                    minData = this._y1Min;
+                if (this._xMin != null) {
+                    minData = this._xMin;
                 } else {
-                    var d3MinY = d3.min(_data, (d:barChartDataItem) => d.y);
-                    if (d3MinY < 0) {
-                        minData = d3MinY;
+                    var d3MinX = d3.min(_data, (d:horizontalBarChartDataItem) => d.x);
+                    if (d3MinX < 0) {
+                        minData = d3MinX;
                     }
                 }
-                if (this._y1Max != null) {
-                    maxData = this._y1Max;
+                if (this._xMax != null) {
+                    maxData = this._xMax;
                 } else {
-                    var d3MaxY = d3.max(_data, (d:barChartDataItem) => d.y);
-                    if (d3MaxY > 0) {
-                        maxData = d3MaxY;
+                    var d3MaxX = d3.max(_data, (d:horizontalBarChartDataItem) => d.x);
+                    if (d3MaxX > 0) {
+                        maxData = d3MaxX;
                     }
 
                     // if the max and min are the same value, then there is no range for us to plot with.
@@ -112,41 +112,35 @@ module ninjaPixel {
 
 
                 if (this._isTimeseries) {
-                    var minX, maxX;
+                    // completely untested
+                    console.warn('The timeseries option is untested.');
+                    var minY, maxY;
                     if (this._xMin != null) {
-                        minX = new Date(this._xMin).getTime();
+                        minY = new Date(this._y1Min).getTime();
                     } else {
-                        minX = getMinDate(_data);
+                        minY = getMinDate(_data);
                     }
                     if (this._xMax != null) {
-                        maxX = new Date(this._xMax).getTime();
+                        maxY = new Date(this._y1Max).getTime();
                     } else {
-                        maxX = getMaxDate(_data);
+                        maxY = getMaxDate(_data);
                     }
 
-                    this._xScale = d3.time.scale()
-                        .domain([minX, maxX])
-                        .range([0 + barW, this._chartWidth - barW]);
+                    this._yScale = d3.time.scale()
+                        .domain([minY, maxY])
+                        .range([0 + barH, this._chartHeight - barH]);
                 } else {
-                    this._xScale = d3.scale.ordinal()
+                    this._yScale = d3.scale.ordinal()
                         .domain(_data.map(function (d, i) {
-                            return d.x;
+                            return d.y;
                         }))
-                        .rangeRoundBands([0, this._chartWidth], 0.1);
+                        .rangeRoundBands([0, this._chartHeight], 0.1);
                 }
 
-//            if(useEntireXAxis){
-//                // if we are plotting other types of char below this one
-//                // then we will want the x labels to line up
-//                // the bar chart has a buffer at each edge, so that bars don't get cropped
-//                // but this means that the date alignment is different to other chart types
-//                // Fix this with the _useEntireXAxis flag.
-//                this._xScale.range([0, this._chartWidth]);  
-//            }
 
-                this._yScale = d3.scale.linear()
+                this._xScale = d3.scale.linear()
                     .domain([minData, maxData])
-                    .range([this._chartHeight, 0]);
+                    .range([0, this._chartWidth]);
 
                 this._barScale = d3.scale.linear()
                     .domain([Math.abs(maxData - minData), 0])
@@ -156,51 +150,46 @@ module ninjaPixel {
                 var yScale = this._yScale;
                 var barScale = this._barScale;
 
-                if (barW <= 0) {
-                    barW = xScale.rangeBand();
+                if (barH <= 0) {
+                    barH = yScale.rangeBand();
                 }
 
                 // set bar adjustment
-                var barAdjustmentX = 0;
+                var barAdjustmentY = 0;
                 if (this._isTimeseries) {
-                    barAdjustmentX = -barW / 2;
+                    barAdjustmentY = -barH / 2;
                 }
-                if (barWidth != null) {
-                    // set by other functions e.g. lollipop chart
-                    barAdjustmentX = (xScale.rangeBand()-barW) / 2;
+                if (barHeight != null) {
+                    // set by other functions e.g. lollipop chart. Untested
+                    barAdjustmentY = (yScale.rangeBand()-barH) / 2;
 
                 }
 
-                var calculateBarWidth = function (d, i) {
-                    return barW;
+
+                function yScaleAdjusted(y) {
+                    return yScale(y) + barAdjustmentY;
                 }
 
-                function xScaleAdjusted(x) {
-                    return xScale(x) + barAdjustmentX;
-                }
-
-                this._xScaleAdjusted = xScaleAdjusted;
+                this._yScaleAdjusted = yScaleAdjusted;
 
                 // Enter, Update, Exit on bars
-                var yScale0 = yScale(0);
+                var xScale0 = xScale(0);
                 var bars = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.bar')
                     .data(_data, function (d) {
-                        return d.x;
+                        return d.y;
                     });
 
                 bars.enter().append('rect')
                     .classed('bar', true)
                     .attr({
-                        x: function (d, i) {
-                            return xScaleAdjusted(d.x);
+                        y: function (d, i) {
+                            return yScaleAdjusted(d.y);
                         },
-                        width: function (d, i) {
-                            return calculateBarWidth(d, i);
-                        },
-                        y: yScale0,
-                        height: 0,
+                        width: 0,
+                        x: xScale0,
+                        height: barH,
                         fill: (d, i) => {
                             return functor(this._itemFill, d, i)
                         },
@@ -256,23 +245,18 @@ module ninjaPixel {
                         }
                     })
                     .attr({
-                        x: function (d, i) {
-                            return xScaleAdjusted(d.x);
+                        y: function (d, i) {
+                            return yScaleAdjusted(d.y);
                         },
-//                    width: barW,
-                        width: function (d, i) {
-                            return calculateBarWidth(d, i);
-                        },
-                        y: function (d) {
-                            if (d.y > 0) {
-                                return yScale(d.y);
+                        height: barH,
+                        x: xScale(0),
+                        width: function (d) {
+                            if (d.x > 0) {
+                                return xScale(d.x);
                             } else {
-                                return yScale(0);
+                                return xScale(0);
                             }
-                        },
-                        height: function (d) {
-                            return Math.abs(barScale(d.y));
-                        },
+                        }
                     });
 
                 bars.exit()
@@ -282,31 +266,18 @@ module ninjaPixel {
                     })
                     .ease(this._transitionEase)
                     .attr({
-                        y: function (d) {
-                            if (d.y > 0) {
-                                return yScale(0);
-                            } else {
-                                return yScale(0);
-                            }
-                        },
-                        height: function (d) {
-                            return Math.abs(barScale(0));
-                        },
+                        x:0
                     })
                     .delay((d, i) => {
                         return functor(this._removeDelay, d, i);
                     })
-                    // .style({
-                    // opacity: 0
-                    // })
+
                     .remove();
 
                 this._plotLabels();
                 this._plotXAxis(xScale, yScale);
                 this._plotYAxis(xScale, yScale);
-//            this._plotGrids(xScale, yScale);
 
-                // end data loop
             });
             //end BarChart            
         }

@@ -364,7 +364,10 @@ module ninjaPixel{
                             return yScale(0);
                         }
                     },
-                    height: function (d) { 
+                    height: function (d) {
+                        if(isNaN(d.yMed)){
+                            return 0;
+                        }
                         return medianWidth;
                     },
                 });

@@ -359,7 +359,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.11';
+    ninjaPixel.version = '0.0.12';
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
@@ -2006,6 +2006,9 @@ var ninjaPixel;
                         }
                     },
                     height: function (d) {
+                        if (isNaN(d.yMed)) {
+                            return 0;
+                        }
                         return medianWidth;
                     },
                 });

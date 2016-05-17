@@ -11,21 +11,26 @@
         stroke: black;
         shape-rendering: crispEdges;
     }
-    .ninja-background{
+
+    .ninja-background {
         fill: #333333;
         stroke: black;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -35,6 +40,7 @@
         font: 12px sans-serif;
         width: 100px;
     }
+
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
         box-sizing: border-box;
@@ -47,6 +53,7 @@
         position: absolute;
         text-align: center;
     }
+
     /* Style northward tooltips differently */
     .d3-tip.n:after {
         margin: -1px 0 0 0;
@@ -54,76 +61,85 @@
         left: 0;
     }
 
-    .ninja-yAxisGroup.ninja-axis g.tick line{
+    .ninja-yAxisGroup.ninja-axis g.tick line {
         stroke: #333333;
-        opacity: 0.7; 
+        opacity: 0.7;
     }
 </style>
 
 <body>
-    <div id="chart"></div>
-    <div id="message"></div>
+<div id="chart"></div>
+<div id="message"></div>
 </body>
-    <script src="../../code/node_modules/moment/moment.js"></script>
+<script src="../../code/node_modules/moment/moment.js"></script>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
 <script>
 
-    
+
     var barChart = new ninjaPixel.GroupedInterquartileChart();
     barChart.transitionDuration(2000)
-        .margin({
-            top: 20,
-            bottom: 50,
-            left: 60,
-            right: 30
-        })
-    .plotBackground(true)
-    .transitionEase('linear')
-    .transitionDelay(function(d,i){return i*30;})
-    .onMouseover(function (d, i) {
-            d3.select('#message').text(d.x);
-        })
-    .mouseOverItemStroke('red')
-    .height(500)
-    .plotHorizontalGridTopping(true)
-    .cornerRounding(3)
-    .isTimeseries(false)
-    .itemFill(function(d,i){return d.color;})
-    .itemFill2(function(d,i){return d.color2;})
-    .medianWidth(4)
-    .mouseOverItemOpacity(function(d,i){return d.opacity;});
+            .margin({
+                top: 20,
+                bottom: 50,
+                left: 60,
+                right: 30
+            })
+            .plotBackground(true)
+            .transitionEase('linear')
+            .transitionDelay(function (d, i) {
+                return i * 30;
+            })
+            .onMouseover(function (d, i) {
+                d3.select('#message').text(d.x);
+            })
+            .mouseOverItemStroke('red')
+            .height(500)
+            .plotHorizontalGridTopping(true)
+            .cornerRounding(3)
+            .isTimeseries(false)
+            .itemFill(function (d, i) {
+                return d.color;
+            })
+            .itemFill2(function (d, i) {
+                return d.color2;
+            })
+            .itemStrokeWidth('5px')
+            .medianWidth(4)
+            .mouseOverItemOpacity(function (d, i) {
+                return d.opacity;
+            });
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {
         return d.y;
     });
     barChart.toolTip(toolTip);
-    
+
     ready();
-        setTimeout(function run() { 
-         ready();
-        setTimeout(run, 30000); 
+    setTimeout(function run() {
+        ready();
+        setTimeout(run, 30000);
     }, 3000);
 
-    function menWomenData(sex, color){
+    function menWomenData(sex, color) {
         var medColor = 'pink';
         var randMed = 2 + Math.random() * (10);
         var yMax = randMed + Math.random() * (2);
         var yMin = randMed - Math.random() * (2);
-        return {group: sex, yMax:yMax, yMed: randMed, yMin:yMin, color: color, color2: medColor};
+        return {group: sex, yMax: yMax, yMed: randMed, yMin: yMin, color: color, color2: medColor};
     }
     function ready(error) {
         var data = [
-            {x:'Jersey', data:[menWomenData('men', '#fc8d59'), menWomenData('women','#91cf60')]},
-            {x:'Guernsey', data:[menWomenData('men', '#fc8d59'), menWomenData('women','#91cf60')]},
-            {x:'Sark', data:[menWomenData('men', '#fc8d59'), menWomenData('women','#91cf60')]}
-                  ];
+            {x: 'Jersey', data: [menWomenData('men', '#fc8d59'), menWomenData('women', '#91cf60')]},
+            {x: 'Guernsey', data: [menWomenData('men', '#fc8d59'), menWomenData('women', '#91cf60')]},
+            {x: 'Sark', data: [menWomenData('men', '#fc8d59'), menWomenData('women', '#91cf60')]}
+        ];
 
         barChart.plot(d3.select("#chart")
-            .datum(data));
-            
-            console.log(data);
+                .datum(data));
+
+        console.log(data);
     }
 </script>
 

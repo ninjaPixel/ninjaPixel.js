@@ -11559,6 +11559,7 @@ var ninjaPixel;
             var barFill = this._itemFill;
             var barFill2 = this._itemFill2;
             var medianWidth = this._medianWidth;
+            var itemStrokeWidth = this._itemStrokeWidth;
             function getMinDate(theData) {
                 return d3.min(theData, function (d) {
                     return new Date(d.x).getTime();
@@ -11686,31 +11687,16 @@ var ninjaPixel;
                     },
                     y: yScale0,
                     height: 0,
-                    fill: function (d, i) {
-                        return functor(_this._itemFill, d, i);
-                    },
+                    fill: 'none',
                     rx: _this._cornerRounding,
-                    ry: _this._cornerRounding
+                    ry: _this._cornerRounding,
+                    'stroke-width': function (d, i) {
+                        return functor(itemStrokeWidth, d, i);
+                    }
                 }).on('mouseover', function (d, i) {
-                    d3.select(this).style({
-                        opacity: function (d, i) {
-                            return functor(mouseOverBarOpacity, d, i);
-                        },
-                        stroke: function (d, i) {
-                            return functor(mouseOverBarStroke, d, i);
-                        }
-                    });
                     myToolTip.show(d);
                     onMouseover(d, myToolTip.getBoundingBox());
                 }).on('mouseout', function (d, i) {
-                    d3.select(this).style({
-                        opacity: function (d, i) {
-                            return functor(defaultBarOpacity, d, i);
-                        },
-                        stroke: function (d, i) {
-                            return functor(defaultStroke, d, i);
-                        }
-                    });
                     myToolTip.hide();
                     onMouseout(d);
                 }).on('click', function (d, i) {
@@ -11723,10 +11709,11 @@ var ninjaPixel;
                         return functor(defaultBarOpacity, d, i);
                     },
                     stroke: function (d, i) {
-                        return functor(defaultStroke, d, i);
-                    },
-                    fill: function (d, i) {
                         return functor(barFill, d, i);
+                    },
+                    fill: 'none',
+                    'stroke-width': function (d, i) {
+                        return functor(itemStrokeWidth, d, i);
                     }
                 }).attr({
                     x: function (d, i) {

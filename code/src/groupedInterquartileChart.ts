@@ -67,6 +67,7 @@ module ninjaPixel{
             var barFill = this._itemFill;   
             var barFill2 = this._itemFill2;   
             var medianWidth = this._medianWidth;
+            var itemStrokeWidth = this._itemStrokeWidth;
             
             function getMinDate(theData) {
                 return d3.min(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
@@ -180,9 +181,6 @@ module ninjaPixel{
             }
             xGroupScale.domain(distinctGroups).rangeRoundBands([0, barW]);
 
-            
-                
-                
             var barAdjustmentX = 0; 
             if(this._isTimeseries){ 
                 barAdjustmentX = -barW/2;
@@ -232,25 +230,27 @@ module ninjaPixel{
                     width: function(d,i){return widthFactor * xGroupScale.rangeBand();},
                     y: yScale0,
                     height: 0,
-                    fill: (d, i) => {return functor(this._itemFill, d, i)},
+                    fill: 'none',//(d, i) => {return functor(this._itemFill, d, i)},
                     rx: this._cornerRounding,
-                    ry: this._cornerRounding
+                    ry: this._cornerRounding,
+                    'stroke-width': (d, i) => {return functor(itemStrokeWidth, d, i);}
+
                 })
                 .on('mouseover', function (d, i) {
-                    d3.select(this)
-                        .style({
-                            opacity: (d, i) => { return functor(mouseOverBarOpacity, d, i);},
-                            stroke:  (d,i) => {return functor(mouseOverBarStroke, d, i);}
-                        });
+                    // d3.select(this)
+                        // .style({
+                        //     opacity: (d, i) => { return functor(mouseOverBarOpacity, d, i);},
+                        //     stroke:  (d,i) => {return functor(mouseOverBarStroke, d, i);},
+                        // });
                     myToolTip.show(d); 
                     onMouseover(d, myToolTip.getBoundingBox());
                 })
                 .on('mouseout', function (d, i) {
-                    d3.select(this)
-                        .style({
-                            opacity: (d, i) => {return functor(defaultBarOpacity,d, i);}, // Re-sets the opacity
-                            stroke:  (d,i) => {return functor(defaultStroke, d, i);}
-                        });
+                    // d3.select(this)
+                    //     .style({
+                    //         opacity: (d, i) => {return functor(defaultBarOpacity,d, i);}, // Re-sets the opacity
+                    //         stroke:  (d,i) => {return functor(defaultStroke, d, i);}
+                    //     });
                     myToolTip.hide();
                     onMouseout(d);
                 })
@@ -264,8 +264,10 @@ module ninjaPixel{
                 .ease(this._transitionEase)
                 .style({
                     opacity:    (d,i) => {return functor(defaultBarOpacity, d, i);} ,
-                    stroke:     (d,i) => {return functor(defaultStroke, d, i);},
-                    fill:       (d,i) => {return functor(barFill,d,i);}
+                    stroke:     (d,i) => {return functor(barFill,d,i);},
+                    fill:       'none',//(d,i) => {return functor(barFill,d,i);},
+                    'stroke-width': (d, i) => {return functor(itemStrokeWidth, d, i);}
+
                 })
                 .attr({
                     x: function (d, i) {

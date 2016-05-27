@@ -10266,6 +10266,8 @@ var ninjaPixel;
                 width: this._width,
                 height: this._height
             });
+            this._svg.style("height", this._height);
+            this._svg.style("width", this._width);
             if (this._category == 1 /* donut */) {
                 this._svg.select('.ninja-containerGroup').attr({
                     transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth / 2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight / 2)) + ')'

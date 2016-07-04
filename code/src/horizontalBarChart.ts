@@ -44,17 +44,13 @@ module ninjaPixel {
         plot(_selection, barHeight?:number) {
             if (this._barWidth) {
                 // auto calc the height of the chart
-
                 var barCount = 1;
                 _selection.each((_data) => {
                     if (_data.length > barCount) {
                         barCount = _data.length;
                     }
                 });
-
-
                 this._height = (this._barWidth * barCount * 1.5) + this._margin.top + this._margin.bottom;
-
             }
 
             this._init(_selection);
@@ -90,9 +86,6 @@ module ninjaPixel {
                 else if (this._barWidth) {
                     // set by the user
                     barH = this._barWidth;
-                    // auto calc the height of the chart
-                    // this._height = (this._barWidth * _data.length * 1.5) + this._margin.top + this._margin.bottom;
-                    // this._init(_selection); // TODO I don't really want to be doing this in the each loop. But am getting away with it here because I know there is only one item to iterate over.
                 }
                 else {
                     if (this._isTimeseries) {

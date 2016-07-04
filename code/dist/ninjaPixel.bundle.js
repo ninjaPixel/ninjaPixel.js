@@ -10188,7 +10188,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.12';
+    ninjaPixel.version = '0.0.13';
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
@@ -11062,6 +11062,15 @@ var ninjaPixel;
         };
         HorizontalBarChart.prototype.plot = function (_selection, barHeight) {
             var _this = this;
+            if (this._barWidth) {
+                var barCount = 1;
+                _selection.each(function (_data) {
+                    if (_data.length > barCount) {
+                        barCount = _data.length;
+                    }
+                });
+                this._height = (this._barWidth * barCount * 1.5) + this._margin.top + this._margin.bottom;
+            }
             this._init(_selection);
             var functor = this._functor;
             var myToolTip = this._toolTip;

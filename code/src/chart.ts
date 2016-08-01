@@ -57,6 +57,7 @@ module ninjaPixel {
         _xAxisTitle:string = '';
         _yAxis1LogScale:boolean = false;
         _xAxisLogScale:boolean = false;
+        _xAxisTextOrientation:string = 'bottom';
         _transitionDuration:number = 300;
         _transitionEase:string = 'linear';
         _transitionDelay:any = 0;// function or value
@@ -175,7 +176,7 @@ module ninjaPixel {
         _plotXAxis(xScale:any, yScale:any) {
             var xAxis = d3.svg.axis()
                 .scale(xScale)
-                .orient('bottom')
+                .orient(this._xAxisTextOrientation)
                 .outerTickSize(0); // remove that presky final tick
 
             if (this._plotVerticalGridTopping) {
@@ -751,6 +752,12 @@ module ninjaPixel {
         xAxisTickFormat(_x):any {
             if (!arguments.length) return this._xAxisTickFormat;
             this._xAxisTickFormat = _x;
+            return this;
+        }
+
+        xAxisTextOrientation(_x):any {
+            if (!arguments.length) return this._xAxisTextOrientation;
+            this._xAxisTextOrientation = _x;
             return this;
         }
 

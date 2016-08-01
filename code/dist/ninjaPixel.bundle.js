@@ -10212,6 +10212,7 @@ var ninjaPixel;
             this._xAxisTitle = '';
             this._yAxis1LogScale = false;
             this._xAxisLogScale = false;
+            this._xAxisTextOrientation = 'bottom';
             this._transitionDuration = 300;
             this._transitionEase = 'linear';
             this._transitionDelay = 0;
@@ -10282,7 +10283,7 @@ var ninjaPixel;
         };
         Chart.prototype._plotXAxis = function (xScale, yScale) {
             var _this = this;
-            var xAxis = d3.svg.axis().scale(xScale).orient('bottom').outerTickSize(0);
+            var xAxis = d3.svg.axis().scale(xScale).orient(this._xAxisTextOrientation).outerTickSize(0);
             if (this._plotVerticalGridTopping) {
                 xAxis.tickSize(-this._chartHeight, 0);
             }
@@ -10725,6 +10726,12 @@ var ninjaPixel;
             if (!arguments.length)
                 return this._xAxisTickFormat;
             this._xAxisTickFormat = _x;
+            return this;
+        };
+        Chart.prototype.xAxisTextOrientation = function (_x) {
+            if (!arguments.length)
+                return this._xAxisTextOrientation;
+            this._xAxisTextOrientation = _x;
             return this;
         };
         Chart.prototype.xAxisTicks = function (_x) {
@@ -11232,11 +11239,18 @@ var ninjaPixel;
                     height: barH,
                     x: xScale(0),
                     width: function (d) {
+                        var width;
                         if (d.x > 0) {
-                            return xScale(d.x);
+                            width = xScale(d.x);
                         }
                         else {
-                            return xScale(0);
+                            width = xScale(0);
+                        }
+                        if (width > 0) {
+                            return width;
+                        }
+                        else {
+                            return 0;
                         }
                     }
                 });

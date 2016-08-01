@@ -261,10 +261,16 @@ module ninjaPixel {
                         height: barH,
                         x: xScale(0),
                         width: function (d) {
+                            var width;
                             if (d.x > 0) {
-                                return xScale(d.x);
+                                width= xScale(d.x);
                             } else {
-                                return xScale(0);
+                                width= xScale(0);
+                            }
+                            if(width>0){
+                                return width;
+                            }else{
+                                return 0;
                             }
                         }
                     });

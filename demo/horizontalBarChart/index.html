@@ -11,21 +11,26 @@
         stroke: black;
         shape-rendering: crispEdges;
     }
-    .ninja-background{
+
+    .ninja-background {
         fill: #333333;
         stroke: black;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -35,6 +40,7 @@
         font: 12px sans-serif;
         width: 100px;
     }
+
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
         box-sizing: border-box;
@@ -47,6 +53,7 @@
         position: absolute;
         text-align: center;
     }
+
     /* Style northward tooltips differently */
     .d3-tip.n:after {
         margin: -1px 0 0 0;
@@ -54,61 +61,72 @@
         left: 0;
     }
 
-    .ninja-yAxisGroup.ninja-axis g.tick line{
+    .ninja-yAxisGroup.ninja-axis g.tick line {
         stroke: #333333;
-        opacity: 0.7; 
+        opacity: 0.7;
     }
 </style>
 
 <body>
-    <div id="chart"></div>
-    <div id="message"></div>
+<div id="chart"></div>
+<div id="message"></div>
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 
 <script>
     var barChart = new ninjaPixel.HorizontalBarChart();
     barChart.transitionDuration(2000)
-        .margin({
-            top: 40,
-            bottom: 250,
-            left: 60,
-            right: 30
-        })
-    .plotBackground(false)
-    .y1Max(12)
-    .transitionEase('elastic')
-    .transitionDelay(function(d,i){return i*30;})
-    .onMouseover(function (d, i) {
-            d3.select('#message').text(d.x);
-        })
-    .height(500)
-    .plotHorizontalGridTopping(false)
-    .cornerRounding(1)
-    .mouseOverItemOpacity(function(d,i){return d.opacity;});
-//    .xAxisTextTransform('rotate(-90) translate(-10,-13)');
-    
+            .margin({
+                top: 40,
+                bottom: 250,
+                left: 60,
+                right: 30
+            })
+            .plotBackground(false)
+            .y1Max(12)
+            .transitionEase('elastic')
+            .transitionDelay(function (d, i) {
+                return i * 30;
+            })
+            .onMouseover(function (d, i) {
+                d3.select('#message').text(d.x);
+            })
+            .height(500)
+            .plotHorizontalGridTopping(false)
+            .cornerRounding(1)
+            .mouseOverItemOpacity(function (d, i) {
+                return d.opacity;
+            })
+            .plotVerticalGridTopping(true)
+            .xAxisTextOrientation('top')
+            .axesOrigin({
+                x: 0,
+                y: 00
+            });
+    //    .xAxisTextTransform('rotate(-90) translate(-10,-13)');
+
     var toolTip = barChart.toolTip();
-    toolTip.html(function(d){return '<i>'+d.artist + '</i><br/>'+ d.song});
+    toolTip.html(function (d) {
+        return '<i>' + d.artist + '</i><br/>' + d.song
+    });
     barChart.toolTip(toolTip);
 
 
-
-
-        function randomBars() {
+    function randomBars() {
         var data = [];
-        for (var i = 1; i < 10; i++) {
+        for (var i = 1; i < 11; i++) {
             data.push({
                 y: 'Item ' + i,
                 x: ~~(Math.random() * 10)
             });
         }
         return data;
-    };
+    }
+    ;
 
     function ready(error) {
         barChart.plot(d3.select("#chart")
-            .datum(randomBars()));
+                .datum(randomBars()));
     }
 
     ready();

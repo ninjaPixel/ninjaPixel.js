@@ -10304,7 +10304,11 @@ var ninjaPixel;
             this._svg.select('.ninja-xAxisGroup.ninja-axis').attr({
                 transform: function () {
                     if (_this._axesOrigin != null) {
-                        return 'translate(0,' + yScale(_this._axesOrigin.y) + ')';
+                        var yPosition = yScale(_this._axesOrigin.y);
+                        if (!yPosition) {
+                            yPosition = 0;
+                        }
+                        return 'translate(0,' + yPosition + ')';
                     }
                     else {
                         return 'translate(0,' + (_this._chartHeight) + ')';

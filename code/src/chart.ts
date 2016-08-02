@@ -30,7 +30,7 @@ interface axesOriginObject {
 
 module ninjaPixel {
 
-    export var version:string = '0.0.13';
+    export var version:string = '0.0.14';
 
     export enum Category {
         xy = 0,
@@ -203,7 +203,13 @@ module ninjaPixel {
                 .attr({
                     transform: ()=> {
                         if (this._axesOrigin != null) {
-                            return 'translate(0,' + yScale(this._axesOrigin.y) + ')';
+                            var yPosition = yScale(this._axesOrigin.y);
+                            if(!yPosition){
+                                // this isn't ideal, it's a hack
+                                // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
+                                yPosition = 0;
+                            }
+                            return 'translate(0,' + yPosition + ')';
                         } else {
                             return 'translate(0,' + (this._chartHeight) + ')';
                         }

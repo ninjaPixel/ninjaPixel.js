@@ -10188,7 +10188,7 @@
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.13';
+    ninjaPixel.version = '0.0.15';
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
         Category[Category["donut"] = 1] = "donut";
@@ -10919,7 +10919,13 @@ var ninjaPixel;
                 _this._barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
                 var xScale = _this._xScale;
                 var yScale = _this._yScale;
-                var barScale = _this._barScale;
+                var barScale = function (value) {
+                    var out = this._barScale(value);
+                    if (out < 0) {
+                        out = 0;
+                    }
+                    return out;
+                };
                 if (barW <= 0) {
                     barW = xScale.rangeBand();
                 }
@@ -11761,6 +11767,9 @@ var ninjaPixel;
                     },
                     height: function (d) {
                         var height = Math.abs(barScale(d.yMax) - barScale(d.yMin));
+                        if (isNaN(height)) {
+                            height = 0;
+                        }
                         return height;
                     },
                 });
@@ -11776,7 +11785,11 @@ var ninjaPixel;
                         }
                     },
                     height: function (d) {
-                        return Math.abs(barScale(0));
+                        var height = Math.abs(barScale(0));
+                        if (isNaN(height)) {
+                            height = 0;
+                        }
+                        return height;
                     },
                 }).delay(function (d, i) {
                     return functor(_this._removeDelay, d, i);
@@ -11869,7 +11882,11 @@ var ninjaPixel;
                         }
                     },
                     height: function (d) {
-                        return Math.abs(barScale(0));
+                        var height = Math.abs(barScale(0));
+                        if (isNaN(height)) {
+                            height = 0;
+                        }
+                        return height;
                     },
                 }).delay(function (d, i) {
                     return functor(_this._removeDelay, d, i);

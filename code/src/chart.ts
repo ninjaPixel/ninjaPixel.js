@@ -30,7 +30,7 @@ interface axesOriginObject {
 
 module ninjaPixel {
 
-    export var version:string = '0.0.14';
+    export var version:string = '0.0.15';
 
     export enum Category {
         xy = 0,

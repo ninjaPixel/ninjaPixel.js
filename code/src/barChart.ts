@@ -154,7 +154,13 @@ module ninjaPixel {
 
                 var xScale = this._xScale;
                 var yScale = this._yScale;
-                var barScale = this._barScale;
+                var barScale = function (value) {
+                    var out = this._barScale(value);
+                    if (out < 0) {
+                        out = 0;
+                    }
+                    return out;
+                };
 
                 if (barW <= 0) {
                     barW = xScale.rangeBand();
@@ -167,7 +173,7 @@ module ninjaPixel {
                 }
                 if (barWidth != null) {
                     // set by other functions e.g. lollipop chart
-                    barAdjustmentX = (xScale.rangeBand()-barW) / 2;
+                    barAdjustmentX = (xScale.rangeBand() - barW) / 2;
 
                 }
 

@@ -1090,13 +1090,7 @@ var ninjaPixel;
                 _this._barScale = d3.scale.linear().domain([Math.abs(maxData - minData), 0]).range([_this._chartHeight, 0]);
                 var xScale = _this._xScale;
                 var yScale = _this._yScale;
-                var barScale = function (value) {
-                    var out = this._barScale(value);
-                    if (out < 0) {
-                        out = 0;
-                    }
-                    return out;
-                };
+                var barScale = _this._barScale;
                 if (barW <= 0) {
                     barW = xScale.rangeBand();
                 }

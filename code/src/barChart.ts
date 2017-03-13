@@ -154,13 +154,8 @@ module ninjaPixel {
 
                 var xScale = this._xScale;
                 var yScale = this._yScale;
-                var barScale = function (value) {
-                    var out = this._barScale(value);
-                    if (out < 0) {
-                        out = 0;
-                    }
-                    return out;
-                };
+                var barScale = this._barScale;
+
 
                 if (barW <= 0) {
                     barW = xScale.rangeBand();

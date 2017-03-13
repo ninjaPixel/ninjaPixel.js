@@ -6,3 +6,5 @@ code/src/.baseDir.ts
 code/src/js/
 .settings
 .idea
+old/*
+node_modules/*

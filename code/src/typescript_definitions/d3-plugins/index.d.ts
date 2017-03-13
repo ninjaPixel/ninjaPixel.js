@@ -1,5 +1,3 @@
-/// <reference path="d3.d.ts" />
-
 declare module d3 {
     export function superformula<T>(): Superformula<T>;
 

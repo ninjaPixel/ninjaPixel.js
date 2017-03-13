@@ -1,36 +1,22 @@
-/// <reference path="typescript_definitions/d3.d.ts" />
-/// <reference path="typescript_definitions/d3-tip.d.ts" />
+/// <reference path="../node_modules/@types/d3/index.d.ts" />
 
-//declare var d3: D3.Base;
-//declare module d3 {
-////    export interface Base{
-////        tip: any;
-////    }
-//    interface Tip {
-//        offest: any;
-//        top: number;
-//        bottom: number;
-//        left: number;        
-//        right: number;
-//    }
-//    export function tip<T>(): Tip<T>;
-//}
+
 
 interface marginObject {
-    top:number;
-    bottom:number;
-    left:number;
-    right:number;
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
 }
 interface axesOriginObject {
-    x:any;
-    y:any;
+    x: any;
+    y: any;
 }
 
 
 module ninjaPixel {
 
-    export var version:string = '0.0.15';
+    export var version: string = '0.0.15';
 
     export enum Category {
         xy = 0,
@@ -41,81 +27,81 @@ module ninjaPixel {
 
     export class Chart {
         // gettable / settable variables
-        _width:number = 800;
-        _height:number = 600;
-        _margin:marginObject = {
+        _width: number = 800;
+        _height: number = 600;
+        _margin: marginObject = {
             top: 10,
             bottom: 10,
             left: 40,
             right: 5
         };
-        _internalXAxisMargin:number;
-        _axesOrigin:axesOriginObject;
-        _title:string = '';
-        _yAxis1Title:string = '';
-        _yAxis2Title:string = '';
-        _xAxisTitle:string = '';
-        _yAxis1LogScale:boolean = false;
-        _xAxisLogScale:boolean = false;
-        _xAxisTextOrientation:string = 'bottom';
-        _transitionDuration:number = 300;
-        _transitionEase:string = 'linear';
-        _transitionDelay:any = 0;// function or value
-        _removeTransitionDelay:any = 0;// function or value
-        _removeDelay:any = 0;// function or value
-        _labelEase:string = 'linear';
-        _plotHorizontalGrid:boolean = false;
-        _plotHorizontalGridTopping:boolean = false;
-        _plotVerticalGrid:boolean = false;
-        _plotVerticalGridTopping:boolean = false;
-        _svg:any;
-        _xAxisTextTransform:string;
-        _xAxisTickFormat:any;
-        _xTitleVerticalOffset:number;
-        _yTitleHorizontalOffset:number;
+        _internalXAxisMargin: number;
+        _axesOrigin: axesOriginObject;
+        _title: string = '';
+        _yAxis1Title: string = '';
+        _yAxis2Title: string = '';
+        _xAxisTitle: string = '';
+        _yAxis1LogScale: boolean = false;
+        _xAxisLogScale: boolean = false;
+        _xAxisTextOrientation: string = 'bottom';
+        _transitionDuration: number = 300;
+        _transitionEase: any = d3.easeLinear;
+        _transitionDelay: any = 0;// function or value
+        _removeTransitionDelay: any = 0;// function or value
+        _removeDelay: any = 0;// function or value
+        _labelEase: any = d3.easeLinear;
+        _plotHorizontalGrid: boolean = false;
+        _plotHorizontalGridTopping: boolean = false;
+        _plotVerticalGrid: boolean = false;
+        _plotVerticalGridTopping: boolean = false;
+        _svg: any;
+        _xAxisTextTransform: string;
+        _xAxisTickFormat: any;
+        _xTitleVerticalOffset: number;
+        _yTitleHorizontalOffset: number;
 //        _yAxisTextTransform: string;
-        _yAxisTickFormat:any;
-        _onMouseover:any = ()=> {
+        _yAxisTickFormat: any;
+        _onMouseover: any = ()=> {
         };
-        _onMouseout:any = ()=> {
+        _onMouseout: any = ()=> {
         };
-        _onClick:any = ()=> {
+        _onClick: any = ()=> {
         };
-        _plotBackground:boolean = false;
-        _y1Max:number;
-        _y2Max:number;
-        _y1Min:number;
-        _y2Min:number;
-        _xMax:any;
-        _xMin:any;
-        _mouseOverItemOpacity:any = 0.3;// function or value
-        _mouseOverItemStroke:any = 'none';// function or value
-        _itemOpacity:any = 1;// function or value
-        _itemStroke:any = 'none'; // function or value
-        _itemFill:any = '#A7EBCA'; // function or value
-        _itemFill2:any = 'lightgray'; // function or value
-        _itemStrokeWidth:any = '3px'; // function or value
+        _plotBackground: boolean = false;
+        _y1Max: number;
+        _y2Max: number;
+        _y1Min: number;
+        _y2Min: number;
+        _xMax: any;
+        _xMin: any;
+        _mouseOverItemOpacity: any = 0.3;// function or value
+        _mouseOverItemStroke: any = 'none';// function or value
+        _itemOpacity: any = 1;// function or value
+        _itemStroke: any = 'none'; // function or value
+        _itemFill: any = '#A7EBCA'; // function or value
+        _itemFill2: any = 'lightgray'; // function or value
+        _itemStrokeWidth: any = '3px'; // function or value
         _toolTip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
-            .transitionDuration(300)
+            // .transitionDuration(300)
             .html(function () {
                 return null;
             })
             .direction('n');
-        _xAxisTicks:any;
-        _yAxisTicks:any;
+        _xAxisTicks: any;
+        _yAxisTicks: any;
         // internal variables
-        _chartHeight:number;
-        _chartWidth:number;
-        _category:Category;
-        _itemTextLabelColor:any;
+        _chartHeight: number;
+        _chartWidth: number;
+        _category: Category;
+        _itemTextLabelColor: any;
 
         constructor() {
 
         }
 
-        _init(_selection:any, category = Category.xy) {
+        _init(_selection: any, category = Category.xy) {
             this._category = category;
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
@@ -173,14 +159,18 @@ module ninjaPixel {
 //            });
 //        }
 
-        _plotXAxis(xScale:any, yScale:any) {
-            var xAxis = d3.svg.axis()
-                .scale(xScale)
-                .orient(this._xAxisTextOrientation)
-                .outerTickSize(0); // remove that presky final tick
+        _plotXAxis(xScale: any, yScale: any) {
+            // var xAxis = d3.svg.axis()
+            // .scale(xScale)
+            //     .orient(this._xAxisTextOrientation)
+            //     .outerTickSize(0); // remove that presky final tick
+
+            let xAxis = d3.axisBottom(xScale)
+                .tickSizeOuter(0); // remove that pesky final tick
+
 
             if (this._plotVerticalGridTopping) {
-                xAxis.tickSize(-this._chartHeight, 0);
+                xAxis.tickSizeInner(this._chartHeight);
             }
 
             if (!this._xAxisLogScale) {
@@ -199,23 +189,23 @@ module ninjaPixel {
                 xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
 
-            this._svg.select('.ninja-xAxisGroup.ninja-axis')
-                .attr({
-                    transform: ()=> {
-                        if (this._axesOrigin != null) {
-                            var yPosition = yScale(this._axesOrigin.y);
-                            if(!yPosition){
-                                // this isn't ideal, it's a hack
-                                // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
-                                yPosition = 0;
-                            }
-                            return 'translate(0,' + yPosition + ')';
-                        } else {
-                            return 'translate(0,' + (this._chartHeight) + ')';
-                        }
-                    }
-                })
-                .call(xAxis);
+            // this._svg.select('.ninja-xAxisGroup.ninja-axis')
+            //     .attr({
+            //         transform: ()=> {
+            //             if (this._axesOrigin != null) {
+            //                 var yPosition = yScale(this._axesOrigin.y);
+            //                 if (!yPosition) {
+            //                     // this isn't ideal, it's a hack
+            //                     // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
+            //                     yPosition = 0;
+            //                 }
+            //                 return 'translate(0,' + yPosition + ')';
+            //             } else {
+            //                 return 'translate(0,' + (this._chartHeight) + ')';
+            //             }
+            //         }
+            //     })
+            //     .call(xAxis);
 
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
@@ -225,28 +215,31 @@ module ninjaPixel {
             }
 
             if (this._plotVerticalGrid) {
-                xAxis.tickSize(-this._chartHeight, 0);
+                xAxis.tickSizeInner(this._chartHeight);
 
-                this._svg.select('.ninja-verticalGrid')
-                    .attr({
-                        transform: ()=> {
-                            return 'translate(0,' + (this._chartHeight) + ')';
-                        }
-                    })
-                    .call(xAxis);
+                // this._svg.select('.ninja-verticalGrid')
+                //     .attr({
+                //         transform: ()=> {
+                //             return 'translate(0,' + (this._chartHeight) + ')';
+                //         }
+                //     })
+                //     .call(xAxis);
 
             }
 
         }
 
-        _plotYAxis(xScale:any, yScale:any) {
-            var yAxis = d3.svg.axis()
-                .scale(yScale)
-                .orient('left')
-                .outerTickSize(0); // remove that pesky final tick;
+        _plotYAxis(xScale: any, yScale: any) {
+            // var yAxis = d3.svg.axis()
+            //     .scale(yScale)
+            //     .orient('left')
+            //     .outerTickSize(0); // remove that pesky final tick;
+
+            let yAxis = d3.axisLeft(yScale)
+                .tickSizeOuter(0);
 
             if (this._plotHorizontalGridTopping) {
-                yAxis.tickSize(-this._chartWidth, 0);
+                yAxis.tickSizeInner(this._chartWidth);
             }
 
             if (this._yAxisTickFormat != null) {
@@ -270,7 +263,7 @@ module ninjaPixel {
                 .call(yAxis);
 
             if (this._plotHorizontalGrid) {
-                yAxis.tickSize(-this._chartWidth, 0);
+                yAxis.tickSizeInner(this._chartWidth);
 
                 this._svg.select('.ninja-horizontalGrid')
                     .transition()
@@ -286,13 +279,13 @@ module ninjaPixel {
             }
         }
 
-        _plotXYAxes(xScale:any, yScale:any) {
+        _plotXYAxes(xScale: any, yScale: any) {
             this._plotXAxis(xScale, yScale);
             this._plotYAxis(xScale, yScale);
         }
 
         _plotLabels() {
-            if (this._svg.select('.ninja-chartTitle')[0][0] == null) {
+            if (!this._svg.select('.ninja-chartTitle')[0] || !this._svg.select('.ninja-chartTitle')[0][0]) {
 
                 // first call, so we'll append the extra title elements.
                 this._svg.append("g").classed("ninja-chartTitle", true);
@@ -375,11 +368,11 @@ module ninjaPixel {
         }
 
 
-        _getChartWidth():number {
+        _getChartWidth(): number {
             return this._width - this._margin.left - this._margin.right;
         }
 
-        _getChartHeight():number {
+        _getChartHeight(): number {
             return this._height - this._margin.bottom - this._margin.top;
         }
 
@@ -509,283 +502,283 @@ module ninjaPixel {
 
 
         // setting the properties
-        axesOrigin(_x):any {
+        axesOrigin(_x): any {
             if (!arguments.length) return this._axesOrigin;
             this._axesOrigin = _x;
             return this;
         }
 
-        itemFill(_x):any {
+        itemFill(_x): any {
             if (!arguments.length) return this._itemFill;
             this._itemFill = _x;
             return this;
         }
 
-        itemFill2(_x):any {
+        itemFill2(_x): any {
             if (!arguments.length) return this._itemFill2;
             this._itemFill2 = _x;
             return this;
         }
 
-        itemStroke(_x):any {
+        itemStroke(_x): any {
             if (!arguments.length) return this._itemStroke;
             this._itemStroke = _x;
             return this;
         }
 
-        itemTextLabelColor(_x):any {
+        itemTextLabelColor(_x): any {
             if (!arguments.length) return this._itemTextLabelColor;
             this._itemTextLabelColor = _x;
             return this;
         }
 
-        itemStrokeWidth(_x):any {
+        itemStrokeWidth(_x): any {
             if (!arguments.length) return this._itemStrokeWidth;
             this._itemStrokeWidth = _x;
             return this;
         }
 
-        itemOpacity(_x):any {
+        itemOpacity(_x): any {
             if (!arguments.length) return this._itemOpacity;
             this._itemOpacity = _x;
             return this;
         }
 
-        mouseOverItemOpacity(_x):any {
+        mouseOverItemOpacity(_x): any {
             if (!arguments.length) return this._mouseOverItemOpacity;
             this._mouseOverItemOpacity = _x;
             return this;
         }
 
-        mouseOverItemStroke(_x):any {
+        mouseOverItemStroke(_x): any {
             if (!arguments.length) return this._mouseOverItemStroke;
             this._mouseOverItemStroke = _x;
             return this;
         }
 
-        transitionDelay(_x):any {
+        transitionDelay(_x): any {
             if (!arguments.length) return this._transitionDelay;
             this._transitionDelay = _x;
             return this;
         }
 
-        removeTransitionDelay(_x):any {
+        removeTransitionDelay(_x): any {
             if (!arguments.length) return this._removeTransitionDelay;
             this._removeTransitionDelay = _x;
             return this;
         }
 
-        removeDelay(_x):any {
+        removeDelay(_x): any {
             if (!arguments.length) return this._removeDelay;
             this._removeDelay = _x;
             return this;
         }
 
-        y1Max(_x):any {
+        y1Max(_x): any {
             if (!arguments.length) return this._y1Max;
             this._y1Max = _x;
             return this;
         }
 
-        y2Max(_x):any {
+        y2Max(_x): any {
             if (!arguments.length) return this._y2Max;
             this._y2Max = _x;
             return this;
         }
 
-        y1Min(_x):any {
+        y1Min(_x): any {
             if (!arguments.length) return this._y1Min;
             this._y1Min = _x;
             return this;
         }
 
-        y2Min(_x):any {
+        y2Min(_x): any {
             if (!arguments.length) return this._y2Min;
             this._y2Min = _x;
             return this;
         }
 
-        xMax(_x):any {
+        xMax(_x): any {
             if (!arguments.length) return this._xMax;
             this._xMax = _x;
             return this;
         }
 
-        xMin(_x):any {
+        xMin(_x): any {
             if (!arguments.length) return this._xMin;
             this._xMin = _x;
             return this;
         }
 
-        plotBackground(_x):any {
+        plotBackground(_x): any {
             if (!arguments.length) return this._plotBackground;
             this._plotBackground = _x;
             return this;
         }
 
-        onMouseover(_x):any {
+        onMouseover(_x): any {
             if (!arguments.length) return this._onMouseover;
             this._onMouseover = _x;
             return this;
         }
 
-        onMouseout(_x):any {
+        onMouseout(_x): any {
             if (!arguments.length) return this._onMouseout;
             this._onMouseout = _x;
             return this;
         }
 
-        onClick(_x):any {
+        onClick(_x): any {
             if (!arguments.length) return this._onClick;
             this._onClick = _x;
             return this;
         }
 
-        toolTip(_x):any {
+        toolTip(_x): any {
             if (!arguments.length) return this._toolTip;
             this._toolTip = _x;
             return this;
         }
 
-        plotVerticalGridTopping(_x):any {
+        plotVerticalGridTopping(_x): any {
             if (!arguments.length) return this._plotVerticalGridTopping;
             this._plotVerticalGridTopping = _x;
             return this;
         }
 
-        plotVerticalGrid(_x):any {
+        plotVerticalGrid(_x): any {
             if (!arguments.length) return this._plotVerticalGrid;
             this._plotVerticalGrid = _x;
             return this;
         }
 
-        plotHorizontalGridTopping(_x):any {
+        plotHorizontalGridTopping(_x): any {
             if (!arguments.length) return this._plotHorizontalGridTopping;
             this._plotHorizontalGridTopping = _x;
             return this;
         }
 
-        plotHorizontalGrid(_x):any {
+        plotHorizontalGrid(_x): any {
             if (!arguments.length) return this._plotHorizontalGrid;
             this._plotHorizontalGrid = _x;
             return this;
         }
 
-        yAxis1LogScale(_x):any {
+        yAxis1LogScale(_x): any {
             if (!arguments.length) return this._yAxis1LogScale;
             this._yAxis1LogScale = _x;
             return this;
         }
 
-        xAxisLogScale(_x):any {
+        xAxisLogScale(_x): any {
             if (!arguments.length) return this._xAxisLogScale;
             this._xAxisLogScale = _x;
             return this;
         }
 
-        transitionEase(_x):any {
+        transitionEase(_x): any {
             if (!arguments.length) return this._transitionEase;
             this._transitionEase = _x;
             return this;
         }
 
-        transitionDuration(_x):any {
+        transitionDuration(_x): any {
             if (!arguments.length) return this._transitionDuration;
             this._transitionDuration = _x;
             return this;
         }
 
-        yAxis1Title(_x):any {
+        yAxis1Title(_x): any {
             if (!arguments.length) return this._yAxis1Title;
             this._yAxis1Title = _x;
             return this;
         }
 
-        yAxis2Title(_x):any {
+        yAxis2Title(_x): any {
             if (!arguments.length) return this._yAxis2Title;
             this._yAxis2Title = _x;
             return this;
         }
 
-        xAxisTitle(_x):any {
+        xAxisTitle(_x): any {
             if (!arguments.length) return this._xAxisTitle;
             this._xAxisTitle = _x;
             return this;
         }
 
-        width(_x):any {
+        width(_x): any {
             if (!arguments.length) return this._width;
             this._width = _x;
             return this;
         }
 
-        height(_x):any {
+        height(_x): any {
             if (!arguments.length) return this._height;
             this._height = _x;
             return this;
         }
 
-        margin(_x):any {
+        margin(_x): any {
             if (!arguments.length) return this._margin;
             this._margin = _x;
             return this;
         }
 
-        title(_x):any {
+        title(_x): any {
             if (!arguments.length) return this._title;
             this._title = _x;
             return this;
         }
 
-        xAxisTextTransform(_x):any {
+        xAxisTextTransform(_x): any {
             if (!arguments.length) return this._xAxisTextTransform;
             this._xAxisTextTransform = _x;
             return this;
         }
 
-        xTitleVerticalOffset(_x):any {
+        xTitleVerticalOffset(_x): any {
             if (!arguments.length) return this._xTitleVerticalOffset;
             this._xTitleVerticalOffset = Number(_x);
             return this;
         }
 
-        yTitleHorizontalOffset(_x):any {
+        yTitleHorizontalOffset(_x): any {
             if (!arguments.length) return this._yTitleHorizontalOffset;
             this._yTitleHorizontalOffset = Number(_x);
             return this;
         }
 
-        xAxisTickFormat(_x):any {
+        xAxisTickFormat(_x): any {
             if (!arguments.length) return this._xAxisTickFormat;
             this._xAxisTickFormat = _x;
             return this;
         }
 
-        xAxisTextOrientation(_x):any {
+        xAxisTextOrientation(_x): any {
             if (!arguments.length) return this._xAxisTextOrientation;
             this._xAxisTextOrientation = _x;
             return this;
         }
 
-        xAxisTicks(_x):any {
+        xAxisTicks(_x): any {
             if (!arguments.length) return this._xAxisTicks;
             this._xAxisTicks = _x;
             return this;
         }
 
-        yAxisTickFormat(_x):any {
+        yAxisTickFormat(_x): any {
             if (!arguments.length) return this._yAxisTickFormat;
             this._yAxisTickFormat = _x;
             return this;
         }
 
-        yAxisTicks(_x):any {
+        yAxisTicks(_x): any {
             if (!arguments.length) return this._yAxisTicks;
             this._yAxisTicks = _x;
             return this;
         }
 
-        internalXAxisMargin(_x):any {
+        internalXAxisMargin(_x): any {
             if (!arguments.length) return this._internalXAxisMargin;
             this._internalXAxisMargin = _x;
             return this;
@@ -794,49 +787,49 @@ module ninjaPixel {
     }
 
 
-    var formatBillionsWithB = function () {
-        // Change D3's SI prefix to more business friendly units
-        //      K = thousands
-        //      M = millions
-        //      B = billions (not G!)
-        //      T = trillion
-        //      P = quadrillion
-        //      E = quintillion
-        // small decimals are handled with e-n formatting. e-3 rather than 'm' - which looks like a million
-        var d3_formatPrefixes = ["e-24", "e-21", "e-18", "e-15", "e-12", "e-9", "e-6", "e-3", "", "K", "M", "B", "T", "P", "E", "Z", "Y"].map(d3_formatPrefix);
-
-        // Override d3's formatPrefix function
-        d3.formatPrefix = function (value, precision) {
-            var i = 0;
-            if (value) {
-                if (value < 0) {
-                    value *= -1;
-                }
-                if (precision) {
-                    value = d3.round(value, d3_format_precision(value, precision));
-                }
-                i = 1 + Math.floor(1e-12 + Math.log(value) / Math.LN10);
-                i = Math.max(-24, Math.min(24, Math.floor((i - 1) / 3) * 3));
-            }
-            return d3_formatPrefixes[8 + i / 3];
-        };
-
-        function d3_formatPrefix(d, i) {
-            var k = Math.pow(10, Math.abs(8 - i) * 3);
-            return {
-                scale: i > 8 ? function (d) {
-                    return d / k;
-                } : function (d) {
-                    return d * k;
-                },
-                symbol: d
-            };
-        }
-
-        function d3_format_precision(x, p) {
-            return p - (x ? Math.ceil(Math.log(x) / Math.LN10) : 1);
-        }
-    }
-    formatBillionsWithB();
+    // var formatBillionsWithB = function () {
+    //     // Change D3's SI prefix to more business friendly units
+    //     //      K = thousands
+    //     //      M = millions
+    //     //      B = billions (not G!)
+    //     //      T = trillion
+    //     //      P = quadrillion
+    //     //      E = quintillion
+    //     // small decimals are handled with e-n formatting. e-3 rather than 'm' - which looks like a million
+    //     var d3_formatPrefixes = ["e-24", "e-21", "e-18", "e-15", "e-12", "e-9", "e-6", "e-3", "", "K", "M", "B", "T", "P", "E", "Z", "Y"].map(d3_formatPrefix);
+    //
+    //     // Override d3's formatPrefix function
+    //     d3.formatPrefix = function (value, precision) {
+    //         var i = 0;
+    //         if (value) {
+    //             if (value < 0) {
+    //                 value *= -1;
+    //             }
+    //             if (precision) {
+    //                 value = d3.round(value, d3_format_precision(value, precision));
+    //             }
+    //             i = 1 + Math.floor(1e-12 + Math.log(value) / Math.LN10);
+    //             i = Math.max(-24, Math.min(24, Math.floor((i - 1) / 3) * 3));
+    //         }
+    //         return d3_formatPrefixes[8 + i / 3];
+    //     };
+    //
+    //     function d3_formatPrefix(d, i) {
+    //         var k = Math.pow(10, Math.abs(8 - i) * 3);
+    //         return {
+    //             scale: i > 8 ? function (d) {
+    //                 return d / k;
+    //             } : function (d) {
+    //                 return d * k;
+    //             },
+    //             symbol: d
+    //         };
+    //     }
+    //
+    //     function d3_format_precision(x, p) {
+    //         return p - (x ? Math.ceil(Math.log(x) / Math.LN10) : 1);
+    //     }
+    // }
+    // formatBillionsWithB();
 }
 

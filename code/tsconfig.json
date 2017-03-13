@@ -1,0 +1,10 @@
+{
+  "typeRoots": [
+    "./src/typescript_definitions",
+    "./node_modules/@types"
+  ],
+  "types": [
+    "d3",
+    "d3-plugins"
+  ]
+}

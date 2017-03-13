@@ -11,21 +11,26 @@
         stroke: black;
         shape-rendering: crispEdges;
     }
-    .ninja-background{
+
+    .ninja-background {
         fill: #333333;
         stroke: black;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -35,6 +40,7 @@
         font: 12px sans-serif;
         width: 100px;
     }
+
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
         box-sizing: border-box;
@@ -47,6 +53,7 @@
         position: absolute;
         text-align: center;
     }
+
     /* Style northward tooltips differently */
     .d3-tip.n:after {
         margin: -1px 0 0 0;
@@ -54,90 +61,94 @@
         left: 0;
     }
 
-    .ninja-yAxisGroup.ninja-axis g.tick line{
+    .ninja-yAxisGroup.ninja-axis g.tick line {
         stroke: #333333;
-        opacity: 0.7; 
+        opacity: 0.7;
     }
 </style>
 
 <body>
-    <div id="chart"></div>
-    <div id="message"></div>
+<div id="chart"></div>
+<div id="message"></div>
 </body>
-    <script src="../../code/node_modules/moment/moment.js"></script>
+<script src="../../code/node_modules/moment/moment.js"></script>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
-<script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
-<script>
-//    var currency = d3.requote('$');
-  
-    var currency = '£';
-var localeFormatter = d3.locale({
-  "decimal": ".",
-  "thousands": ",",
-  "grouping": [3],
-  "currency": [currency, ""],
-  "dateTime": "%a %b %e %X %Y",
-  "date": "%d/%m/%Y",
-  "time": "%H:%M:%S",
-  "periods": ["AM", "PM"],
-  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-  "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-  "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-  "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+<script src="../../code/node_modules/queue-async/build/queue.js" charset="utf-8"></script>
 
-});
-    
+<script>
+    //    var currency = d3.requote('$');
+
+    var currency = '£';
+    //var localeFormatter = d3.locale({
+    //  "decimal": ".",
+    //  "thousands": ",",
+    //  "grouping": [3],
+    //  "currency": [currency, ""],
+    //  "dateTime": "%a %b %e %X %Y",
+    //  "date": "%d/%m/%Y",
+    //  "time": "%H:%M:%S",
+    //  "periods": ["AM", "PM"],
+    //  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    //  "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    //  "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    //  "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    //
+    //});
+
     var barChart = new ninjaPixel.BarChart();
     barChart.transitionDuration(2000)
-        .margin({
-            top: 20,
-            bottom: 50,
-            left: 60,
-            right: 30
-        })
-    .plotBackground(true)
-    .transitionEase('linear')
-    .transitionDelay(function(d,i){return i*30;})
-    .onMouseover(function (d, i) {
-            d3.select('#message').text(d.x);
-        })
-    .mouseOverItemStroke('red')
-    .height(500)
-    .plotHorizontalGridTopping(true)
-    .cornerRounding(0)
-    .isTimeseries(true)
-//    .xMax('2015-Jan-20')
-    .yAxisTickFormat(localeFormatter.numberFormat('$s'))
-    .mouseOverItemOpacity(function(d,i){return d.opacity;});
+            .margin({
+                top: 20,
+                bottom: 50,
+                left: 60,
+                right: 30
+            })
+            .plotBackground(true)
+//            .transitionEase('linear')
+            .transitionDelay(function (d, i) {
+                return i * 30;
+            })
+            .onMouseover(function (d, i) {
+                d3.select('#message').text(d.x);
+            })
+            .mouseOverItemStroke('red')
+            .height(500)
+            .plotHorizontalGridTopping(true)
+            .cornerRounding(0)
+            .isTimeseries(true)
+            //    .xMax('2015-Jan-20')
+            //    .yAxisTickFormat(localeFormatter.numberFormat('$s'))
+            .mouseOverItemOpacity(function (d, i) {
+                return d.opacity;
+            });
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {
         return d.y;
     });
     barChart.toolTip(toolTip);
-    
+
     ready();
 
     function ready(error) {
         var timeseries = [];
         var startDate = new moment('1-12-2014', "DD-MM-YYYY");
         var thisDate = new moment(startDate);
-        for (var i2 = 0; i2 < 40; i2++) {
+        for (var i2 = 0; i2 < 4; i2++) {
             timeseries.push({
                 x: thisDate.toDate(),
-                y: (i2+1)*1000
+                y: (i2 + 1) * 1000
             });
             thisDate = new moment(thisDate).add(1, 'days');
         }
 
-        var filteredData = [];
-        for(var i=0; i<11; i++){
-            var yVal = (i+1)*1000000*i;
-         filteredData.push({x:i, y: yVal });   
-        }
+
+
 
         barChart.plot(d3.select("#chart")
-            .datum(timeseries));
+                .datum(timeseries));
+
+
     }
 </script>
 

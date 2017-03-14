@@ -104,6 +104,7 @@ var ninjaPixel;
             this._plotTheBackground();
         };
         Chart.prototype._plotXAxis = function (xScale, yScale) {
+            var _this = this;
             var xAxis = d3.axisBottom(xScale)
                 .tickSizeOuter(0);
             if (this._plotVerticalGridTopping) {
@@ -123,6 +124,22 @@ var ninjaPixel;
                 }
                 xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
+            this._svg.select('.ninja-xAxisGroup.ninja-axis')
+                .attrs({
+                transform: function () {
+                    if (_this._axesOrigin != null) {
+                        var yPosition = yScale(_this._axesOrigin.y);
+                        if (!yPosition) {
+                            yPosition = 0;
+                        }
+                        return 'translate(0,' + yPosition + ')';
+                    }
+                    else {
+                        return 'translate(0,' + (_this._chartHeight) + ')';
+                    }
+                }
+            })
+                .call(xAxis);
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
                     .selectAll('.tick text')
@@ -131,6 +148,13 @@ var ninjaPixel;
             }
             if (this._plotVerticalGrid) {
                 xAxis.tickSizeInner(this._chartHeight);
+                this._svg.select('.ninja-verticalGrid')
+                    .attrs({
+                    transform: function () {
+                        return 'translate(0,' + (_this._chartHeight) + ')';
+                    }
+                })
+                    .call(xAxis);
             }
         };
         Chart.prototype._plotYAxis = function (xScale, yScale) {
@@ -149,7 +173,7 @@ var ninjaPixel;
             this._svg.select('.ninja-yAxisGroup.ninja-axis')
                 .transition()
                 .ease(this._labelEase)
-                .attr({
+                .attrs({
                 transform: function () {
                     if (_this._axesOrigin != null) {
                         return 'translate(' + xScale(_this._axesOrigin.x) + ',0)';
@@ -162,7 +186,7 @@ var ninjaPixel;
                 this._svg.select('.ninja-horizontalGrid')
                     .transition()
                     .ease(this._labelEase)
-                    .attr({
+                    .attrs({
                     transform: function () {
                         if (_this._axesOrigin != null) {
                         }
@@ -261,7 +285,7 @@ var ninjaPixel;
                     .classed('hLines', true);
                 horizontalLines.transition()
                     .ease(ease)
-                    .attr({
+                    .attrs({
                     "x1": 0,
                     "x2": chartWidth,
                     "y1": function (d) {
@@ -284,7 +308,7 @@ var ninjaPixel;
                     .classed('hLines', true);
                 verticalLines.transition()
                     .ease(ease)
-                    .attr({
+                    .attrs({
                     "x1": function (d) {
                         return xScale(d);
                     },
@@ -318,14 +342,14 @@ var ninjaPixel;
                     .data([1]);
                 background.enter().append('rect')
                     .classed('ninja-background', true)
-                    .attr({
+                    .attrs({
                     x: 0,
                     y: 0,
                     height: this._chartHeight,
                     width: this._chartWidth
                 });
                 background.transition()
-                    .attr({
+                    .attrs({
                     x: 0,
                     y: 0,
                     height: this._chartHeight,
@@ -762,13 +786,12 @@ var ninjaPixel;
                         .rangeRound([0, _this._chartWidth])
                         .padding(0.1);
                 }
-                console.log('this._xScale', _this._xScale);
                 _this._yScale = d3.scaleLinear()
                     .domain([minData, maxData])
-                    .range([_this._chartHeight, 0]);
+                    .rangeRound([_this._chartHeight, 0]);
                 _this._barScale = d3.scaleLinear()
                     .domain([Math.abs(maxData - minData), 0])
-                    .range([_this._chartHeight, 0]);
+                    .rangeRound([_this._chartHeight, 0]);
                 var xScale = _this._xScale;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
@@ -789,7 +812,6 @@ var ninjaPixel;
                     return xScale(x) + barAdjustmentX;
                 }
                 _this._xScaleAdjusted = xScaleAdjusted;
-                console.log('DATA:', _data);
                 var yScale0 = yScale(0);
                 var bars = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
@@ -824,6 +846,33 @@ var ninjaPixel;
                     fill: function (d, i) {
                         return functor(barFill, d, i);
                     }
+                })
+                    .on('mouseover', function (d, i) {
+                    d3.select(this)
+                        .style('opacity', function (d, i) {
+                        return functor(mouseOverBarOpacity, d, i);
+                    })
+                        .style('stroke', function (d, i) {
+                        return functor(mouseOverBarStroke, d, i);
+                    });
+                    myToolTip.show(d);
+                    if (myToolTip.getBoundingBox) {
+                        onMouseover(d, myToolTip.getBoundingBox());
+                    }
+                })
+                    .on('mouseout', function (d, i) {
+                    var thisElem = d3.select(this);
+                    thisElem.style('opacity', function (d, i) {
+                        return functor(defaultBarOpacity, d, i);
+                    });
+                    thisElem.style('stroke', function (d, i) {
+                        return functor(defaultStroke, d, i);
+                    });
+                    myToolTip.hide();
+                    onMouseout(d);
+                })
+                    .on('click', function (d, i) {
+                    onClick(d);
                 });
                 bars.merge(enter)
                     .transition()
@@ -833,8 +882,15 @@ var ninjaPixel;
                 })
                     .ease(_this._transitionEase)
                     .attrs({
+                    y: function (d) {
+                        if (d.y > 0) {
+                            return yScale(d.y);
+                        }
+                        else {
+                            return yScale(0);
+                        }
+                    },
                     height: function (d) {
-                        console.log('Math.abs(barScale(d.y))', Math.abs(barScale(d.y)));
                         return Math.abs(barScale(d.y));
                     },
                 });

@@ -1,7 +1,6 @@
 /// <reference path="../node_modules/@types/d3/index.d.ts" />
 
 
-
 interface marginObject {
     top: number;
     bottom: number;
@@ -189,23 +188,23 @@ module ninjaPixel {
                 xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
 
-            // this._svg.select('.ninja-xAxisGroup.ninja-axis')
-            //     .attr({
-            //         transform: ()=> {
-            //             if (this._axesOrigin != null) {
-            //                 var yPosition = yScale(this._axesOrigin.y);
-            //                 if (!yPosition) {
-            //                     // this isn't ideal, it's a hack
-            //                     // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
-            //                     yPosition = 0;
-            //                 }
-            //                 return 'translate(0,' + yPosition + ')';
-            //             } else {
-            //                 return 'translate(0,' + (this._chartHeight) + ')';
-            //             }
-            //         }
-            //     })
-            //     .call(xAxis);
+            this._svg.select('.ninja-xAxisGroup.ninja-axis')
+                .attrs({
+                    transform: ()=> {
+                        if (this._axesOrigin != null) {
+                            var yPosition = yScale(this._axesOrigin.y);
+                            if (!yPosition) {
+                                // this isn't ideal, it's a hack
+                                // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
+                                yPosition = 0;
+                            }
+                            return 'translate(0,' + yPosition + ')';
+                        } else {
+                            return 'translate(0,' + (this._chartHeight) + ')';
+                        }
+                    }
+                })
+                .call(xAxis);
 
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
@@ -217,13 +216,13 @@ module ninjaPixel {
             if (this._plotVerticalGrid) {
                 xAxis.tickSizeInner(this._chartHeight);
 
-                // this._svg.select('.ninja-verticalGrid')
-                //     .attr({
-                //         transform: ()=> {
-                //             return 'translate(0,' + (this._chartHeight) + ')';
-                //         }
-                //     })
-                //     .call(xAxis);
+                this._svg.select('.ninja-verticalGrid')
+                    .attrs({
+                        transform: ()=> {
+                            return 'translate(0,' + (this._chartHeight) + ')';
+                        }
+                    })
+                    .call(xAxis);
 
             }
 
@@ -253,7 +252,7 @@ module ninjaPixel {
             this._svg.select('.ninja-yAxisGroup.ninja-axis')
                 .transition()
                 .ease(this._labelEase)
-                .attr({
+                .attrs({
                     transform: ()=> {
                         if (this._axesOrigin != null) {
                             return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
@@ -268,7 +267,7 @@ module ninjaPixel {
                 this._svg.select('.ninja-horizontalGrid')
                     .transition()
                     .ease(this._labelEase)
-                    .attr({
+                    .attrs({
                         transform: ()=> {
                             if (this._axesOrigin != null) {
                                 //return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
@@ -399,7 +398,7 @@ module ninjaPixel {
 
                 horizontalLines.transition()
                     .ease(ease)
-                    .attr({
+                    .attrs({
                         "x1": 0,
                         "x2": chartWidth,
                         "y1": function (d) {
@@ -426,7 +425,7 @@ module ninjaPixel {
 
                 verticalLines.transition()
                     .ease(ease)
-                    .attr({
+                    .attrs({
                         "x1": (d) => {
                             return xScale(d);
                         },
@@ -464,7 +463,7 @@ module ninjaPixel {
 
                 background.enter().append('rect')
                     .classed('ninja-background', true)
-                    .attr({
+                    .attrs({
                         x: 0,
                         y: 0,
                         height: this._chartHeight,
@@ -473,7 +472,7 @@ module ninjaPixel {
 
 
                 background.transition()
-                    .attr({
+                    .attrs({
                         x: 0,
                         y: 0,
                         height: this._chartHeight,

@@ -124,8 +124,9 @@
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {
-        return d.y;
+        return `X:${d.x} --- Y:${d.y}`;
     });
+//    toolTip.getBoundingBox = function(){console.log('BB')}
     barChart.toolTip(toolTip);
 
     ready();
@@ -134,7 +135,7 @@
         var timeseries = [];
         var startDate = new moment('1-12-2014', "DD-MM-YYYY");
         var thisDate = new moment(startDate);
-        for (var i2 = 0; i2 < 4; i2++) {
+        for (var i2 = 0; i2 < 40; i2++) {
             timeseries.push({
                 x: thisDate.toDate(),
                 y: (i2 + 1) * 1000

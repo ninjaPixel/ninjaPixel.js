@@ -1,20 +1,6 @@
-/// <reference path="../node_modules/@types/d3/index.d.ts" />
+/// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
 
-
-interface marginObject {
-    top: number;
-    bottom: number;
-    left: number;
-    right: number;
-}
-interface axesOriginObject {
-    x: any;
-    y: any;
-}
-
-
-module ninjaPixel {
-
+namespace ninjaPixel {
     export var version: string = '0.0.15';
 
     export enum Category {
@@ -28,14 +14,14 @@ module ninjaPixel {
         // gettable / settable variables
         _width: number = 800;
         _height: number = 600;
-        _margin: marginObject = {
+        _margin: ninjaTypes.marginObject = {
             top: 10,
             bottom: 10,
             left: 40,
             right: 5
         };
         _internalXAxisMargin: number;
-        _axesOrigin: axesOriginObject;
+        _axesOrigin: ninjaTypes.axesOriginObject;
         _title: string = '';
         _yAxis1Title: string = '';
         _yAxis2Title: string = '';
@@ -44,11 +30,11 @@ module ninjaPixel {
         _xAxisLogScale: boolean = false;
         _xAxisTextOrientation: string = 'bottom';
         _transitionDuration: number = 300;
-        _transitionEase: any = d3.easeLinear;
-        _transitionDelay: any = 0;// function or value
-        _removeTransitionDelay: any = 0;// function or value
-        _removeDelay: any = 0;// function or value
-        _labelEase: any = d3.easeLinear;
+        _transitionEase: ninjaTypes.ease = d3.easeLinear; //|d3.BackEasingFactory|d3.ElasticEasingFactory|d3.PolynomialEasingFactory
+        _transitionDelay: ninjaTypes.numberOrFunction = 0;// function or value
+        _removeTransitionDelay: ninjaTypes.numberOrFunction = 0;// function or value
+        _removeDelay: ninjaTypes.numberOrFunction = 0;// function or value
+        _labelEase: ninjaTypes.ease = d3.easeLinear;
         _plotHorizontalGrid: boolean = false;
         _plotHorizontalGridTopping: boolean = false;
         _plotVerticalGrid: boolean = false;
@@ -71,15 +57,15 @@ module ninjaPixel {
         _y2Max: number;
         _y1Min: number;
         _y2Min: number;
-        _xMax: any;
-        _xMin: any;
-        _mouseOverItemOpacity: any = 0.3;// function or value
-        _mouseOverItemStroke: any = 'none';// function or value
-        _itemOpacity: any = 1;// function or value
-        _itemStroke: any = 'none'; // function or value
-        _itemFill: any = '#A7EBCA'; // function or value
-        _itemFill2: any = 'lightgray'; // function or value
-        _itemStrokeWidth: any = '3px'; // function or value
+        _xMax: number|Date;
+        _xMin: number|Date;
+        _mouseOverItemOpacity: ninjaTypes.numberOrFunction = 0.3;// function or value
+        _mouseOverItemStroke: ninjaTypes.stringOrFunction = 'none';// function or value
+        _itemOpacity: ninjaTypes.numberOrFunction = 1;// function or value
+        _itemStroke: ninjaTypes.stringOrFunction = 'none'; // function or value
+        _itemFill: ninjaTypes.stringOrFunction = '#A7EBCA'; // function or value
+        _itemFill2: ninjaTypes.stringOrFunction = 'lightgray'; // function or value
+        _itemStrokeWidth: ninjaTypes.stringOrFunction = '3px'; // function or value
         _toolTip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
@@ -88,14 +74,16 @@ module ninjaPixel {
                 return null;
             })
             .direction('n');
-        _xAxisTicks: any;
-        _yAxisTicks: any;
+        _xAxisTicks: ninjaTypes.numberOrFunction;
+        _yAxisTicks: ninjaTypes.numberOrFunction;
         // internal variables
         _chartHeight: number;
         _chartWidth: number;
         _category: Category;
-        _itemTextLabelColor: any;
+        _itemTextLabelColor: ninjaTypes.stringOrFunction;
 
+
+        
         constructor() {
 
         }
@@ -128,7 +116,7 @@ module ninjaPixel {
                 }
             }
 
-            this._svg.transition().attr({
+            this._svg.transition().attrs({
                 width: this._width,
                 height: this._height
             });
@@ -137,12 +125,12 @@ module ninjaPixel {
 
             if (this._category == Category.donut) {
                 this._svg.select('.ninja-containerGroup')
-                    .attr({
+                    .attrs({
                         transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth / 2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight / 2)) + ')'
                     });
             } else if (this._category == Category.xy || this._category == Category.treemap || this._category == Category.simpleTreemap) {
                 this._svg.select('.ninja-containerGroup')
-                    .attr({
+                    .attrs({
                         transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
                     });
             }
@@ -153,7 +141,7 @@ module ninjaPixel {
 
 //        _translateNinjaContainerGroup(x:number, y:number){
 //                this._svg.select('.ninja-containerGroup')
-//                    .attr({
+//                    .attrs({
 //                        transform: 'translate(' + Number(this._margin.left) + x + ',' + Number(this._margin.top) + y + ')'
 //            });
 //        }
@@ -675,7 +663,7 @@ module ninjaPixel {
             return this;
         }
 
-        transitionEase(_x): any {
+        transitionEase(_x):any {
             if (!arguments.length) return this._transitionEase;
             this._transitionEase = _x;
             return this;

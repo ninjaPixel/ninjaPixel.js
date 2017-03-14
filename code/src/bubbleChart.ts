@@ -1,6 +1,6 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
-module ninjaPixel{
+namespace ninjaPixel{
     interface bubbleChartDataItem {
         color?: string;
         x: number;
@@ -197,7 +197,7 @@ module ninjaPixel{
             // enter
             bubbles.enter().append('circle')
                 .classed('bubble', true)
-                .attr({
+                .attrs({
                     r: rScale0
                 })
                 .on('mouseover', function (d) {
@@ -231,7 +231,7 @@ module ninjaPixel{
                         stroke:     (d, i) => {return functor(itemStroke, d, i);},
                         fill:       (d, i) => {return functor(this._itemFill, d, i);}
                     })
-                .attr({
+                .attrs({
                     cx: function (d) {
                         return xScale(d.x);
                     },

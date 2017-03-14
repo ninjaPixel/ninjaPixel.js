@@ -1,7 +1,7 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
 //declare var d3: D3.Base;
-module ninjaPixel{
+namespace ninjaPixel{
     interface singleItem{
         y: number;    
 		group: string;    
@@ -210,7 +210,7 @@ module ninjaPixel{
                 
                 bars.enter().append('rect')
                 .classed('bar', true)
-                .attr({
+                .attrs({
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
@@ -252,7 +252,7 @@ module ninjaPixel{
                     stroke:     (d,i) => {return functor(defaultStroke, d, i);},
                     fill:       (d,i) => {return functor(barFill,d,i);}
                 })
-                .attr({
+                .attrs({
                     x: function (d, i) {
                         return xGroupScale(d.group);
                     },
@@ -273,7 +273,7 @@ module ninjaPixel{
                 .transition()
                 .duration((d,i) => {return functor(this._removeTransitionDelay, d, i);})
                 .ease(this._transitionEase)
-                .attr({
+                .attrs({
                     y: function (d) {
                         if (d.y > 0) {
                             return yScale(0);

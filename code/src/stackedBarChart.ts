@@ -2,7 +2,7 @@
 /// <reference path="chart.ts" />
 /// <reference path="barChart.ts" />
 //declare var d3: D3.Base;
-module ninjaPixel{
+namespace ninjaPixel{
     interface barChartDataItem {
         color?: string;
         x: string;
@@ -77,7 +77,7 @@ module ninjaPixel{
             
             bars.enter().append('rect')
                 .classed('bar', true)
-                .attr({
+                .attrs({
                     x: function (d, i) {
                         return xScale(d.data.x);
                     },
@@ -119,7 +119,7 @@ module ninjaPixel{
                     stroke:     (d,i) => {return functor(defaultStroke, d, i);},
                     fill:       (d,i) => {return functor(barFill,d,i);}
                 })
-                .attr({
+                .attrs({
                     x: function (d, i) {
                         return xScale(d.x);
                     },

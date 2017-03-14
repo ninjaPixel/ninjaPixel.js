@@ -1,7 +1,7 @@
 /// <reference path="../node_modules/@types/d3/index.d.ts" />
 /// <reference path="chart.ts" />
 
-module ninjaPixel {
+namespace ninjaPixel {
     interface barChartDataItem {
         color?: string;
         x: string;
@@ -43,16 +43,16 @@ module ninjaPixel {
 
         plot(_selection, barWidth?: number) {
             this._init(_selection);
-            var functor = this._functor;
-            var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
-            var onMouseover = this._onMouseover;
-            var onMouseout = this._onMouseout;
-            var onClick = this._onClick;
-            var mouseOverBarOpacity: any = this._mouseOverItemOpacity;
-            var defaultBarOpacity: any = this._itemOpacity;
-            var mouseOverBarStroke = this._mouseOverItemStroke;
-            var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;
+            let functor = this._functor;
+            let myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
+            let onMouseover = this._onMouseover;
+            let onMouseout = this._onMouseout;
+            let onClick = this._onClick;
+            let mouseOverBarOpacity: any = this._mouseOverItemOpacity;
+            let defaultBarOpacity: any = this._itemOpacity;
+            let mouseOverBarStroke = this._mouseOverItemStroke;
+            let defaultStroke = this._itemStroke;
+            let barFill = this._itemFill;
 
             const mapXToDate = (d: {x: number})=> {
                 return new Date(d.x).getTime();
@@ -248,9 +248,13 @@ module ninjaPixel {
 
 
                             myToolTip.show(d);
-                            if (myToolTip.getBoundingBox) {
-                                onMouseover(d, myToolTip.getBoundingBox());
-                            }
+
+                            onMouseover(d, function () {
+                                if (myToolTip.getBoundingBox) {
+                                    myToolTip.getBoundingBox();
+                                }
+                            });
+
                         })
                         .on('mouseout', function (d, i) {
                             const thisElem = d3.select(this);

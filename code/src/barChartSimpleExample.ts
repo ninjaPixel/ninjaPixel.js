@@ -1,6 +1,6 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
-module ninjaPixel{
+namespace ninjaPixel{
     interface barChartDataItem {
         x: string;
         y: number;        
@@ -62,7 +62,7 @@ module ninjaPixel{
             
             bars.enter().append('rect')
                 .classed('bar', true)
-                .attr({
+                .attrs({
                     x: (d, i) => { return xScale(d.x);},
                     width: barW * 0.95,
                     y: yScale0,
@@ -78,7 +78,7 @@ module ninjaPixel{
                 .style({
                     fill: (d,i) => {return functor(this._itemFill,d,i);}
                 })
-                .attr({
+                .attrs({
                     x: (d, i) => { return xScale(d.x);},
                     width: barW * 0.9,
                     y: (d) => {

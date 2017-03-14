@@ -2,7 +2,7 @@
 /// <reference path="chart.ts" />
 /// <reference path="barChart.ts" />
 //declare var d3: D3.Base;
-module ninjaPixel{
+namespace ninjaPixel{
 
     export class Lollipop extends ninjaPixel.BarChart{
         constructor(){ super();}
@@ -100,7 +100,7 @@ module ninjaPixel{
             // enter
             bubbles.enter().append('circle')
                 .classed('lollipop-head', true)
-                .attr({
+                .attrs({
                     r: this._headRadius
                 })
                 .on('mouseover', function (d) {
@@ -124,7 +124,7 @@ module ninjaPixel{
                 .on('click', function (d) {
                     onClick(d);
                 })
-                .attr({
+                .attrs({
                     cx: (d) => {
                         return xScale(d.x);
                     },
@@ -144,7 +144,7 @@ module ninjaPixel{
                         stroke:     (d, i) => {return functor(itemStroke, d, i);},
                         fill:       (d, i) => {return functor(this._headFill, d, i);}
                     })
-                .attr({
+                .attrs({
                     cx: (d) => {
                         return xScale(d.x);
                     },

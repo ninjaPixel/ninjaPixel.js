@@ -1,7 +1,7 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
 //declare var d3: D3.Base;
-module ninjaPixel {
+namespace ninjaPixel {
     interface singleItem {
         yMax:number;
         yMed:number;
@@ -237,7 +237,7 @@ module ninjaPixel {
 
                 bars.enter().append('rect')
                     .classed('bar', true)
-                    .attr({
+                    .attrs({
                         x: function (d, i) {
                             return xGroupScale(d.group);
                         },
@@ -295,7 +295,7 @@ module ninjaPixel {
                         }
 
                     })
-                    .attr({
+                    .attrs({
                         x: function (d, i) {
                             return xGroupScale(d.group);
                         },
@@ -324,7 +324,7 @@ module ninjaPixel {
                         return functor(this._removeTransitionDelay, d, i);
                     })
                     .ease(this._transitionEase)
-                    .attr({
+                    .attrs({
                         y: function (d) {
                             if (d.yMax > 0) {
                                 return yScale(0);
@@ -353,7 +353,7 @@ module ninjaPixel {
 
                 medianBar.enter().append('rect')
                     .classed('bar-median', true)
-                    .attr({
+                    .attrs({
                         x: function (d, i) {
                             return xGroupScale(d.group);
                         },
@@ -415,7 +415,7 @@ module ninjaPixel {
                             return functor(barFill2, d, i);
                         }
                     })
-                    .attr({
+                    .attrs({
                         x: function (d, i) {
                             return xGroupScale(d.group);
                         },
@@ -443,7 +443,7 @@ module ninjaPixel {
                         return functor(this._removeTransitionDelay, d, i);
                     })
                     .ease(this._transitionEase)
-                    .attr({
+                    .attrs({
                         y: function (d) {
                             if (d.yMax > 0) {
                                 return yScale(0);

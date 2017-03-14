@@ -5,6 +5,20 @@
   ],
   "types": [
     "d3",
-    "d3-plugins"
-  ]
+    "d3-plugins",
+    "ninjaTypes"
+  ],
+  "files": [
+    "./src/chart.ts",
+    "./src/barChart.ts"
+  ],
+  "compilerOptions": {
+    "declaration": false,
+    // set to true to crete .d.ts files
+    "sourceMap": true
+    // set to true to create map files
+
+  },
+  "outDir": "./src/js"
 }
+

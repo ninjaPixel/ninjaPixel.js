@@ -1,7 +1,7 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
 // declare var d3: D3.Base;
-module ninjaPixel{
+namespace ninjaPixel{
      
     export class SimpleTreemap extends ninjaPixel.Chart{
         constructor(){

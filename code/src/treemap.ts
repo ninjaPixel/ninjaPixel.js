@@ -1,7 +1,7 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
 // declare var d3: D3.Base;
-module ninjaPixel{
+namespace ninjaPixel{
      
     export class Treemap extends ninjaPixel.Chart{
         constructor(){
@@ -84,7 +84,7 @@ module ninjaPixel{
         
                 treemapNode.enter().append('rect')
                     .attr('class', 'treemap-node')
-                    .attr({
+                    .attrs({
                         x: (d) => { return d.x;},
                         width: (d) => { return Math.max(0, d.dx - 1);},                  
                         y: (d) => { return d.y;},
@@ -119,7 +119,7 @@ module ninjaPixel{
 
                 treemapNode.transition()
                     .duration(this._transitionDuration)
-                    .attr({
+                    .attrs({
                         x: (d) => { return d.x;},
                         width: (d) => { 
                                 if(drawEmptyTreemap){
@@ -149,7 +149,7 @@ module ninjaPixel{
                 
                 treemapText.enter().append('text')
                     .attr('class', 'treemap-text')
-                    .attr({
+                    .attrs({
                         fill: (d, i) => {return functor(this._itemTextLabelColor, d, i);},
                     })
                     .style({
@@ -171,7 +171,7 @@ module ninjaPixel{
 
                 treemapText.transition()
                     .duration(this._transitionDuration)
-                    .attr({
+                    .attrs({
                         x: (d, i) => { return d.x + functor(nodeTextOffsetLeft, d, i);},
                         y: (d, i) => { return d.y + functor(nodeTextOffsetTop, d, i);},
                         'font-size': (d, i) => { 

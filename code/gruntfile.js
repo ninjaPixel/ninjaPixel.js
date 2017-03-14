@@ -38,17 +38,10 @@ module.exports = function (grunt) {
         },
         ts: {
             default: {
-                // src: ['src/*.ts', '!src/*.d.ts'],
-                src: [
-                    'src/chart.ts',
-                    'src/barChart.ts',
-                ],
-                options: {
-                    declaration: false, // set to true to crete .d.ts files
-                    sourceMap: true // set to true to create map files
-                },
-                outDir: 'src/js'
+                // specifying tsconfig as a boolean will use the 'tsconfig.json' in same folder as Gruntfile.js
+                tsconfig: true
             }
+            
         },
         rename: {
             moveDefinitions: {

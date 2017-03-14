@@ -104,7 +104,7 @@
                 right: 30
             })
             .plotBackground(true)
-//            .transitionEase('linear')
+            .transitionEase(d3.easeExpInOut)
             .transitionDelay(function (d, i) {
                 return i * 30;
             })
@@ -148,7 +148,6 @@
 
         barChart.plot(d3.select("#chart")
                 .datum(timeseries));
-
 
     }
 </script>

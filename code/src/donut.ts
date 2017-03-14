@@ -1,6 +1,6 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
-module ninjaPixel{
+namespace ninjaPixel{
     interface donutDataItem {
         color?: string;
         x: string;

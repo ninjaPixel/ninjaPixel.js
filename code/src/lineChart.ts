@@ -1,7 +1,7 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="typescript_definitions/moment.d.ts" />
 /// <reference path="chart.ts" />
-module ninjaPixel{
+namespace ninjaPixel{
     interface lineChartDataItem {
         color?: string;
         data: { x: number;

@@ -1,7 +1,7 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
 //declare var d3: D3.Base;
-module ninjaPixel {
+namespace ninjaPixel {
     interface horizontalBarChartDataItem {
         color?:string;
         y:string;
@@ -193,7 +193,7 @@ module ninjaPixel {
 
                 bars.enter().append('rect')
                     .classed('bar', true)
-                    .attr({
+                    .attrs({
                         y: function (d, i) {
                             return yScaleAdjusted(d.y);
                         },
@@ -254,7 +254,7 @@ module ninjaPixel {
                             return functor(barFill, d, i);
                         }
                     })
-                    .attr({
+                    .attrs({
                         y: function (d, i) {
                             return yScaleAdjusted(d.y);
                         },
@@ -281,7 +281,7 @@ module ninjaPixel {
                         return functor(this._removeTransitionDelay, d, i);
                     })
                     .ease(this._transitionEase)
-                    .attr({
+                    .attrs({
                         x: 0
                     })
                     .delay((d, i) => {

@@ -83,7 +83,7 @@ var ninjaPixel;
                     container.append('g').classed('ninja-yAxisGroup ninja-axis', true);
                 }
             }
-            this._svg.transition().attr({
+            this._svg.transition().attrs({
                 width: this._width,
                 height: this._height
             });
@@ -91,13 +91,13 @@ var ninjaPixel;
             this._svg.style("width", this._width);
             if (this._category == Category.donut) {
                 this._svg.select('.ninja-containerGroup')
-                    .attr({
+                    .attrs({
                     transform: 'translate(' + Number(Number(this._margin.left) + Number(this._chartWidth / 2)) + ',' + Number(Number(this._margin.top) + Number(this._chartHeight / 2)) + ')'
                 });
             }
             else if (this._category == Category.xy || this._category == Category.treemap || this._category == Category.simpleTreemap) {
                 this._svg.select('.ninja-containerGroup')
-                    .attr({
+                    .attrs({
                     transform: 'translate(' + Number(this._margin.left) + ',' + Number(this._margin.top) + ')'
                 });
             }
@@ -856,9 +856,11 @@ var ninjaPixel;
                         return functor(mouseOverBarStroke, d, i);
                     });
                     myToolTip.show(d);
-                    if (myToolTip.getBoundingBox) {
-                        onMouseover(d, myToolTip.getBoundingBox());
-                    }
+                    onMouseover(d, function () {
+                        if (myToolTip.getBoundingBox) {
+                            myToolTip.getBoundingBox();
+                        }
+                    });
                 })
                     .on('mouseout', function (d, i) {
                     var thisElem = d3.select(this);

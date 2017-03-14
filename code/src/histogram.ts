@@ -1,6 +1,6 @@
 /// <reference path="typescript_definitions/d3.d.ts" />
 /// <reference path="chart.ts" />
-module ninjaPixel{
+namespace ninjaPixel{
     
  export class Histogram extends ninjaPixel.Chart{
     private _cornerRounding: number = 1;
@@ -73,7 +73,7 @@ module ninjaPixel{
             
             bar.enter().append('rect')
                 .classed('bars', true)
-                .attr({
+                .attrs({
                     'x': function (d) {
                         return xScale(d.x);
                     },
@@ -93,7 +93,7 @@ module ninjaPixel{
                 .duration(this._transitionDuration)
                 .ease(this._transitionEase)
                 .attr('width', barWidth)
-                .attr({
+                .attrs({
                     'x': function (d) {
                         return xScale(d.x);
                     },

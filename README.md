@@ -24,4 +24,6 @@ This will create ninjaPixel.js and ninjaPixel.bundle.js. The later includes [d3.
 Include your new TypeScript file in the `code\src` directory (alternatively, if you'd prefer to write in Javascript then save the new file into the `code\src\js` directory). Modify the concat-basic options in the gruntfile, to include your new file. Once complete, run `grunt`.
 
 ###Demos
-There are some demo pages located in the `demo` directory.
+There are some demo pages located in the `demo` directory. Run the webpages with
+
+    npm run demo

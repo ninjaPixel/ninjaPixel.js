@@ -39,7 +39,8 @@ module.exports = function (grunt) {
         ts: {
             default: {
                 // specifying tsconfig as a boolean will use the 'tsconfig.json' in same folder as Gruntfile.js
-                tsconfig: true
+                tsconfig: true,
+                "outDir": "./src/js"
             }
             
         },

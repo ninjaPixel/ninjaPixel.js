@@ -83,7 +83,7 @@ namespace ninjaPixel {
         _itemTextLabelColor: ninjaTypes.stringOrFunction;
 
 
-        
+
         constructor() {
 
         }
@@ -772,6 +772,7 @@ namespace ninjaPixel {
         }
 
     }
+
 
 
     // var formatBillionsWithB = function () {

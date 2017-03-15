@@ -12,12 +12,18 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-rename": "^0.1.4",
     "grunt-ts": "6.0.0-beta.14",
+    "http-server": "^0.9.0",
     "moment": "2",
     "queue-async": "^1.2.1",
+    "reload": "^1.1.1",
     "typescript": "^2.2.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/ninjaPixel/ninjaPixel.js"
+  },
+  "scripts": {
+    "demo": "http-server -a localhost -p 8080 -c-1",
+    "reload": "reload -b"
   }
 }

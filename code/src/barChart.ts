@@ -90,6 +90,7 @@ namespace ninjaPixel {
                     else {
                         if (this._isTimeseries) {
                             barW = 0.9 * this._chartWidth / (_data.length + 1);
+                            barW=0;
                         } else {
                             barW = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
                         }
@@ -145,8 +146,8 @@ namespace ninjaPixel {
                                 return d.x;
                             }))
                             // .rangeRoundBands([0, this._chartWidth], 0.1);
-                            .rangeRound([0, this._chartWidth])
-                            .padding(0.1);
+                            .rangeRound([0, this._chartWidth]);
+                            // .padding(0.1);
                     }
 
 //            if(useEntireXAxis){
@@ -171,9 +172,10 @@ namespace ninjaPixel {
                     var barScale = this._barScale;
 
 
+
                     if (barW <= 0) {
                         // barW = xScale.rangeBand();
-                        barW = xScale.bandWidth();
+                        barW = xScale.domain().bandWidth();
                     }
 
                     // set bar adjustment
@@ -184,13 +186,13 @@ namespace ninjaPixel {
                     if (barWidth != null) {
                         // set by other functions e.g. lollipop chart
                         // barAdjustmentX = (xScale.rangeBand() - barW) / 2;
-                        barAdjustmentX = (xScale.bandWidth() - barW) / 2;
+                        barAdjustmentX = (xScale.domain().bandWidth() - barW) / 2;
 
                     }
 
-                    var calculateBarWidth = function (d, i) {
+                    const calculateBarWidth = function (d, i) {
                         return barW;
-                    }
+                    };
 
                     function xScaleAdjusted(x) {
                         return xScale(x) + barAdjustmentX;

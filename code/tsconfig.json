@@ -18,7 +18,6 @@
     "sourceMap": true
     // set to true to create map files
 
-  },
-  "outDir": "./src/js"
+  }
 }
 

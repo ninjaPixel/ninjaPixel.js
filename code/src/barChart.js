@@ -73,6 +73,7 @@ var ninjaPixel;
                 else {
                     if (_this._isTimeseries) {
                         barW = 0.9 * _this._chartWidth / (_data.length + 1);
+                        barW = 0;
                     }
                     else {
                         barW = 0;
@@ -124,8 +125,7 @@ var ninjaPixel;
                         .domain(_data.map(function (d, i) {
                         return d.x;
                     }))
-                        .rangeRound([0, _this._chartWidth])
-                        .padding(0.1);
+                        .rangeRound([0, _this._chartWidth]);
                 }
                 _this._yScale = d3.scaleLinear()
                     .domain([minData, maxData])
@@ -137,14 +137,14 @@ var ninjaPixel;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
                 if (barW <= 0) {
-                    barW = xScale.bandWidth();
+                    barW = xScale.domain().bandWidth();
                 }
                 var barAdjustmentX = 0;
                 if (_this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
                 if (barWidth != null) {
-                    barAdjustmentX = (xScale.bandWidth() - barW) / 2;
+                    barAdjustmentX = (xScale.domain().bandWidth() - barW) / 2;
                 }
                 var calculateBarWidth = function (d, i) {
                     return barW;

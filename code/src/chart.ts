@@ -226,7 +226,7 @@ namespace ninjaPixel {
                 .tickSizeOuter(0);
 
             if (this._plotHorizontalGridTopping) {
-                yAxis.tickSizeInner(this._chartWidth);
+                yAxis.tickSizeInner(-this._chartWidth);
             }
 
             if (this._yAxisTickFormat != null) {

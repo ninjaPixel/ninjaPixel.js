@@ -162,7 +162,7 @@ var ninjaPixel;
             var yAxis = d3.axisLeft(yScale)
                 .tickSizeOuter(0);
             if (this._plotHorizontalGridTopping) {
-                yAxis.tickSizeInner(this._chartWidth);
+                yAxis.tickSizeInner(-this._chartWidth);
             }
             if (this._yAxisTickFormat != null) {
                 yAxis.tickFormat(this._yAxisTickFormat);
@@ -656,7 +656,7 @@ var ninjaPixel;
     }());
     ninjaPixel.Chart = Chart;
 })(ninjaPixel || (ninjaPixel = {}));
-//# sourceMappingURL=chart.js.map
+//
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -732,7 +732,6 @@ var ninjaPixel;
                 else {
                     if (_this._isTimeseries) {
                         barW = 0.9 * _this._chartWidth / (_data.length + 1);
-                        barW = 0;
                     }
                     else {
                         barW = 0;
@@ -776,15 +775,16 @@ var ninjaPixel;
                         maxX = getMaxDate(_data);
                     }
                     _this._xScale = d3.scaleTime()
-                        .domain([minX, maxX])
-                        .rangeRound([0 + barW, _this._chartWidth - barW]);
+                        .range([0 + barW, _this._chartWidth - barW])
+                        .domain([minX, maxX]);
                 }
                 else {
                     _this._xScale = d3.scaleBand()
                         .domain(_data.map(function (d, i) {
                         return d.x;
                     }))
-                        .rangeRound([0, _this._chartWidth]);
+                        .range([0, _this._chartWidth])
+                        .padding(0.1);
                 }
                 _this._yScale = d3.scaleLinear()
                     .domain([minData, maxData])
@@ -796,14 +796,19 @@ var ninjaPixel;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
                 if (barW <= 0) {
-                    barW = xScale.domain().bandWidth();
+                    if (!_this._isTimeseries) {
+                        barW = xScale.bandwidth();
+                    }
+                    else {
+                        console.warn("Bar width is " + barW + " for a timeseries bar chart. This shouldn't be happening.");
+                    }
                 }
                 var barAdjustmentX = 0;
                 if (_this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
                 if (barWidth != null) {
-                    barAdjustmentX = (xScale.domain().bandWidth() - barW) / 2;
+                    barAdjustmentX = (xScale.bandwidth() - barW) / 2;
                 }
                 var calculateBarWidth = function (d, i) {
                     return barW;
@@ -811,7 +816,6 @@ var ninjaPixel;
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;
                 }
-                _this._xScaleAdjusted = xScaleAdjusted;
                 var yScale0 = yScale(0);
                 var bars = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
@@ -928,4 +932,262 @@ var ninjaPixel;
     }(ninjaPixel.Chart));
     ninjaPixel.BarChart = BarChart;
 })(ninjaPixel || (ninjaPixel = {}));
-//# sourceMappingURL=barChart.js.map
+//
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
+    var LineChart = (function (_super) {
+        __extends(LineChart, _super);
+        function LineChart() {
+            var _this = _super.call(this) || this;
+            _this._isTimeseries = false;
+            _this._areaOpacity = 0;
+            _this._lineInterpolation = d3.curveLinear;
+            _this._lineDashArray = 'none';
+            return _this;
+        }
+        LineChart.prototype.isTimeseries = function (_x) {
+            if (!arguments.length)
+                return this._isTimeseries;
+            this._isTimeseries = _x;
+            return this;
+        };
+        LineChart.prototype.areaOpacity = function (_x) {
+            if (!arguments.length)
+                return this._areaOpacity;
+            this._areaOpacity = _x;
+            return this;
+        };
+        LineChart.prototype.lineInterpolation = function (_x) {
+            if (!arguments.length)
+                return this._lineInterpolation;
+            this._lineInterpolation = _x;
+            return this;
+        };
+        LineChart.prototype.lineDashArray = function (_x) {
+            if (!arguments.length)
+                return this._lineDashArray;
+            this._lineDashArray = _x;
+            return this;
+        };
+        LineChart.prototype.plot = function (_selection) {
+            var _this = this;
+            var functor = this._functor;
+            this._init(_selection);
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            function getMinDate(theData) {
+                return d3.min(theData, function (d) { return new Date(d.x).getTime(); });
+            }
+            function getMaxDate(theData) {
+                return d3.max(theData, function (d) { return new Date(d.x).getTime(); });
+            }
+            function getMinX(theData) {
+                return d3.min(theData, function (d) { return d.x; });
+            }
+            function getMaxX(theData) {
+                return d3.max(theData, function (d) { return d.x; });
+            }
+            function getMinY(theData) {
+                return d3.min(theData, function (d) { return d.y; });
+            }
+            function getMaxY(theData) {
+                return d3.max(theData, function (d) { return d.y; });
+            }
+            _selection.each(function (_data) {
+                var dataLen = _data.length;
+                var minX, maxX, minY, maxY;
+                for (var index = 0; index < dataLen; index++) {
+                    var minYOfThisArray = getMinY(_data[index].data), maxYOfThisArray = getMaxY(_data[index].data), minXOfThisArray, maxXOfThisArray;
+                    if (_this._isTimeseries) {
+                        minXOfThisArray = getMinDate(_data[index].data);
+                        maxXOfThisArray = getMaxDate(_data[index].data);
+                    }
+                    else {
+                        minXOfThisArray = getMinX(_data[index].data);
+                        maxXOfThisArray = getMaxX(_data[index].data);
+                    }
+                    if (index === 0) {
+                        minX = minXOfThisArray;
+                        maxX = maxXOfThisArray;
+                        minY = minYOfThisArray;
+                        maxY = maxYOfThisArray;
+                    }
+                    else {
+                        if (minXOfThisArray < minX) {
+                            minX = minXOfThisArray;
+                        }
+                        if (maxXOfThisArray > maxX) {
+                            maxX = maxXOfThisArray;
+                        }
+                        if (maxYOfThisArray > maxY) {
+                            maxY = maxYOfThisArray;
+                        }
+                        if (minYOfThisArray < minY) {
+                            minY = minYOfThisArray;
+                        }
+                    }
+                }
+                if (_this._y1Min != null) {
+                    minY = _this._y1Min;
+                }
+                if (_this._y1Max != null) {
+                    maxY = _this._y1Max;
+                }
+                if (_this._xMin != null) {
+                    minX = _this._xMin;
+                }
+                if (_this._xMax != null) {
+                    maxX = _this._xMax;
+                }
+                var xScale;
+                if (_this._isTimeseries) {
+                    xScale = d3.scaleTime();
+                }
+                else {
+                    xScale = d3.scaleLinear();
+                }
+                if (_this._internalXAxisMargin) {
+                    xScale.range([0 + _this._internalXAxisMargin, _this._chartWidth - _this._internalXAxisMargin]);
+                }
+                else {
+                    xScale.range([0, _this._chartWidth]);
+                }
+                xScale.domain([minX, maxX]);
+                var yScale;
+                if (_this._yAxis1LogScale) {
+                    yScale = d3.scaleLog()
+                        .domain([minY, maxY])
+                        .range([_this._chartHeight, 0]);
+                }
+                else {
+                    yScale = d3.scaleLinear()
+                        .domain([minY, maxY])
+                        .range([_this._chartHeight, 0]);
+                }
+                var singleLine = d3.line()
+                    .x(function (d) {
+                    return xScale(d.x);
+                })
+                    .y(function (d) {
+                    return yScale(d.y);
+                });
+                singleLine.curve(_this._lineInterpolation);
+                var baseLine = d3.line()
+                    .x(function (d) { return xScale(d.x); })
+                    .y(function (d) { return yScale(0); });
+                baseLine.curve(_this._lineInterpolation);
+                var area = d3.area()
+                    .x(function (d) { return xScale(d.x); })
+                    .y0(function (d) {
+                    if (minY > 0) {
+                        return yScale(minY);
+                    }
+                    else if (maxY < 0) {
+                        return yScale(maxY);
+                    }
+                    else {
+                        return yScale(0);
+                    }
+                })
+                    .y1(function (d) { return yScale(d.y); });
+                area.curve(_this._lineInterpolation);
+                var baseArea = d3.area()
+                    .x(function (d) { return xScale(d.x); })
+                    .y0(function (d) { return yScale(0); })
+                    .y1(function (d) { return yScale(0); });
+                baseArea.curve(_this._lineInterpolation);
+                var areaSvg = _this._svg.select('.ninja-chartGroup').selectAll('path.area')
+                    .data(_data, function (d) {
+                    return d.name;
+                });
+                var enterArea = areaSvg.enter()
+                    .append('svg:path')
+                    .attr('class', 'area')
+                    .style('opacity', 0)
+                    .style('fill', 'none')
+                    .style('stroke-width', '0px')
+                    .attr('d', function (d) {
+                    return baseArea(d.data);
+                });
+                areaSvg.merge(enterArea)
+                    .transition()
+                    .delay(function (d, i) { return functor(_this._transitionDelay, d, i); })
+                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
+                    .ease(_this._transitionEase)
+                    .attr('d', function (d) {
+                    return area(d.data);
+                })
+                    .style({
+                    opacity: function (d, i) { return functor(_this._areaOpacity, d, i); },
+                    fill: function (d, i) { return functor(_this._itemFill, d, i); }
+                });
+                areaSvg.exit()
+                    .transition()
+                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
+                    .ease(_this._transitionEase)
+                    .style('opacity', 0)
+                    .remove();
+                var lineSvg = _this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .selectAll('path.line')
+                    .data(_data, function (d) {
+                    return d.name;
+                });
+                lineSvg.enter()
+                    .append('svg:path')
+                    .attr('class', 'line')
+                    .on('mouseover', function (d) {
+                    myToolTip.show(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
+                })
+                    .on('mouseout', function (d) {
+                    myToolTip.hide();
+                    onMouseout(d);
+                })
+                    .style({
+                    opacity: 0,
+                    stroke: function (d, i) { return functor(_this._itemFill, d, i); },
+                    fill: 'none',
+                    'stroke-dasharray': function (d, i) { return functor(_this._lineDashArray, d, i); },
+                    'stroke-width': function (d, i) { return functor(_this._itemStrokeWidth, d, i); }
+                })
+                    .attr('d', function (d) { return baseLine(d.data); });
+                lineSvg.transition()
+                    .delay(function (d, i) { return functor(_this._transitionDelay, d, i); })
+                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
+                    .ease(_this._transitionEase)
+                    .attr('d', function (d) { return singleLine(d.data); })
+                    .style({
+                    opacity: function (d, i) { return functor(_this._itemOpacity, d, i); },
+                    stroke: function (d, i) { return functor(_this._itemFill, d, i); },
+                    'stroke-dasharray': function (d, i) { return functor(_this._lineDashArray, d, i); },
+                    'stroke-width': function (d, i) { return functor(_this._itemStrokeWidth, d, i); }
+                });
+                lineSvg.exit()
+                    .transition()
+                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
+                    .ease(_this._transitionEase)
+                    .style('opacity', 0)
+                    .remove();
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+            });
+        };
+        return LineChart;
+    }(ninjaPixel.Chart));
+    ninjaPixel.LineChart = LineChart;
+})(ninjaPixel || (ninjaPixel = {}));
+//
+//# sourceMappingURL=ninjaPixel.js.map

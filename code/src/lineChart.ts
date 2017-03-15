@@ -1,6 +1,6 @@
-/// <reference path="typescript_definitions/d3.d.ts" />
-/// <reference path="typescript_definitions/moment.d.ts" />
-/// <reference path="chart.ts" />
+/// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
+
+
 namespace ninjaPixel{
     interface lineChartDataItem {
         color?: string;
@@ -12,7 +12,7 @@ namespace ninjaPixel{
     export class LineChart extends ninjaPixel.Chart{
         private _isTimeseries: boolean= false;
         private _areaOpacity: number= 0;
-        private _lineInterpolation: any = 'basis';
+        private _lineInterpolation: any = d3.curveLinear;
         private _lineDashArray: any = 'none';
         
         constructor(){super();}
@@ -131,11 +131,11 @@ namespace ninjaPixel{
                 // create the scaling functions
                 var xScale;
                 if (this._isTimeseries) {
-                    xScale = d3.time.scale();
+                    xScale = d3.scaleTime();
 //                        .range([0, this._chartWidth])
 //                        .domain([minX, maxX]);
                 } else {
-                    xScale = d3.scale.linear();
+                    xScale = d3.scaleLinear();
 //                        .range([0, this._chartWidth])
 //                        .domain([minX, maxX]);
                 }                                   
@@ -147,11 +147,11 @@ namespace ninjaPixel{
                 xScale.domain([minX, maxX]);
                 var yScale;
                 if(this._yAxis1LogScale){
-                    yScale = d3.scale.log()
+                    yScale = d3.scaleLog()
                         .domain([minY, maxY])
                         .range([this._chartHeight, 0]);
                 }else {
-                    yScale = d3.scale.linear()
+                    yScale = d3.scaleLinear()
                         .domain([minY, maxY])
                         .range([this._chartHeight, 0]);
                 }
@@ -160,21 +160,23 @@ namespace ninjaPixel{
 
                 // *** CHARTING ***
                 // create line and area functions
-                var singleLine = d3.svg.line()
+                var singleLine = d3.line()
                     .x(function (d:any) {
                         return xScale(d.x);
                     })
                     .y(function (d:any) {
                         return yScale(d.y);
                     });
-                singleLine.interpolate(this._lineInterpolation);
-                
-                var baseLine = d3.svg.line()
+                // singleLine.interpolate(this._lineInterpolation);
+                singleLine.curve(this._lineInterpolation);
+
+                var baseLine = d3.line()
                     .x(function (d:any) { return xScale(d.x);})
                 .y(function (d:any) { return yScale(0);});
-                baseLine.interpolate(this._lineInterpolation);
+                // baseLine.interpolate(this._lineInterpolation);
+                baseLine.curve(this._lineInterpolation);
 
-                var area = d3.svg.area()
+                var area = d3.area()
                     .x((d:any) => {return xScale(d.x);})
                     .y0((d) => {
                         if (minY > 0) {
@@ -186,13 +188,15 @@ namespace ninjaPixel{
                         }
                     })
                     .y1((d:any) => {return yScale(d.y);});
-                area.interpolate(this._lineInterpolation);
-                
-                var baseArea = d3.svg.area()
+                // area.interpolate(this._lineInterpolation);
+                area.curve(this._lineInterpolation);
+
+                var baseArea = d3.area()
                     .x((d:any) => {return xScale(d.x);})
                     .y0((d) => {return yScale(0);})
                     .y1((d) => {return yScale(0);});
-                baseArea.interpolate(this._lineInterpolation);
+                // baseArea.interpolate(this._lineInterpolation);
+                baseArea.curve(this._lineInterpolation);
 
                 // shade area
                 var areaSvg = this._svg.select('.ninja-chartGroup').selectAll('path.area')
@@ -200,7 +204,8 @@ namespace ninjaPixel{
                         return d.name;
                     });
 
-                areaSvg.enter()
+                
+                const enterArea = areaSvg.enter()
                     .append('svg:path')
                     .attr('class', 'area')
                     .style('opacity', 0)
@@ -210,7 +215,8 @@ namespace ninjaPixel{
                         return baseArea(d.data);
                     });
 
-                areaSvg.transition()
+                areaSvg.merge(enterArea)
+                    .transition()
                     .delay((d, i) => {return functor(this._transitionDelay, d, i);})                
                     .duration((d, i) => {return functor(this._transitionDuration, d, i);})
                     .ease(this._transitionEase)
@@ -224,9 +230,8 @@ namespace ninjaPixel{
 
                 areaSvg.exit()
                     .transition()
-//                    .duration(500)
                     .duration((d, i) => {return functor(this._transitionDuration, d, i);})
-                    .ease('linear')
+                    .ease(this._transitionEase)
                     .style('opacity', 0)
                     .remove();
 

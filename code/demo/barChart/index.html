@@ -77,7 +77,6 @@
         })
     .plotBackground(true)
     .y1Max(12)
-    .transitionEase('elastic')
     .transitionDelay(function(d,i){return i*30;})
     .onMouseover(function (d, i) {
             d3.select('#message').text(d.x);
@@ -114,7 +113,7 @@
     function ready(error) {
 
         var filteredData = topHits.filter(function (d) {
-            if (d.year >= 1980 & d.year < 1985) return d;
+            if (d.year >= 1970 & d.year < 2012) return d;
         });
 
         barChart.plot(d3.select("#chart")

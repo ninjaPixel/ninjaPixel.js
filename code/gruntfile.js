@@ -12,9 +12,11 @@ module.exports = function (grunt) {
         concat: {
             options: {
                 //                separator: ';',
+                sourceMap:true
             },
             basic: {
-                src: ['src/js/d3.tip.js',
+                src: [
+                    'src/js/d3.tip.js',
                     'src/js/chart.js',
                     'src/js/barChart.js',
                     'src/js/horizontalBarChart.js',
@@ -32,7 +34,12 @@ module.exports = function (grunt) {
                 dest: 'dist/ninjaPixel.js',
             },
             bundle: {
-                src: ['node_modules/d3/build/d3.js', 'node_modules/d3-selection-multi/build/d3-selection-multi.js', 'node_modules/d3-tip/index.js', 'dist/ninjaPixel.js'],
+                src: [
+                    'node_modules/d3/build/d3.js',
+                    'node_modules/d3-selection-multi/build/d3-selection-multi.js',
+                    'node_modules/d3-tip/index.js',
+                    'dist/ninjaPixel.js'
+                ],
                 dest: 'dist/ninjaPixel.bundle.js',
             }
         },

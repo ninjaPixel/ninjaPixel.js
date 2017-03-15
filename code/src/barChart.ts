@@ -90,9 +90,8 @@ namespace ninjaPixel {
                     else {
                         if (this._isTimeseries) {
                             barW = 0.9 * this._chartWidth / (_data.length + 1);
-                            barW=0;
                         } else {
-                            barW = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
+                            barW = 0; // revisit this once we have xScale and use  xScale.bandwidth();
                         }
                     }
                     var minData: any = 0;
@@ -138,26 +137,17 @@ namespace ninjaPixel {
                         }
 
                         this._xScale = d3.scaleTime()
-                            .domain([minX, maxX])
-                            .rangeRound([0 + barW, this._chartWidth - barW]);
+                            .range([0 + barW , this._chartWidth - barW ])
+                            .domain([minX, maxX]);
                     } else {
                         this._xScale = d3.scaleBand()
                             .domain(_data.map(function (d, i) {
                                 return d.x;
                             }))
                             // .rangeRoundBands([0, this._chartWidth], 0.1);
-                            .rangeRound([0, this._chartWidth]);
-                            // .padding(0.1);
+                            .range([0, this._chartWidth])
+                            .padding(0.1);
                     }
-
-//            if(useEntireXAxis){
-//                // if we are plotting other types of char below this one
-//                // then we will want the x labels to line up
-//                // the bar chart has a buffer at each edge, so that bars don't get cropped
-//                // but this means that the date alignment is different to other chart types
-//                // Fix this with the _useEntireXAxis flag.
-//                this._xScale.range([0, this._chartWidth]);  
-//            }
 
                     this._yScale = d3.scaleLinear()
                         .domain([minData, maxData])
@@ -167,15 +157,17 @@ namespace ninjaPixel {
                         .domain([Math.abs(maxData - minData), 0])
                         .rangeRound([this._chartHeight, 0]);
 
-                    var xScale = this._xScale;
-                    var yScale = this._yScale;
-                    var barScale = this._barScale;
-
+                    const xScale = this._xScale;
+                    const yScale = this._yScale;
+                    const barScale = this._barScale;
 
 
                     if (barW <= 0) {
-                        // barW = xScale.rangeBand();
-                        barW = xScale.domain().bandWidth();
+                        if (!this._isTimeseries) {
+                            barW = xScale.bandwidth();
+                        } else {
+                            console.warn(`Bar width is ${barW} for a timeseries bar chart. This shouldn't be happening.`)
+                        }
                     }
 
                     // set bar adjustment
@@ -186,7 +178,7 @@ namespace ninjaPixel {
                     if (barWidth != null) {
                         // set by other functions e.g. lollipop chart
                         // barAdjustmentX = (xScale.rangeBand() - barW) / 2;
-                        barAdjustmentX = (xScale.domain().bandWidth() - barW) / 2;
+                        barAdjustmentX = (xScale.bandwidth() - barW) / 2;
 
                     }
 
@@ -197,8 +189,6 @@ namespace ninjaPixel {
                     function xScaleAdjusted(x) {
                         return xScale(x) + barAdjustmentX;
                     }
-
-                    this._xScaleAdjusted = xScaleAdjusted;
 
                     // Enter, Update, Exit on bars
                     let yScale0 = yScale(0);

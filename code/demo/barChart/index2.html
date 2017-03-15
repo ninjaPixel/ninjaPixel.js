@@ -76,24 +76,22 @@
 <script src="../../node_modules/queue-async/build/queue.js" charset="utf-8"></script>
 
 <script>
-    //    var currency = d3.requote('$');
-
     var currency = '£';
-    //var localeFormatter = d3.locale({
-    //  "decimal": ".",
-    //  "thousands": ",",
-    //  "grouping": [3],
-    //  "currency": [currency, ""],
-    //  "dateTime": "%a %b %e %X %Y",
-    //  "date": "%d/%m/%Y",
-    //  "time": "%H:%M:%S",
-    //  "periods": ["AM", "PM"],
-    //  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    //  "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    //  "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    //  "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    //
-    //});
+    var localeFormatter = d3.formatLocale({
+        "decimal": ".",
+        "thousands": ",",
+        "grouping": [3],
+        "currency": [currency, ""],
+        "dateTime": "%a %b %e %X %Y",
+        "date": "%d/%m/%Y",
+        "time": "%H:%M:%S",
+        "periods": ["AM", "PM"],
+        "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    });
 
     var barChart = new ninjaPixel.BarChart();
     barChart.transitionDuration(2000)
@@ -116,8 +114,7 @@
             .plotHorizontalGridTopping(true)
             .cornerRounding(0)
             .isTimeseries(true)
-            //    .xMax('2015-Jan-20')
-            //    .yAxisTickFormat(localeFormatter.numberFormat('$s'))
+            .yAxisTickFormat(localeFormatter.format(('$.0s')))
             .mouseOverItemOpacity(function (d, i) {
                 return d.opacity;
             });
@@ -126,7 +123,7 @@
     toolTip.html(function (d) {
         return `X:${d.x} --- Y:${d.y}`;
     });
-//    toolTip.getBoundingBox = function(){console.log('BB')}
+    //    toolTip.getBoundingBox = function(){console.log('BB')}
     barChart.toolTip(toolTip);
 
     ready();
@@ -142,8 +139,6 @@
             });
             thisDate = new moment(thisDate).add(1, 'days');
         }
-
-
 
 
         barChart.plot(d3.select("#chart")

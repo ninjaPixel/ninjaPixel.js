@@ -10,7 +10,8 @@
   ],
   "files": [
     "./src/chart.ts",
-    "./src/barChart.ts"
+    "./src/barChart.ts",
+    "./src/lineChart.ts"
   ],
   "compilerOptions": {
     "declaration": false,

@@ -91,13 +91,13 @@ namespace ninjaPixel{
                         height: 0,
                         fill: (d, i) => {return functor(nodeFill, d, i);}
                     })
-                    .style({
+                    .styles({
                         opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
                         stroke:  (d,i) => {return functor(defaultStroke, d, i);}
                     })
                     .on('mouseover', function (d, i) {
                         d3.select(this)
-                            .style({
+                            .styles({
                                 opacity: (d, i) => { return functor(mouseOverOpacity, d, i);},
                                 stroke:  (d,i) => {return functor(mouseOverStroke, d, i);}
                             });
@@ -106,7 +106,7 @@ namespace ninjaPixel{
                     })
                     .on('mouseout', function (d, i) {
                         d3.select(this)
-                            .style({
+                            .styles({
                                 opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
                                 stroke:  (d,i) => {return functor(defaultStroke, d, i);}
                             });
@@ -136,7 +136,7 @@ namespace ninjaPixel{
                         },                        
                         fill: (d, i) => {return functor(this._itemFill, d, i);}
                     })
-                    .style({
+                    .styles({
                         opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
                         stroke:  (d,i) => {return functor(defaultStroke, d, i);}
                     });                
@@ -152,7 +152,7 @@ namespace ninjaPixel{
                     .attrs({
                         fill: (d, i) => {return functor(this._itemTextLabelColor, d, i);},
                     })
-                    .style({
+                    .styles({
                         opacity: (d, i) => {return functor(defaultOpacity,d, i);}, // Re-sets the opacity
                     })
                     .on('mouseover', function (d, i) {

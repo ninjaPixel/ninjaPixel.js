@@ -46,7 +46,7 @@ namespace ninjaPixel{
             
             path.enter()
                 .append('path')
-                .style({
+                .styles({
                     opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
                     stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
                     fill:    (d, i) => {return this._functor(this._itemFill, d, i);}
@@ -59,7 +59,7 @@ namespace ninjaPixel{
 
             path.transition()
                 .duration(this._transitionDuration)
-                .style({
+                .styles({
                     opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
                     stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
                     fill:    (d, i) => {return this._functor(this._itemFill, d, i);}

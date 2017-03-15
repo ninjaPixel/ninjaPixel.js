@@ -208,7 +208,7 @@ namespace ninjaPixel {
                     })
                     .on('mouseover', function (d, i) {
                         d3.select(this)
-                            .style({
+                            .styles({
                                 opacity: (d, i) => {
                                     return functor(mouseOverBarOpacity, d, i);
                                 },
@@ -222,7 +222,7 @@ namespace ninjaPixel {
                     })
                     .on('mouseout', function (d, i) {
                         d3.select(this)
-                            .style({
+                            .styles({
                                 opacity: (d, i) => {
                                     return functor(defaultBarOpacity, d, i);
                                 }, // Re-sets the opacity
@@ -243,7 +243,7 @@ namespace ninjaPixel {
                         return functor(this._transitionDelay, d, i);
                     })
                     .ease(this._transitionEase)
-                    .style({
+                    .styles({
                         opacity: (d, i) => {
                             return functor(defaultBarOpacity, d, i);
                         },

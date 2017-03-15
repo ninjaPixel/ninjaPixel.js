@@ -75,7 +75,7 @@ namespace ninjaPixel{
                 .duration(this._transitionDuration)
                 .delay((d,i) => {return functor(this._transitionDelay, d, i);})
                 .ease(this._transitionEase)
-                .style({
+                .styles({
                     fill: (d,i) => {return functor(this._itemFill,d,i);}
                 })
                 .attrs({
@@ -93,7 +93,7 @@ namespace ninjaPixel{
                 
             bars.exit()
                 .transition()
-                .style({
+                .styles({
                 opacity: 0
                 })
                 .remove();   

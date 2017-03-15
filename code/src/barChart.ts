@@ -314,7 +314,7 @@ namespace ninjaPixel {
                         .delay((d, i) => {
                             return functor(this._removeDelay, d, i);
                         })
-                        // .style({
+                        // .styles({
                         // opacity: 0
                         // })
                         .remove();

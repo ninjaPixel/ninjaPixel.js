@@ -17966,22 +17966,34 @@ var ninjaPixel;
             var onMouseover = this._onMouseover;
             var onMouseout = this._onMouseout;
             function getMinDate(theData) {
-                return d3.min(theData, function (d) { return new Date(d.x).getTime(); });
+                return d3.min(theData, function (d) {
+                    return new Date(d.x).getTime();
+                });
             }
             function getMaxDate(theData) {
-                return d3.max(theData, function (d) { return new Date(d.x).getTime(); });
+                return d3.max(theData, function (d) {
+                    return new Date(d.x).getTime();
+                });
             }
             function getMinX(theData) {
-                return d3.min(theData, function (d) { return d.x; });
+                return d3.min(theData, function (d) {
+                    return d.x;
+                });
             }
             function getMaxX(theData) {
-                return d3.max(theData, function (d) { return d.x; });
+                return d3.max(theData, function (d) {
+                    return d.x;
+                });
             }
             function getMinY(theData) {
-                return d3.min(theData, function (d) { return d.y; });
+                return d3.min(theData, function (d) {
+                    return d.y;
+                });
             }
             function getMaxY(theData) {
-                return d3.max(theData, function (d) { return d.y; });
+                return d3.max(theData, function (d) {
+                    return d.y;
+                });
             }
             _selection.each(function (_data) {
                 var dataLen = _data.length;
@@ -18063,11 +18075,17 @@ var ninjaPixel;
                 });
                 singleLine.curve(_this._lineInterpolation);
                 var baseLine = d3.line()
-                    .x(function (d) { return xScale(d.x); })
-                    .y(function (d) { return yScale(0); });
+                    .x(function (d) {
+                    return xScale(d.x);
+                })
+                    .y(function (d) {
+                    return yScale(0);
+                });
                 baseLine.curve(_this._lineInterpolation);
                 var area = d3.area()
-                    .x(function (d) { return xScale(d.x); })
+                    .x(function (d) {
+                    return xScale(d.x);
+                })
                     .y0(function (d) {
                     if (minY > 0) {
                         return yScale(minY);
@@ -18079,13 +18097,20 @@ var ninjaPixel;
                         return yScale(0);
                     }
                 })
-                    .y1(function (d) { return yScale(d.y); });
+                    .y1(function (d) {
+                    return yScale(d.y);
+                });
                 area.curve(_this._lineInterpolation);
                 var baseArea = d3.area()
-                    .x(function (d) { return xScale(d.x); })
-                    .y0(function (d) { return yScale(0); })
-                    .y1(function (d) { return yScale(0); });
-                baseArea.curve(_this._lineInterpolation);
+                    .x(function (d) {
+                    return xScale(d.x);
+                })
+                    .y0(function (d) {
+                    return yScale(0);
+                })
+                    .y1(function (d) {
+                    return yScale(0);
+                });
                 var areaSvg = _this._svg.select('.ninja-chartGroup').selectAll('path.area')
                     .data(_data, function (d) {
                     return d.name;
@@ -18101,19 +18126,28 @@ var ninjaPixel;
                 });
                 areaSvg.merge(enterArea)
                     .transition()
-                    .delay(function (d, i) { return functor(_this._transitionDelay, d, i); })
-                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
-                    .ease(_this._transitionEase)
+                    .delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                })
+                    .duration(function (d, i) {
+                    return functor(_this._transitionDuration, d, i);
+                })
                     .attr('d', function (d) {
                     return area(d.data);
                 })
-                    .style({
-                    opacity: function (d, i) { return functor(_this._areaOpacity, d, i); },
-                    fill: function (d, i) { return functor(_this._itemFill, d, i); }
+                    .styles({
+                    opacity: function (d, i) {
+                        return functor(_this._areaOpacity, d, i);
+                    },
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    }
                 });
                 areaSvg.exit()
                     .transition()
-                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
+                    .duration(function (d, i) {
+                    return functor(_this._transitionDuration, d, i);
+                })
                     .ease(_this._transitionEase)
                     .style('opacity', 0)
                     .remove();
@@ -18123,39 +18157,67 @@ var ninjaPixel;
                     .data(_data, function (d) {
                     return d.name;
                 });
-                lineSvg.enter()
+                var lineEnter = lineSvg.enter()
                     .append('svg:path')
                     .attr('class', 'line')
                     .on('mouseover', function (d) {
                     myToolTip.show(d);
-                    onMouseover(d, myToolTip.getBoundingBox());
+                    onMouseover(d, function () {
+                        if (myToolTip.getBoundingBox) {
+                            myToolTip.getBoundingBox();
+                        }
+                    });
                 })
                     .on('mouseout', function (d) {
                     myToolTip.hide();
                     onMouseout(d);
                 })
-                    .style({
+                    .styles({
                     opacity: 0,
-                    stroke: function (d, i) { return functor(_this._itemFill, d, i); },
+                    stroke: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    },
                     fill: 'none',
-                    'stroke-dasharray': function (d, i) { return functor(_this._lineDashArray, d, i); },
-                    'stroke-width': function (d, i) { return functor(_this._itemStrokeWidth, d, i); }
+                    'stroke-dasharray': function (d, i) {
+                        return functor(_this._lineDashArray, d, i);
+                    },
+                    'stroke-width': function (d, i) {
+                        return functor(_this._itemStrokeWidth, d, i);
+                    }
                 })
-                    .attr('d', function (d) { return baseLine(d.data); });
-                lineSvg.transition()
-                    .delay(function (d, i) { return functor(_this._transitionDelay, d, i); })
-                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
-                    .ease(_this._transitionEase)
-                    .attr('d', function (d) { return singleLine(d.data); })
-                    .style({
-                    opacity: function (d, i) { return functor(_this._itemOpacity, d, i); },
-                    stroke: function (d, i) { return functor(_this._itemFill, d, i); },
-                    'stroke-dasharray': function (d, i) { return functor(_this._lineDashArray, d, i); },
-                    'stroke-width': function (d, i) { return functor(_this._itemStrokeWidth, d, i); }
+                    .attr('d', function (d) {
+                    return baseLine(d.data);
+                });
+                lineSvg.merge(lineEnter)
+                    .transition()
+                    .delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                })
+                    .duration(function (d, i) {
+                    return functor(_this._transitionDuration, d, i);
+                })
+                    .attr('d', function (d) {
+                    return singleLine(d.data);
+                })
+                    .styles({
+                    opacity: function (d, i) {
+                        return functor(_this._itemOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    },
+                    'stroke-dasharray': function (d, i) {
+                        return functor(_this._lineDashArray, d, i);
+                    },
+                    'stroke-width': function (d, i) {
+                        return functor(_this._itemStrokeWidth, d, i);
+                    }
                 });
                 lineSvg.exit()
                     .transition()
-                    .duration(function (d, i) { return functor(_this._transitionDuration, d, i); })
+                    .duration(function (d, i) {
+                    return functor(_this._transitionDuration, d, i);
+                })
                     .ease(_this._transitionEase)
                     .style('opacity', 0)
                     .remove();

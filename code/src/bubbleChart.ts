@@ -202,7 +202,7 @@ namespace ninjaPixel{
                 })
                 .on('mouseover', function (d) {
                     d3.select(this)
-                        .style({
+                        .styles({
                             opacity: (d, i) => {return functor(mouseOverOpacity, d, i);}, // Re-sets the opacity of the circle
                             stroke: (d, i) => {return functor(mouseOverStroke, d, i);}
                         });
@@ -211,7 +211,7 @@ namespace ninjaPixel{
                 })
                 .on('mouseout', function (d) {
                     d3.select(this)
-                        .style({
+                        .styles({
                             opacity: (d, i) => {return functor(itemOpacity, d, i);}, // Re-sets the opacity of the circle
                             stroke: (d, i) => {return functor(itemStroke, d, i);}
                         });
@@ -226,7 +226,7 @@ namespace ninjaPixel{
                 .duration(this._transitionDuration)
                 .delay((d,i) => {return functor(this._transitionDelay, d, i);})
                 .ease(this._transitionEase)
-                .style({
+                .styles({
                         opacity:    (d, i) => {return functor(itemOpacity, d, i);}, // Re-sets the opacity of the circle
                         stroke:     (d, i) => {return functor(itemStroke, d, i);},
                         fill:       (d, i) => {return functor(this._itemFill, d, i);}
@@ -245,7 +245,7 @@ namespace ninjaPixel{
 
             bubbles.exit()
                 .transition()
-                .style({
+                .styles({
                 opacity: 0
                 })
                 .remove();    

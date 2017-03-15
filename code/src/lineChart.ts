@@ -1,83 +1,100 @@
 /// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
 
 
-namespace ninjaPixel{
+namespace ninjaPixel {
     interface lineChartDataItem {
         color?: string;
         data: { x: number;
-                y: number;};
-        
+            y: number;};
+
     }
-    
-    export class LineChart extends ninjaPixel.Chart{
-        private _isTimeseries: boolean= false;
-        private _areaOpacity: number= 0;
+
+    export class LineChart extends ninjaPixel.Chart {
+        private _isTimeseries: boolean = false;
+        private _areaOpacity: number = 0;
         private _lineInterpolation: any = d3.curveLinear;
         private _lineDashArray: any = 'none';
-        
-        constructor(){super();}
-        
-        isTimeseries(_x): any{
+
+        constructor() {
+            super();
+        }
+
+        isTimeseries(_x): any {
             if (!arguments.length) return this._isTimeseries;
             this._isTimeseries = _x;
             return this;
         }
-        areaOpacity(_x): any{
+
+        areaOpacity(_x): any {
             if (!arguments.length) return this._areaOpacity;
             this._areaOpacity = _x;
             return this;
         }
-        lineInterpolation(_x): any{
+
+        lineInterpolation(_x): any {
             if (!arguments.length) return this._lineInterpolation;
             this._lineInterpolation = _x;
             return this;
         }
-        lineDashArray(_x): any{
+
+        lineDashArray(_x): any {
             if (!arguments.length) return this._lineDashArray;
             this._lineDashArray = _x;
             return this;
         }
-        
-        
-        plot(_selection){
+
+
+        plot(_selection) {
             var functor = this._functor;
             this._init(_selection);
             var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
             var onMouseover = this._onMouseover;
             var onMouseout = this._onMouseout;
-            
+
             // just creating simple function to get the min and max values for each line (correct practice to do this outside the loop)
             function getMinDate(theData) {
-                return d3.min(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
+                return d3.min(theData, (d: {x: number}) => {
+                    return new Date(d.x).getTime();
+                });
             }
 
             function getMaxDate(theData) {
-                return d3.max(theData, (d: {x: number}) => {return new Date(d.x).getTime();});
+                return d3.max(theData, (d: {x: number}) => {
+                    return new Date(d.x).getTime();
+                });
             }
 
             function getMinX(theData) {
-                return d3.min(theData, (d: {x: number}) => {return d.x; });
+                return d3.min(theData, (d: {x: number}) => {
+                    return d.x;
+                });
             }
 
             function getMaxX(theData) {
-                return d3.max(theData, (d: {x: number}) => {return d.x;});
+                return d3.max(theData, (d: {x: number}) => {
+                    return d.x;
+                });
             }
 
             function getMinY(theData) {
-                return d3.min(theData, (d: {y: number}) => {return d.y;});
+                return d3.min(theData, (d: {y: number}) => {
+                    return d.y;
+                });
             }
 
             function getMaxY(theData) {
-                return d3.max(theData, (d: {y: number}) => {return d.y;});
+                return d3.max(theData, (d: {y: number}) => {
+                    return d.y;
+                });
             }
-            
+
             _selection.each((_data) => {
-                var dataLen: number =   _data.length;
+                var dataLen: number = _data.length;
                 var minX,
                     maxX,
                     minY,
                     maxY;
-            
+
                 // cycle through all the data to get min and max dates and the min/max y values
                 for (var index = 0; index < dataLen; index++) {
                     var minYOfThisArray = getMinY(_data[index].data),
@@ -121,11 +138,11 @@ namespace ninjaPixel{
                 if (this._y1Max != null) {
                     maxY = this._y1Max;
                 }
-                if(this._xMin != null){
-                    minX = this._xMin;   
+                if (this._xMin != null) {
+                    minX = this._xMin;
                 }
-                if(this._xMax != null){
-                    maxX = this._xMax;   
+                if (this._xMax != null) {
+                    maxX = this._xMax;
                 }
 
                 // create the scaling functions
@@ -138,46 +155,51 @@ namespace ninjaPixel{
                     xScale = d3.scaleLinear();
 //                        .range([0, this._chartWidth])
 //                        .domain([minX, maxX]);
-                }                                   
-                if(this._internalXAxisMargin){
+                }
+                if (this._internalXAxisMargin) {
                     xScale.range([0 + this._internalXAxisMargin, this._chartWidth - this._internalXAxisMargin]);
-                } else{
+                } else {
                     xScale.range([0, this._chartWidth]);
                 }
                 xScale.domain([minX, maxX]);
                 var yScale;
-                if(this._yAxis1LogScale){
+                if (this._yAxis1LogScale) {
                     yScale = d3.scaleLog()
                         .domain([minY, maxY])
                         .range([this._chartHeight, 0]);
-                }else {
+                } else {
                     yScale = d3.scaleLinear()
                         .domain([minY, maxY])
                         .range([this._chartHeight, 0]);
                 }
-                
 
 
                 // *** CHARTING ***
                 // create line and area functions
                 var singleLine = d3.line()
-                    .x(function (d:any) {
+                    .x(function (d: any) {
                         return xScale(d.x);
                     })
-                    .y(function (d:any) {
+                    .y(function (d: any) {
                         return yScale(d.y);
                     });
                 // singleLine.interpolate(this._lineInterpolation);
                 singleLine.curve(this._lineInterpolation);
 
                 var baseLine = d3.line()
-                    .x(function (d:any) { return xScale(d.x);})
-                .y(function (d:any) { return yScale(0);});
+                    .x(function (d: any) {
+                        return xScale(d.x);
+                    })
+                    .y(function (d: any) {
+                        return yScale(0);
+                    });
                 // baseLine.interpolate(this._lineInterpolation);
                 baseLine.curve(this._lineInterpolation);
 
                 var area = d3.area()
-                    .x((d:any) => {return xScale(d.x);})
+                    .x((d: any) => {
+                        return xScale(d.x);
+                    })
                     .y0((d) => {
                         if (minY > 0) {
                             return yScale(minY);
@@ -187,16 +209,24 @@ namespace ninjaPixel{
                             return yScale(0);
                         }
                     })
-                    .y1((d:any) => {return yScale(d.y);});
+                    .y1((d: any) => {
+                        return yScale(d.y);
+                    });
                 // area.interpolate(this._lineInterpolation);
                 area.curve(this._lineInterpolation);
 
                 var baseArea = d3.area()
-                    .x((d:any) => {return xScale(d.x);})
-                    .y0((d) => {return yScale(0);})
-                    .y1((d) => {return yScale(0);});
-                // baseArea.interpolate(this._lineInterpolation);
-                baseArea.curve(this._lineInterpolation);
+                    .x((d: any) => {
+                        return xScale(d.x);
+                    })
+                    .y0((d) => {
+                        return yScale(0);
+                    })
+                    .y1((d) => {
+                        return yScale(0);
+                    });
+                // FIXME
+                // baseArea.curve(this._lineInterpolation);
 
                 // shade area
                 var areaSvg = this._svg.select('.ninja-chartGroup').selectAll('path.area')
@@ -204,7 +234,7 @@ namespace ninjaPixel{
                         return d.name;
                     });
 
-                
+
                 const enterArea = areaSvg.enter()
                     .append('svg:path')
                     .attr('class', 'area')
@@ -217,83 +247,123 @@ namespace ninjaPixel{
 
                 areaSvg.merge(enterArea)
                     .transition()
-                    .delay((d, i) => {return functor(this._transitionDelay, d, i);})                
-                    .duration((d, i) => {return functor(this._transitionDuration, d, i);})
-                    .ease(this._transitionEase)
+                    .delay((d, i) => {
+                        return functor(this._transitionDelay, d, i);
+                    })
+                    .duration((d, i) => {
+                        return functor(this._transitionDuration, d, i);
+                    })
+                    // FIXME
+                    // .ease(this._transitionEase)
                     .attr('d', function (d) {
                         return area(d.data);
                     })
-                    .style({
-                        opacity:    (d, i) => {return functor(this._areaOpacity, d, i);}, // Re-sets the opacity of the circle                    
-                        fill:       (d, i) => {return functor(this._itemFill, d, i);} // use the same fill as the item (i.e. the line).
+                    .styles({
+                        opacity: (d, i) => {
+                            return functor(this._areaOpacity, d, i);
+                        }, // Re-sets the opacity of the circle
+                        fill: (d, i) => {
+                            return functor(this._itemFill, d, i);
+                        } // use the same fill as the item (i.e. the line).
                     });
 
                 areaSvg.exit()
                     .transition()
-                    .duration((d, i) => {return functor(this._transitionDuration, d, i);})
+                    .duration((d, i) => {
+                        return functor(this._transitionDuration, d, i);
+                    })
                     .ease(this._transitionEase)
                     .style('opacity', 0)
                     .remove();
 
                 // draw line
-                var lineSvg = this._svg.select('.ninja-chartGroup')
+                const lineSvg = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('path.line')
                     .data(_data, function (d) {
                         return d.name;
                     });
 
-                lineSvg.enter()
+                const lineEnter = lineSvg.enter()
                     .append('svg:path')
                     .attr('class', 'line')
-                    .on('mouseover', function(d){
+                    .on('mouseover', function (d) {
                         myToolTip.show(d);
-                        onMouseover(d, myToolTip.getBoundingBox());
+                        onMouseover(d, function () {
+                            if (myToolTip.getBoundingBox) {
+                                myToolTip.getBoundingBox();
+                            }
+                        });
                     })
-                    .on('mouseout', function(d){
+                    .on('mouseout', function (d) {
                         //myToolTip.hide(d); typescript not happy
-                        myToolTip.hide(); 
+                        myToolTip.hide();
                         onMouseout(d);
                     })
-                    .style({
+                    .styles({
                         opacity: 0,//       (d, i) => {return functor(this._itemOpacity, d, i);}, // Re-sets the opacity of the circle                    
-                        stroke:         (d, i) => {return functor(this._itemFill, d, i);}, // use the same fill as the item (i.e. the line).
-                        fill:           'none',
-                        'stroke-dasharray': (d, i) => {return functor(this._lineDashArray, d, i);},
-                        'stroke-width': (d, i) => {return functor(this._itemStrokeWidth, d, i);}//'2.5px'
+                        stroke: (d, i) => {
+                            return functor(this._itemFill, d, i);
+                        }, // use the same fill as the item (i.e. the line).
+                        fill: 'none',
+                        'stroke-dasharray': (d, i) => {
+                            return functor(this._lineDashArray, d, i);
+                        },
+                        'stroke-width': (d, i) => {
+                            return functor(this._itemStrokeWidth, d, i);
+                        }//'2.5px'
                     })
-                    .attr('d', (d) => {return baseLine(d.data);});
+                    .attr('d', (d) => {
+                        return baseLine(d.data);
+                    });
 
-                lineSvg.transition()
-                    .delay((d, i) => {return functor(this._transitionDelay, d, i);}) 
-                    .duration((d, i) => {return functor(this._transitionDuration, d, i);})
-                    .ease(this._transitionEase)
-                    .attr('d', (d) => { return singleLine(d.data);})
-                    .style({
-                        opacity: (d, i) => {return functor(this._itemOpacity, d, i);}, // Re-sets the opacity of the circle                    
-                        stroke:  (d, i) => {return functor(this._itemFill, d, i);}, // use the same fill as the item (i.e. the line).
-                        'stroke-dasharray': (d, i) => {return functor(this._lineDashArray, d, i);},
-                        'stroke-width': (d, i) => {return functor(this._itemStrokeWidth, d, i);}
-                    });    
+                lineSvg.merge(lineEnter)
+                    .transition()
+                    .delay((d, i) => {
+                        return functor(this._transitionDelay, d, i);
+                    })
+                    .duration((d, i) => {
+                        return functor(this._transitionDuration, d, i);
+                    })
+                    // .ease(this._transitionEase)
+                    .attr('d', (d) => {
+                        return singleLine(d.data);
+                    })
+                    .styles({
+                        opacity: (d, i) => {
+                            return functor(this._itemOpacity, d, i);
+                        }, // Re-sets the opacity of the circle
+                        stroke: (d, i) => {
+                            return functor(this._itemFill, d, i);
+                        }, // use the same fill as the item (i.e. the line).
+                        'stroke-dasharray': (d, i) => {
+                            return functor(this._lineDashArray, d, i);
+                        },
+                        'stroke-width': (d, i) => {
+                            return functor(this._itemStrokeWidth, d, i);
+                        }
+                    });
 
                 lineSvg.exit()
                     .transition()
-                    .duration((d, i) => {return functor(this._transitionDuration, d, i);})
+                    .duration((d, i) => {
+                        return functor(this._transitionDuration, d, i);
+                    })
                     .ease(this._transitionEase)
                     .style('opacity', 0)
                     .remove();
-                
+
                 this._plotLabels();
                 this._plotXAxis(xScale, yScale);
-                this._plotYAxis(xScale, yScale); 
+                this._plotYAxis(xScale, yScale);
                 //this._plotGrids(xScale, yScale);
                 // end _data loop
-                });
+            });
 
             // end plot
         }
-        
-     
+
+
         // end LineChart
     }
 }

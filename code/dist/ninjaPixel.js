@@ -666,12 +666,8 @@ var ninjaPixel;
             this._init(_selection);
             var functor = this._functor;
             var myToolTip = this._toolTip;
-            var onMouseover = this._onMouseover;
-            var onMouseout = this._onMouseout;
             var onClick = this._onClick;
-            var mouseOverBarOpacity = this._mouseOverItemOpacity;
             var defaultBarOpacity = this._itemOpacity;
-            var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
             var barFill = this._itemFill;
             var genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
@@ -932,12 +928,8 @@ var ninjaPixel;
             this._init(_selection);
             var functor = this._functor;
             var myToolTip = this._toolTip;
-            var onMouseover = this._onMouseover;
-            var onMouseout = this._onMouseout;
             var onClick = this._onClick;
-            var mouseOverBarOpacity = this._mouseOverItemOpacity;
             var defaultBarOpacity = this._itemOpacity;
-            var mouseOverBarStroke = this._mouseOverItemStroke;
             var defaultStroke = this._itemStroke;
             var barFill = this._itemFill;
             var genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
@@ -1028,14 +1020,14 @@ var ninjaPixel;
                 var yScale = _this._yScale;
                 var barScale = _this._barScale;
                 if (barH <= 0) {
-                    barH = yScale.rangeBand();
+                    barH = yScale.bandwidth();
                 }
                 var barAdjustmentY = 0;
                 if (_this._isTimeseries) {
                     barAdjustmentY = -barH / 2;
                 }
                 if (barHeight != null) {
-                    barAdjustmentY = (yScale.rangeBand() - barH) / 2;
+                    barAdjustmentY = (yScale.bandwidth() - barH) / 2;
                 }
                 function yScaleAdjusted(y) {
                     return yScale(y) + barAdjustmentY;
@@ -1048,7 +1040,7 @@ var ninjaPixel;
                     .data(_data, function (d) {
                     return d.y;
                 });
-                bars.enter().append('rect')
+                var enterBars = bars.enter().append('rect')
                     .classed('bar', true)
                     .attrs({
                     y: function (d, i) {
@@ -1072,7 +1064,8 @@ var ninjaPixel;
                     .on('click', function (d, i) {
                     onClick(d);
                 });
-                bars.transition()
+                bars.merge(enterBars)
+                    .transition()
                     .duration(_this._transitionDuration)
                     .delay(function (d, i) {
                     return functor(_this._transitionDelay, d, i);
@@ -1184,8 +1177,8 @@ var ninjaPixel;
             var functor = this._functor;
             this._init(_selection);
             var myToolTip = this._toolTip;
-            var onMouseover = this._onMouseover;
-            var onMouseout = this._onMouseout;
+            var genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
+            var genericMouseoutBehaviour = this._genericMouseoutBehaviour.bind(this);
             function getMinDate(theData) {
                 return d3.min(theData, function (d) {
                     return new Date(d.x).getTime();
@@ -1381,13 +1374,11 @@ var ninjaPixel;
                 var lineEnter = lineSvg.enter()
                     .append('svg:path')
                     .attr('class', 'line')
-                    .on('mouseover', function (d) {
-                    myToolTip.show(d);
-                    onMouseover(d);
+                    .on('mouseover', function (d, i) {
+                    genericMouseoverBehaviour(this, d, i);
                 })
-                    .on('mouseout', function (d) {
-                    myToolTip.hide();
-                    onMouseout(d);
+                    .on('mouseout', function (d, i) {
+                    genericMouseoutBehaviour(this, d, i);
                 })
                     .styles({
                     opacity: 0,

@@ -56,12 +56,8 @@ namespace ninjaPixel {
             this._init(_selection);
             let functor = this._functor;
             let myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
-            let onMouseover = this._onMouseover;
-            let onMouseout = this._onMouseout;
             let onClick = this._onClick;
-            let mouseOverBarOpacity: any = this._mouseOverItemOpacity;
             let defaultBarOpacity: any = this._itemOpacity;
-            let mouseOverBarStroke = this._mouseOverItemStroke;
             let defaultStroke = this._itemStroke;
             let barFill = this._itemFill;
             const genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
@@ -159,12 +155,12 @@ namespace ninjaPixel {
                     .domain([Math.abs(maxData - minData), 0])
                     .range([this._chartHeight, 0]);
 
-                var xScale = this._xScale;
-                var yScale = this._yScale;
-                var barScale = this._barScale;
+                const xScale = this._xScale;
+                const yScale = this._yScale;
+                const barScale = this._barScale;
 
                 if (barH <= 0) {
-                    barH = yScale.rangeBand();
+                    barH = yScale.bandwidth();
                 }
 
                 // set bar adjustment
@@ -174,7 +170,7 @@ namespace ninjaPixel {
                 }
                 if (barHeight != null) {
                     // set by other functions e.g. lollipop chart. Untested
-                    barAdjustmentY = (yScale.rangeBand() - barH) / 2;
+                    barAdjustmentY = (yScale.bandwidth() - barH) / 2;
 
                 }
 
@@ -186,15 +182,15 @@ namespace ninjaPixel {
                 this._yScaleAdjusted = yScaleAdjusted;
 
                 // Enter, Update, Exit on bars
-                var xScale0 = xScale(0);
-                var bars = this._svg.select('.ninja-chartGroup')
+                const xScale0 = xScale(0);
+                const bars = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.bar')
                     .data(_data, function (d) {
                         return d.y;
                     });
 
-                bars.enter().append('rect')
+                const enterBars = bars.enter().append('rect')
                     .classed('bar', true)
                     .attrs({
                         y: function (d, i) {
@@ -219,7 +215,8 @@ namespace ninjaPixel {
                         onClick(d);
                     });
 
-                bars.transition()
+                bars.merge(enterBars)
+                    .transition()
                     .duration(this._transitionDuration)
                     .delay((d, i) => {
                         return functor(this._transitionDelay, d, i);

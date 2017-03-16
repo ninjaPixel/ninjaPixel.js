@@ -43,15 +43,10 @@ namespace ninjaPixel {
 
         plot(_selection, barWidth?: number) {
             this._init(_selection);
-            // const that = this;
             let functor = this._functor;
             let myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
-            let onMouseover = this._onMouseover;
-            let onMouseout = this._onMouseout;
             let onClick = this._onClick;
-            let mouseOverBarOpacity: any = this._mouseOverItemOpacity;
             let defaultBarOpacity: any = this._itemOpacity;
-            let mouseOverBarStroke = this._mouseOverItemStroke;
             let defaultStroke = this._itemStroke;
             let barFill = this._itemFill;
             const genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
@@ -236,15 +231,6 @@ namespace ninjaPixel {
                         })
                         .on('mouseout', function (d, i) {
                             genericMouseoutBehaviour(this,d,i);
-                            // const thisElem = d3.select(this);
-                            // thisElem.style('opacity', (d, i) => {
-                            //     return functor(defaultBarOpacity, d, i);
-                            // });
-                            // thisElem.style('stroke', (d, i) => {
-                            //     return functor(defaultStroke, d, i);
-                            // });
-                            // myToolTip.hide();
-                            // onMouseout(d);
                         })
                         .on('click', function (d, i) {
                             onClick(d);

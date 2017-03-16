@@ -156,18 +156,41 @@ namespace ninjaPixel {
 //        }
 
         _plotXAxis(xScale: any, yScale: any) {
-            // var xAxis = d3.svg.axis()
-            // .scale(xScale)
-            //     .orient(this._xAxisTextOrientation)
-            //     .outerTickSize(0); // remove that presky final tick
+            const top = this._xAxisTextOrientation === 'top';
+            const setTickSizeInner = ()=> {
+                if (top) {
+                    xAxis.tickSizeInner(-this._chartHeight);
+                } else {
+                    xAxis.tickSizeInner(this._chartHeight);
+                }
+            };
 
-            let xAxis = d3.axisBottom(xScale)
-                .tickSizeOuter(0); // remove that pesky final tick
+            const transformAxis = ()=> {
+                if (this._axesOrigin != null) {
+                    var yPosition = yScale(this._axesOrigin.y);
+                    if (!yPosition) {
+                        // this isn't ideal, it's a hack
+                        // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
+                        yPosition = 0;
+                    }
+                    return 'translate(0,' + yPosition + ')';
+                } else {
+                    return 'translate(0,' + (this._chartHeight) + ')';
+                }
+            };
+
+
+            let xAxis = d3.axisBottom(xScale);
+            if (top) {
+                xAxis = d3.axisTop(xScale);
+            }
+            xAxis.tickSizeOuter(0); // remove that pesky final tick
 
 
             if (this._plotVerticalGridTopping) {
-                xAxis.tickSizeInner(this._chartHeight);
+                setTickSizeInner();
             }
+
 
             if (!this._xAxisLogScale) {
                 if (this._xAxisTickFormat != null) {
@@ -185,24 +208,14 @@ namespace ninjaPixel {
                 xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
 
-            this._svg.select('.ninja-xAxisGroup.ninja-axis')
-                .attrs({
-                    transform: ()=> {
-                        if (this._axesOrigin != null) {
-                            var yPosition = yScale(this._axesOrigin.y);
-                            if (!yPosition) {
-                                // this isn't ideal, it's a hack
-                                // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
-                                yPosition = 0;
-                            }
-                            return 'translate(0,' + yPosition + ')';
-                        } else {
-                            return 'translate(0,' + (this._chartHeight) + ')';
-                        }
-                    }
-                })
-                .call(xAxis);
 
+            if (!this._plotVerticalGrid) {
+                this._svg.select('.ninja-xAxisGroup.ninja-axis')
+                    .attrs({
+                        transform: transformAxis
+                    })
+                    .call(xAxis);
+            }
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
                     .selectAll('.tick text')
@@ -211,14 +224,11 @@ namespace ninjaPixel {
             }
 
             if (this._plotVerticalGrid) {
-                xAxis.tickSizeInner(this._chartHeight);
-
+                setTickSizeInner();
                 this._svg.select('.ninja-verticalGrid')
-                // .attrs({
-                //     transform: ()=> {
-                //         return 'translate(0,' + (this._chartHeight) + ')';
-                //     }
-                // })
+                    .attrs({
+                        transform: transformAxis
+                    })
                     .call(xAxis);
 
             }

@@ -112,10 +112,34 @@ var ninjaPixel;
         };
         Chart.prototype._plotXAxis = function (xScale, yScale) {
             var _this = this;
-            var xAxis = d3.axisBottom(xScale)
-                .tickSizeOuter(0);
+            var top = this._xAxisTextOrientation === 'top';
+            var setTickSizeInner = function () {
+                if (top) {
+                    xAxis.tickSizeInner(-_this._chartHeight);
+                }
+                else {
+                    xAxis.tickSizeInner(_this._chartHeight);
+                }
+            };
+            var transformAxis = function () {
+                if (_this._axesOrigin != null) {
+                    var yPosition = yScale(_this._axesOrigin.y);
+                    if (!yPosition) {
+                        yPosition = 0;
+                    }
+                    return 'translate(0,' + yPosition + ')';
+                }
+                else {
+                    return 'translate(0,' + (_this._chartHeight) + ')';
+                }
+            };
+            var xAxis = d3.axisBottom(xScale);
+            if (top) {
+                xAxis = d3.axisTop(xScale);
+            }
+            xAxis.tickSizeOuter(0);
             if (this._plotVerticalGridTopping) {
-                xAxis.tickSizeInner(this._chartHeight);
+                setTickSizeInner();
             }
             if (!this._xAxisLogScale) {
                 if (this._xAxisTickFormat != null) {
@@ -131,22 +155,13 @@ var ninjaPixel;
                 }
                 xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
-            this._svg.select('.ninja-xAxisGroup.ninja-axis')
-                .attrs({
-                transform: function () {
-                    if (_this._axesOrigin != null) {
-                        var yPosition = yScale(_this._axesOrigin.y);
-                        if (!yPosition) {
-                            yPosition = 0;
-                        }
-                        return 'translate(0,' + yPosition + ')';
-                    }
-                    else {
-                        return 'translate(0,' + (_this._chartHeight) + ')';
-                    }
-                }
-            })
-                .call(xAxis);
+            if (!this._plotVerticalGrid) {
+                this._svg.select('.ninja-xAxisGroup.ninja-axis')
+                    .attrs({
+                    transform: transformAxis
+                })
+                    .call(xAxis);
+            }
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
                     .selectAll('.tick text')
@@ -154,8 +169,11 @@ var ninjaPixel;
                     .attr('transform', this._xAxisTextTransform);
             }
             if (this._plotVerticalGrid) {
-                xAxis.tickSizeInner(this._chartHeight);
+                setTickSizeInner();
                 this._svg.select('.ninja-verticalGrid')
+                    .attrs({
+                    transform: transformAxis
+                })
                     .call(xAxis);
             }
         };

@@ -149,11 +149,6 @@ var ninjaPixel;
             if (this._plotVerticalGrid) {
                 xAxis.tickSizeInner(this._chartHeight);
                 this._svg.select('.ninja-verticalGrid')
-                    .attrs({
-                    transform: function () {
-                        return 'translate(0,' + (_this._chartHeight) + ')';
-                    }
-                })
                     .call(xAxis);
             }
         };
@@ -189,6 +184,10 @@ var ninjaPixel;
                     .attrs({
                     transform: function () {
                         if (_this._axesOrigin != null) {
+                            return "translate(" + xScale(_this._axesOrigin.x) + ",0)";
+                        }
+                        else {
+                            return "translate(" + _this._chartWidth + ",0)";
                         }
                     }
                 })

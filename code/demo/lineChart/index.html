@@ -5,27 +5,36 @@
     <title>ninjaPixel.js Line Chart</title>
 </head>
 <style>
+    #chart {
+        padding-top: 30px;
+    }
+
     .ninja-axis path,
     .ninja-axis line {
         fill: none;
         stroke: black;
         shape-rendering: crispEdges;
     }
+
     .ninja-background {
         fill: #333333;
         stroke: black;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -35,6 +44,7 @@
         font: 12px sans-serif;
         width: 100px;
     }
+
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
         box-sizing: border-box;
@@ -47,31 +57,34 @@
         position: absolute;
         text-align: center;
     }
+
     /* Style northward tooltips differently */
     .d3-tip.n:after {
         margin: -1px 0 0 0;
         top: 100%;
         left: 0;
     }
+
     .ninja-horizontalGrid,
-    .ninja-verticalGrid
-    {
+    .ninja-verticalGrid {
         stroke: lightgrey;
         opacity: 0.7;
     }
+
     .ninja-horizontalGrid text,
-    .ninja-verticalGrid text{
-           font: 0px sans-serif;
+    .ninja-verticalGrid text {
+        font: 0px sans-serif;
     }
-    .ninja-xAxisGroup.ninja-axis g.tick line{
-       stroke: #333333;
-        opacity: 0.7; 
+
+    .ninja-xAxisGroup.ninja-axis g.tick line {
+        stroke: #333333;
+        opacity: 0.7;
     }
 </style>
 
 <body>
-    <div id="chart"></div>
-    <div id="message"></div>
+<div id="chart"></div>
+<div id="message"></div>
 </body>
 <script src="../../node_modules/d3/build/d3.js"></script>
 <script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
@@ -80,90 +93,95 @@
 <script src="../../node_modules/moment/moment.js"></script>
 <script>
     function randomTimeseries() {
-    var lineChartData = [],
-        numberOfLines = 2,
-        colours = ['#A75C56', '#E89C84', '#F5C972', '#C3B274'],
-        startDate = new moment('1-12-2014', "DD-MM-YYYY");
-        
+        var lineChartData = [],
+                numberOfLines = 2,
+                colours = ['#A75C56', '#E89C84', '#F5C972', '#C3B274'],
+                startDate = new moment('1-12-2014', "DD-MM-YYYY");
 
-    for (var i = 0; i < numberOfLines; i++) {
-        var currentValue = 1,
-            name = 'Line Series ' + i,
-            colour = colours[i];
-        timeseries = [];
 
-        var thisDate = new moment(startDate);
-        for (var i2 = 0; i2 < 50; i2++) {
-            timeseries.push({
-                x: thisDate.toDate(),
-                y: currentValue
-            });
-            thisDate = new moment(thisDate).add(1, 'days');
-            var posNeg = -1;
-            if (Math.random() > 0.5) {
-                posNeg = 1;
-            }
+        for (var i = 0; i < numberOfLines; i++) {
+            var currentValue = 1,
+                    name = 'Line Series ' + i,
+                    colour = colours[i];
+            timeseries = [];
+
+            var thisDate = new moment(startDate);
+            for (var i2 = 0; i2 < 50; i2++) {
+                timeseries.push({
+                    x: thisDate.toDate(),
+                    y: currentValue
+                });
+                thisDate = new moment(thisDate).add(1, 'days');
+                var posNeg = -1;
+                if (Math.random() > 0.5) {
+                    posNeg = 1;
+                }
 //            currentValue += ~~(Math.random() * 10 * posNeg);
-            currentValue += ~~(Math.random() * 10 );
+                currentValue += ~~(Math.random() * 10 );
+            }
+
+            lineChartData.push({
+                name: name,
+                color: colour,
+                data: timeseries,
+                dashArray: '6,6'
+            });
         }
 
-        lineChartData.push({
-            name: name,
-            color: colour,
-            data: timeseries,
-            dashArray: '6,6'
-        });
+        return lineChartData;
     }
 
-    return lineChartData;
-}
-    
 
-    
     var chart = new ninjaPixel.LineChart();
     chart.transitionDuration(2000)
-        .margin({
-            top: 50,
-            bottom: 80,
-            left: 60,
-            right: 30
-        })
-//        .transitionEase('linear')
-        .plotVerticalGridTopping(false)
-        .plotHorizontalGridTopping(false)
-        .plotHorizontalGrid(true)
-        .plotVerticalGrid(true)
-        .height(500)
-        .title('Random Time-Series data')
-        .itemFill(function(d){return d.color;})
-        .xAxisTickFormat(d3.timeFormat('%a %e %b'))
-        .xAxisTicks(d3.timeFridays)
-        .xAxisTextTransform('rotate(-90) translate(-10,-13)')
-        .areaOpacity(0.1)
-        .yAxis1LogScale(false)   
-        .itemStrokeWidth('5px')
-//        .lineInterpolation(d3.curveBasis)
-        .lineDashArray(function(d){return d.dashArray;})
-        .isTimeseries(true);
+            .margin({
+                top: 50,
+                bottom: 80,
+                left: 60,
+                right: 30
+            })
+            //        .transitionEase('linear')
+            .plotVerticalGridTopping(false)
+            .plotHorizontalGridTopping(false)
+            .plotHorizontalGrid(true)
+            .plotVerticalGrid(true)
+            .height(500)
+            .width(700)
+            .title('Random Time-Series data')
+            .itemFill(function (d) {
+                return d.color;
+            })
+            .xAxisTickFormat(d3.timeFormat('%a %e %b'))
+            .xAxisTicks(d3.timeFriday)
+            .yAxisTicks(4)
+            .xAxisTextTransform('rotate(-90) translate(-10,-13)')
+            .areaOpacity(0.1)
+            .yAxis1LogScale(false)
+            .itemStrokeWidth('5px')
+            //        .lineInterpolation(d3.curveBasis)
+            .lineDashArray(function (d) {
+                return d.dashArray;
+            })
+            .isTimeseries(true);
 
-//    var toolTip = chart.toolTip();
-//    toolTip.html(function (d) {
-//        return d.name;
-//    });
-//    chart.toolTip(toolTip);
-    
+        var toolTip = chart.toolTip();
+        toolTip.html(function (d) {
+            return d.name;
+        });
+        chart.toolTip(toolTip);
+
 
     function ready() {
         var data = randomTimeseries();
 //        console.log('length',data.length, data);
         chart.plot(d3.select("#chart")
-            .datum(data));
+                .datum(data));
     }
-    
+
     ready();
-    setTimeout(function run() { 
-         ready();
-        setTimeout(run, 50000); 
+    setTimeout(function run() {
+        ready();
+        setTimeout(run, 50000);
     }, 50000);
 </script>
 

@@ -83,7 +83,6 @@ namespace ninjaPixel {
         _itemTextLabelColor: ninjaTypes.stringOrFunction;
 
 
-
         constructor() {
 
         }
@@ -205,11 +204,11 @@ namespace ninjaPixel {
                 xAxis.tickSizeInner(this._chartHeight);
 
                 this._svg.select('.ninja-verticalGrid')
-                    .attrs({
-                        transform: ()=> {
-                            return 'translate(0,' + (this._chartHeight) + ')';
-                        }
-                    })
+                // .attrs({
+                //     transform: ()=> {
+                //         return 'translate(0,' + (this._chartHeight) + ')';
+                //     }
+                // })
                     .call(xAxis);
 
             }
@@ -258,7 +257,11 @@ namespace ninjaPixel {
                     .attrs({
                         transform: ()=> {
                             if (this._axesOrigin != null) {
-                                //return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
+                                // return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
+                                return `translate(${xScale(this._axesOrigin.x)},0)`;
+
+                            } else {
+                                return `translate(${this._chartWidth},0)`;
                             }
                         }
                     })
@@ -663,7 +666,7 @@ namespace ninjaPixel {
             return this;
         }
 
-        transitionEase(_x):any {
+        transitionEase(_x): any {
             if (!arguments.length) return this._transitionEase;
             this._transitionEase = _x;
             return this;
@@ -772,7 +775,6 @@ namespace ninjaPixel {
         }
 
     }
-
 
 
     // var formatBillionsWithB = function () {

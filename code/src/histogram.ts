@@ -45,7 +45,7 @@ namespace ninjaPixel{
             _data = this._histogramFunction(_data);
          
             // Update the x-scale.
-            var xScale = d3.scale.ordinal()
+            var xScale = d3.scaleOrdinal()
                 .domain(_data.map(function (d) {
                     return d.x;
             }));
@@ -61,7 +61,7 @@ namespace ninjaPixel{
                 yMax = this._y1Max;
             }
 
-            var yScale = d3.scale.linear()
+            var yScale = d3.scaleLinear()
                 .domain([0, yMax])
                 .range([this._chartHeight, 0]);
          

@@ -88,6 +88,16 @@ namespace ninjaPixel {
         }
 
         _init(_selection: any, category = Category.xy) {
+
+            const mouseOverFn = this._onMouseover;
+            this._onMouseover = function (d) {
+                mouseOverFn(d);
+                if (this._toolTip.getBoundingBox) {
+                    this._toolTip.getBoundingBox();
+                }
+            };
+
+
             this._category = category;
             this._chartHeight = this._getChartHeight();
             this._chartWidth = this._getChartWidth();
@@ -366,86 +376,6 @@ namespace ninjaPixel {
             return this._height - this._margin.bottom - this._margin.top;
         }
 
-        _plotGrids_DEPRECATED(xScale, yScale) {
-            console.log('WARNING: the -plotGrids methods has been deprecated and will shortly be removed');
-            // 'this' won't work inside plotHGrid, so extract the values here.
-            var svg = this._svg;
-            var chartWidth = this._chartWidth;
-            var chartHeight = this._chartHeight;
-            var ease = this._labelEase;
-
-            if (this._xAxisTicks != null) {
-                xScale.ticks(this._xAxisTicks);
-            }
-
-            function plotHGrid(yScale, className) {
-                var horizontalLines = svg.select('.' + className)
-                    .selectAll('hLines')
-                    .data(yScale.ticks());
-
-                horizontalLines.enter()
-                    .append('line')
-                    .classed('hLines', true);
-
-                horizontalLines.transition()
-                    .ease(ease)
-                    .attrs({
-                        "x1": 0,
-                        "x2": chartWidth,
-                        "y1": function (d) {
-                            return yScale(d);
-                        },
-                        "y2": function (d) {
-                            return yScale(d);
-                        }
-                    });
-
-                horizontalLines.exit()
-                    .remove();
-
-            };
-
-            function plotVGrid(xScale, className) {
-                var verticalLines = svg.select('.' + className)
-                    .selectAll('hLines')
-                    .data(xScale.ticks());
-
-                verticalLines.enter()
-                    .append('line')
-                    .classed('hLines', true);
-
-                verticalLines.transition()
-                    .ease(ease)
-                    .attrs({
-                        "x1": (d) => {
-                            return xScale(d);
-                        },
-                        "x2": (d) => {
-                            return xScale(d);
-                        },
-                        "y1": 0,
-                        "y2": chartHeight
-                    });
-
-                verticalLines.exit()
-                    .remove();
-
-            };
-
-            if (this._plotHorizontalGrid) {
-                plotHGrid(yScale, 'ninja-horizontalGrid');
-            }
-            if (this._plotHorizontalGridTopping) {
-                plotHGrid(yScale, 'ninja-horizontalGridTopping');
-            }
-            if (this._plotVerticalGrid) {
-                plotVGrid(xScale, 'ninja-verticalGrid');
-            }
-            if (this._plotVerticalGridTopping) {
-                plotVGrid(xScale, 'ninja-verticalGridTopping');
-            }
-        }
-
         _plotTheBackground() {
             if (this._plotBackground == true) {
                 var background = this._svg.select('.ninja-chartGroup')
@@ -475,11 +405,9 @@ namespace ninjaPixel {
             }
         }
 
-        _functor(variable, d, i) {
+        _functor(variable, d, i): any {
             // if variable is a function, then execute it. Otherwise just return the variable.
             function isFunction(functionToCheck) {
-                //                    var getType = {};
-                //                    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
                 return !!(functionToCheck && functionToCheck.constructor && functionToCheck.call && functionToCheck.apply); // this is how underscore.js does it.
             }
 
@@ -488,6 +416,37 @@ namespace ninjaPixel {
             } else {
                 return variable;
             }
+        }
+
+        _genericMouseoverBehaviour(that, d, i): void {
+            d3.select(that)
+                .style(
+                    'opacity', (d, i) => {
+                        return this._functor(this._mouseOverItemOpacity, d, i);
+                    })
+                .style('stroke', (d, i) => {
+                    return this._functor(this._mouseOverItemStroke, d, i);
+                });
+
+            if (this._toolTip) {
+                this._toolTip.show(d);
+            }
+            this._onMouseover(d);
+        }
+
+        _genericMouseoutBehaviour(that, d, i): void {
+            d3.select(that)
+                .style('opacity', (d, i) => {
+                    return this._functor(this._itemOpacity, d, i);
+                })
+                .style('stroke', (d, i) => {
+                    return this._functor(this._itemStroke, d, i);
+                });
+
+            if (this._toolTip) {
+                this._toolTip.hide();
+            }
+            this._onMouseout(d);
         }
 
 

@@ -1,37 +1,37 @@
-/// <reference path="typescript_definitions/d3.d.ts" />
-/// <reference path="chart.ts" />
-//declare var d3: D3.Base;
+/// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
+
+
 namespace ninjaPixel {
     interface horizontalBarChartDataItem {
-        color?:string;
-        y:string;
-        x:number;
+        color?: string;
+        y: string;
+        x: number;
     }
 
     export class HorizontalBarChart extends ninjaPixel.Chart {
-        _cornerRounding:number = 1;
-        _xScale:any;
-        _yScale:any;
-        _barScale:any;
-        _yScaleAdjusted:any;
+        _cornerRounding: number = 1;
+        _xScale: any;
+        _yScale: any;
+        _barScale: any;
+        _yScaleAdjusted: any;
 
-        cornerRounding(_x:number):any {
+        cornerRounding(_x: number): any {
             if (!arguments.length) return this._cornerRounding;
             this._cornerRounding = _x;
             return this;
         }
 
-        private _isTimeseries:boolean = false;
+        private _isTimeseries: boolean = false;
 
-        isTimeseries(_x):any {
+        isTimeseries(_x): any {
             if (!arguments.length) return this._isTimeseries;
             this._isTimeseries = _x;
             return this;
         }
 
-        private _barWidth:number;
+        private _barWidth: number;
 
-        barWidth(_x):any {
+        barWidth(_x): any {
             if (!arguments.length) return this._barWidth;
             this._barWidth = _x;
             return this;
@@ -41,7 +41,7 @@ namespace ninjaPixel {
             super();
         }
 
-        plot(_selection, barHeight?:number) {
+        plot(_selection, barHeight?: number) {
             if (this._barWidth) {
                 // auto calc the height of the chart
                 var barCount = 1;
@@ -54,31 +54,33 @@ namespace ninjaPixel {
             }
 
             this._init(_selection);
-            var functor = this._functor;
-            var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
-            var onMouseover = this._onMouseover;
-            var onMouseout = this._onMouseout;
-            var onClick = this._onClick;
-            var mouseOverBarOpacity:any = this._mouseOverItemOpacity;
-            var defaultBarOpacity:any = this._itemOpacity;
-            var mouseOverBarStroke = this._mouseOverItemStroke;
-            var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;
+            let functor = this._functor;
+            let myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
+            let onMouseover = this._onMouseover;
+            let onMouseout = this._onMouseout;
+            let onClick = this._onClick;
+            let mouseOverBarOpacity: any = this._mouseOverItemOpacity;
+            let defaultBarOpacity: any = this._itemOpacity;
+            let mouseOverBarStroke = this._mouseOverItemStroke;
+            let defaultStroke = this._itemStroke;
+            let barFill = this._itemFill;
+            const genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
+            const genericMouseoutBehaviour = this._genericMouseoutBehaviour.bind(this);
 
             function getMinDate(theData) {
-                return d3.min(theData, (d:{y:number}) => {
+                return d3.min(theData, (d: {y: number}) => {
                     return new Date(d.y).getTime();
                 });
             }
 
             function getMaxDate(theData) {
-                return d3.max(theData, (d:{y:number}) => {
+                return d3.max(theData, (d: {y: number}) => {
                     return new Date(d.y).getTime();
                 });
             }
 
             _selection.each((_data) => {
-                var barH:number;
+                var barH: number;
                 if (barHeight != null) {
                     // set by other functions e.g. lollipop chart
                     barH = barHeight;
@@ -94,13 +96,13 @@ namespace ninjaPixel {
                         barH = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
                     }
                 }
-                var minData:any = 0;
-                var maxData:any = 0;
+                var minData: any = 0;
+                var maxData: any = 0;
 
                 if (this._xMin != null) {
                     minData = this._xMin;
                 } else {
-                    var d3MinX = d3.min(_data, (d:horizontalBarChartDataItem) => d.x);
+                    var d3MinX = d3.min(_data, (d: horizontalBarChartDataItem) => d.x);
                     if (d3MinX < 0) {
                         minData = d3MinX;
                     }
@@ -108,7 +110,7 @@ namespace ninjaPixel {
                 if (this._xMax != null) {
                     maxData = this._xMax;
                 } else {
-                    var d3MaxX = d3.max(_data, (d:horizontalBarChartDataItem) => d.x);
+                    var d3MaxX = d3.max(_data, (d: horizontalBarChartDataItem) => d.x);
                     if (d3MaxX > 0) {
                         maxData = d3MaxX;
                     }
@@ -136,23 +138,24 @@ namespace ninjaPixel {
                         maxY = getMaxDate(_data);
                     }
 
-                    this._yScale = d3.time.scale()
+                    this._yScale = d3.scaleTime()
                         .domain([minY, maxY])
                         .range([0 + barH, this._chartHeight - barH]);
                 } else {
-                    this._yScale = d3.scale.ordinal()
+                    this._yScale = d3.scaleBand()
                         .domain(_data.map(function (d, i) {
                             return d.y;
                         }))
-                        .rangeRoundBands([0, this._chartHeight], 0.1);
+                        .range([0, this._chartHeight])
+                        .padding(0.1);
                 }
 
 
-                this._xScale = d3.scale.linear()
+                this._xScale = d3.scaleLinear()
                     .domain([minData, maxData])
                     .range([0, this._chartWidth]);
 
-                this._barScale = d3.scale.linear()
+                this._barScale = d3.scaleLinear()
                     .domain([Math.abs(maxData - minData), 0])
                     .range([this._chartHeight, 0]);
 
@@ -207,31 +210,10 @@ namespace ninjaPixel {
                         ry: this._cornerRounding
                     })
                     .on('mouseover', function (d, i) {
-                        d3.select(this)
-                            .styles({
-                                opacity: (d, i) => {
-                                    return functor(mouseOverBarOpacity, d, i);
-                                },
-                                stroke: (d, i) => {
-                                    return functor(mouseOverBarStroke, d, i);
-                                }
-                            });
-
-                        myToolTip.show(d);
-                        onMouseover(d, myToolTip.getBoundingBox());
+                        genericMouseoverBehaviour(this, d, i);
                     })
                     .on('mouseout', function (d, i) {
-                        d3.select(this)
-                            .styles({
-                                opacity: (d, i) => {
-                                    return functor(defaultBarOpacity, d, i);
-                                }, // Re-sets the opacity
-                                stroke: (d, i) => {
-                                    return functor(defaultStroke, d, i);
-                                }
-                            });
-                        myToolTip.hide();
-                        onMouseout(d);
+                        genericMouseoverBehaviour(this,d,i);
                     })
                     .on('click', function (d, i) {
                         onClick(d);
@@ -263,13 +245,13 @@ namespace ninjaPixel {
                         width: function (d) {
                             var width;
                             if (d.x > 0) {
-                                width= xScale(d.x);
+                                width = xScale(d.x);
                             } else {
-                                width= xScale(0);
+                                width = xScale(0);
                             }
-                            if(width>0){
+                            if (width > 0) {
                                 return width;
-                            }else{
+                            } else {
                                 return 0;
                             }
                         }
@@ -291,8 +273,7 @@ namespace ninjaPixel {
                     .remove();
 
                 this._plotLabels();
-                this._plotXAxis(xScale, yScale);
-                this._plotYAxis(xScale, yScale);
+                this._plotXYAxes(xScale, yScale);
 
             });
             //end BarChart            

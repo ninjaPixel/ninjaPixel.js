@@ -43,6 +43,7 @@ namespace ninjaPixel {
 
         plot(_selection, barWidth?: number) {
             this._init(_selection);
+            // const that = this;
             let functor = this._functor;
             let myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
             let onMouseover = this._onMouseover;
@@ -53,6 +54,8 @@ namespace ninjaPixel {
             let mouseOverBarStroke = this._mouseOverItemStroke;
             let defaultStroke = this._itemStroke;
             let barFill = this._itemFill;
+            const genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
+            const genericMouseoutBehaviour = this._genericMouseoutBehaviour.bind(this);
 
             const mapXToDate = (d: {x: number})=> {
                 return new Date(d.x).getTime();
@@ -137,7 +140,7 @@ namespace ninjaPixel {
                         }
 
                         this._xScale = d3.scaleTime()
-                            .range([0 + barW , this._chartWidth - barW ])
+                            .range([0 + barW, this._chartWidth - barW])
                             .domain([minX, maxX]);
                     } else {
                         this._xScale = d3.scaleBand()
@@ -229,45 +232,19 @@ namespace ninjaPixel {
                             }
                         })
                         .on('mouseover', function (d, i) {
-                            d3.select(this)
-                                .style(
-                                    'opacity', (d, i) => {
-                                        return functor(mouseOverBarOpacity, d, i);
-                                    })
-                                .style('stroke', (d, i) => {
-                                    return functor(mouseOverBarStroke, d, i);
-                                });
-
-
-                            myToolTip.show(d);
-
-                            onMouseover(d, function () {
-                                if (myToolTip.getBoundingBox) {
-                                    myToolTip.getBoundingBox();
-                                }
-                            });
-
+                            genericMouseoverBehaviour(this,d,i);
                         })
                         .on('mouseout', function (d, i) {
-                            const thisElem = d3.select(this);
-                            thisElem.style('opacity', (d, i) => {
-                                return functor(defaultBarOpacity, d, i);
-                            });
-                            thisElem.style('stroke', (d, i) => {
-                                return functor(defaultStroke, d, i);
-                            });
-
-                            // d3.select(this)
-                            //     .styles({
-                            //         opacity: (d, i) => {
-                            //             return functor(defaultBarOpacity, d, i);
-                            //         }, // Re-sets the opacity
-                            //         stroke: (d, i) => {
-                            //             return functor(defaultStroke, d, i);
-                            //         }
-                            //     });
-                            myToolTip.hide();
-                            onMouseout(d);
+                            genericMouseoutBehaviour(this,d,i);
+                            // const thisElem = d3.select(this);
+                            // thisElem.style('opacity', (d, i) => {
+                            //     return functor(defaultBarOpacity, d, i);
+                            // });
+                            // thisElem.style('stroke', (d, i) => {
+                            //     return functor(defaultStroke, d, i);
+                            // });
+                            // myToolTip.hide();
+                            // onMouseout(d);
                         })
                         .on('click', function (d, i) {
                             onClick(d);
@@ -320,10 +297,7 @@ namespace ninjaPixel {
                         .remove();
 
                     this._plotLabels();
-                    this._plotXAxis(xScale, yScale);
-                    this._plotYAxis(xScale, yScale);
-//            this._plotGrids(xScale, yScale);
-
+                    this._plotXYAxes(xScale, yScale);
                     // end data loop
                 }
             );

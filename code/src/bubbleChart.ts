@@ -82,17 +82,17 @@ namespace ninjaPixel{
                     xScale = d3.scale.log()
                         .domain([minX, maxX]);
                 }else {
-                    xScale = d3.scale.linear()
+                    xScale = d3.scaleLinear()
                         .domain([minX, maxX]);
                 }
                 xScale.range([0, this._chartWidth]);
 
-            var yScale = d3.scale.linear()
+            var yScale = d3.scaleLinear()
                 .domain([minY, maxY])
                 .range([this._chartHeight, 0]);
 
             // create the radius scaling function
-            var rScale = d3.scale.linear()
+            var rScale = d3.scaleLinear()
                 .domain([0, maxR])
                 .range([0, this._maxBubbleRadius]); 
                 
@@ -162,11 +162,11 @@ namespace ninjaPixel{
                     }
 
                     // redefine the X Y scaling functions, now that we have this new information
-                    xScale = d3.scale.linear()
+                    xScale = d3.scaleLinear()
                         .domain([minX, maxX])
                         .range([0, this._chartWidth]);
 
-                    yScale = d3.scale.linear()
+                    yScale = d3.scaleLinear()
                         .domain([minY, maxY])
                         .range([this._chartHeight, 0]);
                 };

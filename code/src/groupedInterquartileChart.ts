@@ -159,7 +159,7 @@ namespace ninjaPixel {
                         .domain([minX, maxX])
                         .range([0 + barW, this._chartWidth - barW]);
                 } else {
-                    this._xScale = d3.scale.ordinal()
+                    this._xScale = d3.scaleOrdinal()
                         .domain(_data.map(function (d, i) {
                             return d.x;
                         }))
@@ -167,18 +167,18 @@ namespace ninjaPixel {
                 }
 
 
-                this._yScale = d3.scale.linear()
+                this._yScale = d3.scaleLinear()
                     .domain([minData, maxData])
                     .range([this._chartHeight, 0]);
 
-                this._barScale = d3.scale.linear()
+                this._barScale = d3.scaleLinear()
                     .domain([Math.abs(maxData - minData), 0])
                     .range([this._chartHeight, 0]);
 
                 var xScale = this._xScale;
                 var yScale = this._yScale;
                 var barScale = this._barScale;
-                var xGroupScale = d3.scale.ordinal();
+                var xGroupScale = d3.scaleOrdinal();
 
 
                 if (barW <= 0) {

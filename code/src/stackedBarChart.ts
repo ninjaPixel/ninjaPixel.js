@@ -52,18 +52,18 @@ namespace ninjaPixel{
                 
                 console.log('maxData',maxData,'minData',minData);
                 
-            var xScale = d3.scale.ordinal()
+            var xScale = d3.scaleOrdinal()
                 .domain(_data.data[0].map(function (d, i) {
                     return d.x;
                 }))
                 .rangeRoundBands([0, this._chartWidth], 0);
             var barWidth = xScale.rangeBand();
 
-            var yScale = d3.scale.linear()
+            var yScale = d3.scaleLinear()
                 .domain([minData, maxData])
                 .range([this._chartHeight, 0]);
                 
-            var barScale = d3.scale.linear()
+            var barScale = d3.scaleLinear()
                 .domain([Math.abs(maxData - minData), 0])
                 .range([this._chartHeight, 0]);
             

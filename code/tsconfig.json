@@ -11,7 +11,8 @@
   "files": [
     "./src/chart.ts",
     "./src/barChart.ts",
-    "./src/lineChart.ts"
+    "./src/lineChart.ts",
+    "./src/horizontalBarChart.ts"
   ],
   "compilerOptions": {
     "declaration": false,

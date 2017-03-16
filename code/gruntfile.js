@@ -6,7 +6,7 @@ module.exports = function (grunt) {
         watch: {
             typescript: {
                 files: ['src/*.ts', '!src/*.d.ts'],
-                tasks: ['default'],
+                tasks: ['ts', 'concat']
             }
         },
         concat: {

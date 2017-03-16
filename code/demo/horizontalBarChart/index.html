@@ -71,7 +71,10 @@
 <div id="chart"></div>
 <div id="message"></div>
 </body>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 
 <script>
     var barChart = new ninjaPixel.HorizontalBarChart();
@@ -84,7 +87,7 @@
             })
             .plotBackground(false)
             .y1Max(12)
-            .transitionEase('elastic')
+            .transitionEase(d3.easeCubic)
             .transitionDelay(function (d, i) {
                 return i * 30;
             })
@@ -92,6 +95,7 @@
                 d3.select('#message').text(d.x);
             })
             .height(500)
+            .width(700)
             .plotHorizontalGridTopping(false)
             .cornerRounding(1)
             .mouseOverItemOpacity(function (d, i) {
@@ -101,9 +105,8 @@
             .xAxisTextOrientation('top')
             .axesOrigin({
                 x: 0,
-                y: 00
+                y: 0
             });
-    //    .xAxisTextTransform('rotate(-90) translate(-10,-13)');
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {

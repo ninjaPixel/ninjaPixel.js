@@ -289,11 +289,12 @@ namespace ninjaPixel {
                     .attr('class', 'line')
                     .on('mouseover', function (d) {
                         myToolTip.show(d);
-                        onMouseover(d, function () {
-                            if (myToolTip.getBoundingBox) {
-                                myToolTip.getBoundingBox();
-                            }
-                        });
+                        onMouseover(d);
+                        // onMouseover(d, function () {
+                        //     if (myToolTip.getBoundingBox) {
+                        //         myToolTip.getBoundingBox();
+                        //     }
+                        // });
                     })
                     .on('mouseout', function (d) {
                         //myToolTip.hide(d); typescript not happy
@@ -354,9 +355,7 @@ namespace ninjaPixel {
                     .remove();
 
                 this._plotLabels();
-                this._plotXAxis(xScale, yScale);
-                this._plotYAxis(xScale, yScale);
-                //this._plotGrids(xScale, yScale);
+                this._plotXYAxes(xScale, yScale);
                 // end _data loop
             });
 

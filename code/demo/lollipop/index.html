@@ -80,8 +80,11 @@
 <div id="chart"></div>
 <div id="message"></div>
 </body>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
-<script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
+
 <script>
     var barChart = new ninjaPixel.Lollipop();
     barChart.transitionDuration(800)
@@ -100,7 +103,7 @@
             //    .itemOpacity(0.5)
             .itemStroke('none')
             .itemFill('#333333')
-            .transitionEase('linear')
+            .transitionEase(d3.easeLinear)
             .transitionDelay(function (d, i) {
                 return i * 100;
             })
@@ -120,11 +123,6 @@
             .offset([-40, 0]);
     barChart.toolTip(toolTip);
 
-    //    var headToolTip = barChart.headToolTip();
-    //    headToolTip.html(function(d){return '<i>'+d.x + '</i><br/>'+ d.y})
-    //        .offset([-10, 0]);
-    //    barChart.headToolTip(headToolTip);
-    //
     var headToolTip = toolTip; // need to make a copy of this object
     headToolTip.offset([-10, 0]);
     barChart.headToolTip(headToolTip);

@@ -184,9 +184,12 @@ namespace ninjaPixel {
                         return barW;
                     };
 
+                    // used by charts which inherrit from this one (e.g. lollipop)
                     function xScaleAdjusted(x) {
                         return xScale(x) + barAdjustmentX;
                     }
+                    this._xScaleAdjusted = xScaleAdjusted;
+
 
                     // Enter, Update, Exit on bars
                     let yScale0 = yScale(0);

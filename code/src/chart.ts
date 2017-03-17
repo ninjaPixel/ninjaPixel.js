@@ -151,6 +151,16 @@ namespace ninjaPixel {
         _plotXAxis(xScale: any, yScale: any) {
             const top = this._xAxisTextOrientation === 'top';
 
+            const setTickSizeInner = ()=> {
+                if (top) {
+                    xAxis.tickSizeInner(-this._chartHeight);
+
+                } else {
+                    xAxis.tickSizeInner(this._chartHeight);
+
+                }
+            };
+
             const transformAxis = ()=> {
                 console.log('this._axesOrigin', this._axesOrigin);
                 if (this._axesOrigin != null) {
@@ -204,8 +214,9 @@ namespace ninjaPixel {
                     .attr('transform', this._xAxisTextTransform);
             }
 
+
             if (this._plotVerticalGridTopping) {
-                xAxis.tickSizeInner(this._chartHeight);
+                setTickSizeInner();
                 const topping = this._svg.select('.ninja-verticalGridTopping');
                 topping.transition()
                     .ease(this._labelEase)
@@ -215,7 +226,7 @@ namespace ninjaPixel {
             }
 
             if (this._plotVerticalGrid) {
-                xAxis.tickSizeInner(this._chartHeight);
+                setTickSizeInner();
                 const grid = this._svg.select('.ninja-verticalGrid');
                 grid.call(xAxis);
                 this._hideAxisLineAndText(grid);

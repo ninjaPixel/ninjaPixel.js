@@ -11,8 +11,9 @@
   "files": [
     "./src/chart.ts",
     "./src/barChart.ts",
-    "./src/lineChart.ts",
+    "./src/lollipop.ts",
     "./src/horizontalBarChart.ts",
+    "./src/lineChart.ts",
     "./src/bubbleChart.ts"
   ],
   "compilerOptions": {
@@ -20,7 +21,6 @@
     // set to true to crete .d.ts files
     "sourceMap": true
     // set to true to create map files
-
   }
 }
 

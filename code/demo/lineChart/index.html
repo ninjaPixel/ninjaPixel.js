@@ -140,7 +140,6 @@
                 left: 60,
                 right: 30
             })
-            //        .transitionEase('linear')
             .plotVerticalGridTopping(false)
             .plotHorizontalGridTopping(false)
             .plotHorizontalGrid(true)
@@ -158,7 +157,6 @@
             .areaOpacity(0.1)
             .yAxis1LogScale(false)
             .itemStrokeWidth('5px')
-            //        .lineInterpolation(d3.curveBasis)
             .lineDashArray(function (d) {
                 return d.dashArray;
             })
@@ -173,7 +171,6 @@
 
     function ready() {
         var data = randomTimeseries();
-//        console.log('length',data.length, data);
         chart.plot(d3.select("#chart")
                 .datum(data));
     }

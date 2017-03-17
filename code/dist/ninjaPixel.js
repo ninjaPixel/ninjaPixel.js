@@ -122,6 +122,7 @@ var ninjaPixel;
                 }
             };
             var transformAxis = function () {
+                console.log('this._axesOrigin', _this._axesOrigin);
                 if (_this._axesOrigin != null) {
                     var yPosition = yScale(_this._axesOrigin.y);
                     if (!yPosition) {
@@ -177,7 +178,7 @@ var ninjaPixel;
                     .call(xAxis);
             }
         };
-        Chart.prototype._plotYAxis = function (xScale, yScale) {
+        Chart.prototype._plotYAxisDEPRECATED = function (xScale, yScale) {
             var _this = this;
             var yAxis = d3.axisLeft(yScale)
                 .tickSizeOuter(0);
@@ -216,6 +217,45 @@ var ninjaPixel;
                         }
                     }
                 })
+                    .call(yAxis);
+            }
+        };
+        Chart.prototype._plotYAxis = function (xScale, yScale) {
+            var _this = this;
+            var yAxis = d3.axisLeft(yScale)
+                .tickSizeOuter(0);
+            if (this._plotHorizontalGridTopping) {
+            }
+            if (this._yAxisTickFormat != null) {
+                yAxis.tickFormat(this._yAxisTickFormat);
+            }
+            if (this._yAxisTicks != null) {
+                yAxis.ticks(this._yAxisTicks);
+            }
+            this._svg.select('.ninja-yAxisGroup.ninja-axis')
+                .transition()
+                .ease(this._labelEase)
+                .attrs({
+                transform: function () {
+                    if (_this._axesOrigin != null) {
+                        return 'translate(' + xScale(_this._axesOrigin.x) + ',0)';
+                    }
+                }
+            })
+                .call(yAxis);
+            if (this._plotHorizontalGridTopping) {
+                yAxis.tickSizeInner(-this._chartWidth);
+                var topping = this._svg.select('.ninja-horizontalGridTopping');
+                topping.transition()
+                    .ease(this._labelEase).call(yAxis);
+                topping.selectAll('text')
+                    .style('font-size', '0px');
+            }
+            if (this._plotHorizontalGrid) {
+                yAxis.tickSizeInner(-this._chartWidth);
+                this._svg.select('.ninja-horizontalGrid')
+                    .transition()
+                    .ease(this._labelEase)
                     .call(yAxis);
             }
         };
@@ -1142,6 +1182,233 @@ var ninjaPixel;
         return HorizontalBarChart;
     }(ninjaPixel.Chart));
     ninjaPixel.HorizontalBarChart = HorizontalBarChart;
+})(ninjaPixel || (ninjaPixel = {}));
+//
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
+    var BubbleChart = (function (_super) {
+        __extends(BubbleChart, _super);
+        function BubbleChart() {
+            var _this = _super.call(this) || this;
+            _this._allowBubblesToSpillOffChart = false;
+            _this._maxBubbleRadius = 50;
+            return _this;
+        }
+        BubbleChart.prototype.maxBubbleRadius = function (_x) {
+            if (!arguments.length)
+                return this._maxBubbleRadius;
+            this._maxBubbleRadius = _x;
+            return this;
+        };
+        BubbleChart.prototype.allowBubblesToSpillOffChart = function (_x) {
+            if (!arguments.length)
+                return this._allowBubblesToSpillOffChart;
+            this._allowBubblesToSpillOffChart = _x;
+            return this;
+        };
+        BubbleChart.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection);
+            _selection.each(function (_data) {
+                var minX, maxX, minY, maxY, minR, maxR;
+                if (_this._xMin) {
+                    minX = _this._xMin;
+                }
+                else {
+                    minX = d3.min(_data, function (d) {
+                        return d.x;
+                    });
+                }
+                if (_this._xMax) {
+                    maxX = _this._xMax;
+                }
+                else {
+                    maxX = d3.max(_data, function (d) {
+                        return d.x;
+                    });
+                }
+                if (_this._y1Min) {
+                    minY = _this._y1Min;
+                }
+                else {
+                    minY = d3.min(_data, function (d) {
+                        return d.y;
+                    });
+                }
+                if (_this._y1Max) {
+                    maxY = _this._y1Max;
+                }
+                else {
+                    maxY = d3.max(_data, function (d) {
+                        return d.y;
+                    });
+                }
+                minR = d3.min(_data, function (d) {
+                    return d.r;
+                });
+                maxR = d3.max(_data, function (d) {
+                    return d.r;
+                });
+                var minXOriginal = minX, maxXOriginal = maxX, minYOriginal = minY, maxYOriginal = maxY;
+                _data.sort(function (a, b) {
+                    return b.r - a.r;
+                });
+                var xScale;
+                if (_this._xAxisLogScale) {
+                    xScale = d3.scaleLog()
+                        .domain([minX, maxX]);
+                }
+                else {
+                    xScale = d3.scaleLinear()
+                        .domain([minX, maxX]);
+                }
+                xScale.range([0, _this._chartWidth]);
+                var yScale = d3.scaleLinear()
+                    .domain([minY, maxY])
+                    .range([_this._chartHeight, 0]);
+                var rScale = d3.scaleLinear()
+                    .domain([0, maxR])
+                    .range([0, _this._maxBubbleRadius]);
+                if (!_this._allowBubblesToSpillOffChart) {
+                    var dataLength = _data.length;
+                    var updateXYScalesBasedOnBubbleEdges = function () {
+                        var bubbleEdgePixels = [];
+                        for (var i = 0; i < dataLength; i++) {
+                            var rPixels = rScale(_data[i].r), rInTermsOfX = Math.abs(minX - xScale.invert(rPixels)), rInTermsOfY = Math.abs(maxY - yScale.invert(rPixels));
+                            var upperPixelsY = _data[i].y + rInTermsOfY;
+                            var lowerPixelsY = _data[i].y - rInTermsOfY;
+                            var upperPixelsX = _data[i].x + rInTermsOfX;
+                            var lowerPixelsX = _data[i].x - rInTermsOfX;
+                            bubbleEdgePixels.push({
+                                highX: upperPixelsX,
+                                highY: upperPixelsY,
+                                lowX: lowerPixelsX,
+                                lowY: lowerPixelsY
+                            });
+                        }
+                        var minEdgeX = d3.min(bubbleEdgePixels, function (d) {
+                            return d.lowX;
+                        });
+                        var maxEdgeX = d3.max(bubbleEdgePixels, function (d) {
+                            return d.highX;
+                        });
+                        var minEdgeY = d3.min(bubbleEdgePixels, function (d) {
+                            return d.lowY;
+                        });
+                        var maxEdgeY = d3.max(bubbleEdgePixels, function (d) {
+                            return d.highY;
+                        });
+                        maxY = maxEdgeY;
+                        minY = minEdgeY;
+                        maxX = maxEdgeX;
+                        minX = minEdgeX;
+                        if (_this._y1Min) {
+                            minY = _this._y1Min;
+                        }
+                        if (_this._y1Max) {
+                            maxY = _this._y1Max;
+                        }
+                        if (_this._xMin) {
+                            minX = _this._xMin;
+                        }
+                        if (_this._xMax) {
+                            maxX = _this._xMax;
+                        }
+                        xScale = d3.scaleLinear()
+                            .domain([minX, maxX])
+                            .range([0, _this._chartWidth]);
+                        yScale = d3.scaleLinear()
+                            .domain([minY, maxY])
+                            .range([_this._chartHeight, 0]);
+                    };
+                    for (var scaleCount = 0; scaleCount < 10; scaleCount++) {
+                        updateXYScalesBasedOnBubbleEdges();
+                    }
+                }
+                var functor = _this._functor;
+                var rScale0 = rScale(0);
+                var itemOpacity = _this._itemOpacity;
+                var onClick = _this._onClick;
+                var itemStroke = _this._itemStroke;
+                var myToolTip = _this._toolTip;
+                var genericMouseoverBehaviour = _this._genericMouseoverBehaviour.bind(_this);
+                var genericMouseoutBehaviour = _this._genericMouseoutBehaviour.bind(_this);
+                var bubbles = _this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .selectAll('.bubble')
+                    .data(_data);
+                var enterBubbles = bubbles.enter().append('circle')
+                    .classed('bubble', true)
+                    .attrs({
+                    cx: function (d) {
+                        return xScale(d.x);
+                    },
+                    cy: function (d) {
+                        return yScale(d.y);
+                    },
+                    r: rScale0
+                })
+                    .on('mouseover', function (d, i) {
+                    genericMouseoverBehaviour(this, d, i);
+                })
+                    .on('mouseout', function (d, i) {
+                    genericMouseoutBehaviour(this, d, i);
+                })
+                    .on('click', function (d) {
+                    onClick(d);
+                });
+                bubbles.merge(enterBubbles)
+                    .transition()
+                    .duration(_this._transitionDuration)
+                    .delay(function (d, i) {
+                    return functor(_this._transitionDelay, d, i);
+                })
+                    .ease(_this._transitionEase)
+                    .styles({
+                    opacity: function (d, i) {
+                        return functor(itemOpacity, d, i);
+                    },
+                    stroke: function (d, i) {
+                        return functor(itemStroke, d, i);
+                    },
+                    fill: function (d, i) {
+                        return functor(_this._itemFill, d, i);
+                    }
+                })
+                    .attrs({
+                    cx: function (d) {
+                        return xScale(d.x);
+                    },
+                    cy: function (d) {
+                        return yScale(d.y);
+                    },
+                    r: function (d) {
+                        return rScale(d.r);
+                    }
+                });
+                bubbles.exit()
+                    .transition()
+                    .styles({
+                    opacity: 0
+                })
+                    .remove();
+                _this._plotLabels();
+                _this._plotXYAxes(xScale, yScale);
+            });
+        };
+        return BubbleChart;
+    }(ninjaPixel.Chart));
+    ninjaPixel.BubbleChart = BubbleChart;
 })(ninjaPixel || (ninjaPixel = {}));
 //
 var __extends = (this && this.__extends) || (function () {

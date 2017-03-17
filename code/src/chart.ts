@@ -166,8 +166,9 @@ namespace ninjaPixel {
             };
 
             const transformAxis = ()=> {
+                console.log('this._axesOrigin', this._axesOrigin);
                 if (this._axesOrigin != null) {
-                    var yPosition = yScale(this._axesOrigin.y);
+                    let yPosition = yScale(this._axesOrigin.y);
                     if (!yPosition) {
                         // this isn't ideal, it's a hack
                         // if we have a chart with an ordinal scale then yScale will return undefined, so gotta catch that here.
@@ -235,7 +236,7 @@ namespace ninjaPixel {
 
         }
 
-        _plotYAxis(xScale: any, yScale: any) {
+        _plotYAxisDEPRECATED(xScale: any, yScale: any) {
             // var yAxis = d3.svg.axis()
             //     .scale(yScale)
             //     .orient('left')
@@ -288,6 +289,57 @@ namespace ninjaPixel {
                     .call(yAxis);
             }
         }
+
+        _plotYAxis(xScale: any, yScale: any) {
+
+            const yAxis = d3.axisLeft(yScale)
+                .tickSizeOuter(0);
+
+            if (this._plotHorizontalGridTopping) {
+                // yAxis.tickSizeInner(-this._chartWidth);
+                // console.warn(`The plotHorizontalGridTopping feature has been deprecated. Please use plotHorizontalGrid instead.`)
+            }
+
+            if (this._yAxisTickFormat != null) {
+                yAxis.tickFormat(this._yAxisTickFormat);
+            }
+
+            if (this._yAxisTicks != null) {
+                yAxis.ticks(this._yAxisTicks);
+            }
+
+            this._svg.select('.ninja-yAxisGroup.ninja-axis')
+                .transition()
+                .ease(this._labelEase)
+                .attrs({
+                    transform: ()=> {
+                        if (this._axesOrigin != null) {
+                            return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
+                        }
+                    }
+                })
+                .call(yAxis);
+
+            if (this._plotHorizontalGridTopping) {
+                yAxis.tickSizeInner(-this._chartWidth);
+                const topping = this._svg.select('.ninja-horizontalGridTopping');
+                topping.transition()
+                    .ease(this._labelEase).call(yAxis);
+
+                topping.selectAll('text')
+                    .style('font-size', '0px');
+
+            }
+
+            if (this._plotHorizontalGrid) {
+                yAxis.tickSizeInner(-this._chartWidth);
+                this._svg.select('.ninja-horizontalGrid')
+                    .transition()
+                    .ease(this._labelEase)
+                    .call(yAxis);
+            }
+        }
+
 
         _plotXYAxes(xScale: any, yScale: any) {
             this._plotXAxis(xScale, yScale);
@@ -428,7 +480,7 @@ namespace ninjaPixel {
             }
         }
 
-        _genericMouseoverBehaviour(that, d, i): void {
+        _genericMouseoverBehaviour(that, d, i) {
             d3.select(that)
                 .style(
                     'opacity', (d, i) => {
@@ -444,7 +496,7 @@ namespace ninjaPixel {
             this._onMouseover(d);
         }
 
-        _genericMouseoutBehaviour(that, d, i): void {
+        _genericMouseoutBehaviour(that, d, i) {
             d3.select(that)
                 .style('opacity', (d, i) => {
                     return this._functor(this._itemOpacity, d, i);

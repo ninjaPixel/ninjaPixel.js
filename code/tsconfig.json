@@ -12,7 +12,8 @@
     "./src/chart.ts",
     "./src/barChart.ts",
     "./src/lineChart.ts",
-    "./src/horizontalBarChart.ts"
+    "./src/horizontalBarChart.ts",
+    "./src/bubbleChart.ts"
   ],
   "compilerOptions": {
     "declaration": false,

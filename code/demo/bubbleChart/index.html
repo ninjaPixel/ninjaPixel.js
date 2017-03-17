@@ -58,6 +58,7 @@
         stroke: lightgrey;
         opacity: 0.7;
     }
+    .ninja-horizontalGridTopping textx,
     .ninja-horizontalGrid text,
     .ninja-verticalGrid text{
            font: 0px sans-serif;
@@ -68,7 +69,10 @@
     <div id="chart"></div>
     <div id="message"></div>
 </body>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 <script>
     function randomBubbleData() {
         function randomNumber(maxAbsoluteValue) {
@@ -80,7 +84,7 @@
         }
         var numberOfBubbles = 100,
             bubbleData = [],
-            colors = d3.scale.category20();
+            colors = d3.scaleOrdinal(d3.schemeCategory20);
 
 
         for (var i = 0; i < numberOfBubbles; i++) {
@@ -109,13 +113,14 @@
             right: 30
         })
         .plotBackground(false)
-        .transitionEase('cubic')
+        .transitionEase(d3.easeCubic)
         .transitionDelay(function (d, i) {
             return i * 25;
         })
         .height(600)
-        .plotHorizontalGrid(true)
-        .plotVerticalGrid(true)
+        .plotHorizontalGridTopping(true)
+        .plotHorizontalGrid(false)
+        .plotVerticalGridTopping(false)
         .plotBackground(true)
         .title('Random Bubbles')
         .yAxis1Title('Y Title')

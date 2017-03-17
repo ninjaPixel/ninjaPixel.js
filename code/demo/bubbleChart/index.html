@@ -56,7 +56,7 @@
     .ninja-horizontalGrid,
     .ninja-verticalGrid {
         stroke: lightgrey;
-        opacity: 0.7;
+        opacity: 0.2;
     }
     .ninja-horizontalGridTopping textx,
     .ninja-horizontalGrid text,
@@ -118,9 +118,10 @@
             return i * 25;
         })
         .height(600)
-        .plotHorizontalGridTopping(true)
-        .plotHorizontalGrid(false)
+        .plotHorizontalGridTopping(false)
+        .plotHorizontalGrid(true)
         .plotVerticalGridTopping(false)
+        .plotVerticalGrid(true)
         .plotBackground(true)
         .title('Random Bubbles')
         .yAxis1Title('Y Title')

@@ -17092,14 +17092,6 @@ var ninjaPixel;
         Chart.prototype._plotXAxis = function (xScale, yScale) {
             var _this = this;
             var top = this._xAxisTextOrientation === 'top';
-            var setTickSizeInner = function () {
-                if (top) {
-                    xAxis.tickSizeInner(-_this._chartHeight);
-                }
-                else {
-                    xAxis.tickSizeInner(_this._chartHeight);
-                }
-            };
             var transformAxis = function () {
                 console.log('this._axesOrigin', _this._axesOrigin);
                 if (_this._axesOrigin != null) {
@@ -17118,9 +17110,6 @@ var ninjaPixel;
                 xAxis = d3.axisTop(xScale);
             }
             xAxis.tickSizeOuter(0);
-            if (this._plotVerticalGridTopping) {
-                setTickSizeInner();
-            }
             if (!this._xAxisLogScale) {
                 if (this._xAxisTickFormat != null) {
                     xAxis.tickFormat(this._xAxisTickFormat);
@@ -17135,76 +17124,36 @@ var ninjaPixel;
                 }
                 xAxis.ticks(this._xAxisTicks, this._xAxisTickFormat);
             }
-            if (!this._plotVerticalGrid) {
-                this._svg.select('.ninja-xAxisGroup.ninja-axis')
-                    .attrs({
-                    transform: transformAxis
-                })
-                    .call(xAxis);
-            }
+            this._svg.select('.ninja-xAxisGroup.ninja-axis')
+                .attrs({
+                transform: transformAxis
+            })
+                .call(xAxis);
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
                     .selectAll('.tick text')
                     .style('text-anchor', 'end')
                     .attr('transform', this._xAxisTextTransform);
             }
-            if (this._plotVerticalGrid) {
-                setTickSizeInner();
-                this._svg.select('.ninja-verticalGrid')
-                    .attrs({
-                    transform: transformAxis
-                })
-                    .call(xAxis);
-            }
-        };
-        Chart.prototype._plotYAxisDEPRECATED = function (xScale, yScale) {
-            var _this = this;
-            var yAxis = d3.axisLeft(yScale)
-                .tickSizeOuter(0);
-            if (this._plotHorizontalGridTopping) {
-                yAxis.tickSizeInner(-this._chartWidth);
-            }
-            if (this._yAxisTickFormat != null) {
-                yAxis.tickFormat(this._yAxisTickFormat);
-            }
-            if (this._yAxisTicks != null) {
-                yAxis.ticks(this._yAxisTicks);
-            }
-            this._svg.select('.ninja-yAxisGroup.ninja-axis')
-                .transition()
-                .ease(this._labelEase)
-                .attrs({
-                transform: function () {
-                    if (_this._axesOrigin != null) {
-                        return 'translate(' + xScale(_this._axesOrigin.x) + ',0)';
-                    }
-                }
-            })
-                .call(yAxis);
-            if (this._plotHorizontalGrid) {
-                yAxis.tickSizeInner(this._chartWidth);
-                this._svg.select('.ninja-horizontalGrid')
-                    .transition()
+            if (this._plotVerticalGridTopping) {
+                xAxis.tickSizeInner(this._chartHeight);
+                var topping = this._svg.select('.ninja-verticalGridTopping');
+                topping.transition()
                     .ease(this._labelEase)
-                    .attrs({
-                    transform: function () {
-                        if (_this._axesOrigin != null) {
-                            return "translate(" + xScale(_this._axesOrigin.x) + ",0)";
-                        }
-                        else {
-                            return "translate(" + _this._chartWidth + ",0)";
-                        }
-                    }
-                })
-                    .call(yAxis);
+                    .call(xAxis);
+                this._hideAxisLineAndText(topping);
+            }
+            if (this._plotVerticalGrid) {
+                xAxis.tickSizeInner(this._chartHeight);
+                var grid = this._svg.select('.ninja-verticalGrid');
+                grid.call(xAxis);
+                this._hideAxisLineAndText(grid);
             }
         };
         Chart.prototype._plotYAxis = function (xScale, yScale) {
             var _this = this;
             var yAxis = d3.axisLeft(yScale)
                 .tickSizeOuter(0);
-            if (this._plotHorizontalGridTopping) {
-            }
             if (this._yAxisTickFormat != null) {
                 yAxis.tickFormat(this._yAxisTickFormat);
             }
@@ -17218,6 +17167,9 @@ var ninjaPixel;
                 transform: function () {
                     if (_this._axesOrigin != null) {
                         return 'translate(' + xScale(_this._axesOrigin.x) + ',0)';
+                    }
+                    else {
+                        return "translate(0,0)";
                     }
                 }
             })
@@ -17226,17 +17178,30 @@ var ninjaPixel;
                 yAxis.tickSizeInner(-this._chartWidth);
                 var topping = this._svg.select('.ninja-horizontalGridTopping');
                 topping.transition()
-                    .ease(this._labelEase).call(yAxis);
-                topping.selectAll('text')
-                    .style('font-size', '0px');
+                    .ease(this._labelEase)
+                    .call(yAxis);
+                this._hideAxisLineAndText(topping);
             }
             if (this._plotHorizontalGrid) {
                 yAxis.tickSizeInner(-this._chartWidth);
-                this._svg.select('.ninja-horizontalGrid')
-                    .transition()
+                var grid = this._svg.select('.ninja-horizontalGrid');
+                grid.transition()
                     .ease(this._labelEase)
                     .call(yAxis);
+                this._hideAxisText(grid);
             }
+        };
+        Chart.prototype._hideAxisLine = function (selection) {
+            selection.selectAll('path.domain')
+                .style('stroke', 'none');
+        };
+        Chart.prototype._hideAxisText = function (selection) {
+            selection.selectAll('text')
+                .style('font-size', '0px');
+        };
+        Chart.prototype._hideAxisLineAndText = function (selection) {
+            this._hideAxisLine(selection);
+            this._hideAxisText(selection);
         };
         Chart.prototype._plotXYAxes = function (xScale, yScale) {
             this._plotXAxis(xScale, yScale);
@@ -17253,7 +17218,8 @@ var ninjaPixel;
             var titleSvg = this._svg.select(".ninja-chartTitle")
                 .selectAll("text.ninja-chartTitle")
                 .data(arr);
-            titleSvg.enter().append("text")
+            var enterTitle = titleSvg.enter()
+                .append("text")
                 .attr("class", "ninja-chartTitle")
                 .attr('x', (this._chartWidth / 2) + this._margin.left)
                 .attr('y', (this._margin.top / 2))
@@ -17262,13 +17228,13 @@ var ninjaPixel;
                 .transition()
                 .duration(this._transitionDuration)
                 .remove();
-            titleSvg.transition()
+            titleSvg.merge(enterTitle).transition()
                 .duration(this._transitionDuration)
                 .text(this._title);
             var yTitleSvg1 = this._svg.select('.ninja-y1Title')
                 .selectAll('text.ninja-y1Title')
                 .data(arr);
-            yTitleSvg1.enter().append('text')
+            var enterYTitleSvg1 = yTitleSvg1.enter().append('text')
                 .attr('class', 'ninja-y1Title')
                 .attr('transform', 'rotate(-90)')
                 .style('text-anchor', 'middle');
@@ -17279,14 +17245,14 @@ var ninjaPixel;
             if (this._yTitleHorizontalOffset) {
                 horizontalOffset = this._yTitleHorizontalOffset;
             }
-            yTitleSvg1.transition()
+            yTitleSvg1.merge(enterYTitleSvg1).transition()
                 .duration(this._transitionDuration)
                 .text(this._yAxis1Title)
                 .attr('x', -(this._chartHeight / 2) - this._margin.top)
                 .attr('y', horizontalOffset);
             var xTitleSvg = this._svg.select('.ninja-xTitle')
                 .selectAll('text.ninja-xTitle').data(arr);
-            xTitleSvg.enter().append('text')
+            var enterXTitleSvg = xTitleSvg.enter().append('text')
                 .attr('class', 'ninja-xTitle')
                 .style('text-anchor', 'middle');
             xTitleSvg.exit().transition()
@@ -17298,7 +17264,7 @@ var ninjaPixel;
                 verticalOffset = this._xTitleVerticalOffset;
             }
             var yPos = this._chartHeight + this._margin.top + verticalOffset;
-            xTitleSvg.transition()
+            xTitleSvg.merge(enterXTitleSvg).transition()
                 .duration(this._transitionDuration)
                 .text(this._xAxisTitle)
                 .attr('y', yPos)

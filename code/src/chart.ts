@@ -148,22 +148,8 @@ namespace ninjaPixel {
             this._plotTheBackground();
         }
 
-//        _translateNinjaContainerGroup(x:number, y:number){
-//                this._svg.select('.ninja-containerGroup')
-//                    .attrs({
-//                        transform: 'translate(' + Number(this._margin.left) + x + ',' + Number(this._margin.top) + y + ')'
-//            });
-//        }
-
         _plotXAxis(xScale: any, yScale: any) {
             const top = this._xAxisTextOrientation === 'top';
-            const setTickSizeInner = ()=> {
-                if (top) {
-                    xAxis.tickSizeInner(-this._chartHeight);
-                } else {
-                    xAxis.tickSizeInner(this._chartHeight);
-                }
-            };
 
             const transformAxis = ()=> {
                 console.log('this._axesOrigin', this._axesOrigin);
@@ -188,11 +174,6 @@ namespace ninjaPixel {
             xAxis.tickSizeOuter(0); // remove that pesky final tick
 
 
-            if (this._plotVerticalGridTopping) {
-                setTickSizeInner();
-            }
-
-
             if (!this._xAxisLogScale) {
                 if (this._xAxisTickFormat != null) {
                     xAxis.tickFormat(this._xAxisTickFormat);
@@ -210,13 +191,12 @@ namespace ninjaPixel {
             }
 
 
-            if (!this._plotVerticalGrid) {
-                this._svg.select('.ninja-xAxisGroup.ninja-axis')
-                    .attrs({
-                        transform: transformAxis
-                    })
-                    .call(xAxis);
-            }
+            this._svg.select('.ninja-xAxisGroup.ninja-axis')
+                .attrs({
+                    transform: transformAxis
+                })
+                .call(xAxis);
+
             if (this._xAxisTextTransform != null) {
                 this._svg.select('.ninja-xAxisGroup.ninja-axis')
                     .selectAll('.tick text')
@@ -224,70 +204,24 @@ namespace ninjaPixel {
                     .attr('transform', this._xAxisTextTransform);
             }
 
-            if (this._plotVerticalGrid) {
-                setTickSizeInner();
-                this._svg.select('.ninja-verticalGrid')
-                    .attrs({
-                        transform: transformAxis
-                    })
+            if (this._plotVerticalGridTopping) {
+                xAxis.tickSizeInner(this._chartHeight);
+                const topping = this._svg.select('.ninja-verticalGridTopping');
+                topping.transition()
+                    .ease(this._labelEase)
                     .call(xAxis);
 
+                this._hideAxisLineAndText(topping);
             }
 
-        }
+            if (this._plotVerticalGrid) {
+                xAxis.tickSizeInner(this._chartHeight);
+                const grid = this._svg.select('.ninja-verticalGrid');
+                grid.call(xAxis);
+                this._hideAxisLineAndText(grid);
 
-        _plotYAxisDEPRECATED(xScale: any, yScale: any) {
-            // var yAxis = d3.svg.axis()
-            //     .scale(yScale)
-            //     .orient('left')
-            //     .outerTickSize(0); // remove that pesky final tick;
-
-            let yAxis = d3.axisLeft(yScale)
-                .tickSizeOuter(0);
-
-            if (this._plotHorizontalGridTopping) {
-                yAxis.tickSizeInner(-this._chartWidth);
             }
 
-            if (this._yAxisTickFormat != null) {
-                yAxis.tickFormat(this._yAxisTickFormat);
-            }
-
-            if (this._yAxisTicks != null) {
-                yAxis.ticks(this._yAxisTicks);
-            }
-
-            this._svg.select('.ninja-yAxisGroup.ninja-axis')
-                .transition()
-                .ease(this._labelEase)
-                .attrs({
-                    transform: ()=> {
-                        if (this._axesOrigin != null) {
-                            return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
-                        }
-                    }
-                })
-                .call(yAxis);
-
-            if (this._plotHorizontalGrid) {
-                yAxis.tickSizeInner(this._chartWidth);
-
-                this._svg.select('.ninja-horizontalGrid')
-                    .transition()
-                    .ease(this._labelEase)
-                    .attrs({
-                        transform: ()=> {
-                            if (this._axesOrigin != null) {
-                                // return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
-                                return `translate(${xScale(this._axesOrigin.x)},0)`;
-
-                            } else {
-                                return `translate(${this._chartWidth},0)`;
-                            }
-                        }
-                    })
-                    .call(yAxis);
-            }
         }
 
         _plotYAxis(xScale: any, yScale: any) {
@@ -295,11 +229,6 @@ namespace ninjaPixel {
             const yAxis = d3.axisLeft(yScale)
                 .tickSizeOuter(0);
 
-            if (this._plotHorizontalGridTopping) {
-                // yAxis.tickSizeInner(-this._chartWidth);
-                // console.warn(`The plotHorizontalGridTopping feature has been deprecated. Please use plotHorizontalGrid instead.`)
-            }
-
             if (this._yAxisTickFormat != null) {
                 yAxis.tickFormat(this._yAxisTickFormat);
             }
@@ -315,6 +244,8 @@ namespace ninjaPixel {
                     transform: ()=> {
                         if (this._axesOrigin != null) {
                             return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
+                        } else {
+                            return `translate(0,0)`;
                         }
                     }
                 })
@@ -324,22 +255,40 @@ namespace ninjaPixel {
                 yAxis.tickSizeInner(-this._chartWidth);
                 const topping = this._svg.select('.ninja-horizontalGridTopping');
                 topping.transition()
-                    .ease(this._labelEase).call(yAxis);
+                    .ease(this._labelEase)
+                    .call(yAxis);
 
-                topping.selectAll('text')
-                    .style('font-size', '0px');
+                this._hideAxisLineAndText(topping);
+
 
             }
 
             if (this._plotHorizontalGrid) {
                 yAxis.tickSizeInner(-this._chartWidth);
-                this._svg.select('.ninja-horizontalGrid')
-                    .transition()
+                const grid = this._svg.select('.ninja-horizontalGrid');
+                grid.transition()
                     .ease(this._labelEase)
                     .call(yAxis);
+                this._hideAxisText(grid)
             }
         }
 
+        _hideAxisLine(selection) {
+            selection.selectAll('path.domain')
+                .style('stroke', 'none');
+        }
+
+        _hideAxisText(selection) {
+            selection.selectAll('text')
+                .style('font-size', '0px');
+        }
+
+        _hideAxisLineAndText(selection) {
+            this._hideAxisLine(selection);
+            this._hideAxisText(selection);
+
+
+        }
 
         _plotXYAxes(xScale: any, yScale: any) {
             this._plotXAxis(xScale, yScale);
@@ -356,14 +305,15 @@ namespace ninjaPixel {
                 this._svg.append("g").classed("ninja-xTitle", true);
             }
 
-            var arr = [0];
+            const arr = [0];
 
             // main chart title
-            var titleSvg = this._svg.select(".ninja-chartTitle")
+            const titleSvg = this._svg.select(".ninja-chartTitle")
                 .selectAll("text.ninja-chartTitle")
                 .data(arr);
             // enter
-            titleSvg.enter().append("text")
+            const enterTitle = titleSvg.enter()
+                .append("text")
                 .attr("class", "ninja-chartTitle")
                 .attr('x', (this._chartWidth / 2) + this._margin.left)
                 .attr('y', (this._margin.top / 2))
@@ -374,17 +324,17 @@ namespace ninjaPixel {
                 .duration(this._transitionDuration)
                 .remove();
             // transition
-            titleSvg.transition()
+            titleSvg.merge(enterTitle).transition()
                 .duration(this._transitionDuration)
                 .text(this._title);
 
 
             // y title
-            var yTitleSvg1 = this._svg.select('.ninja-y1Title')
+            const yTitleSvg1 = this._svg.select('.ninja-y1Title')
                 .selectAll('text.ninja-y1Title')
                 .data(arr);
             // enter
-            yTitleSvg1.enter().append('text')
+            const enterYTitleSvg1 = yTitleSvg1.enter().append('text')
                 .attr('class', 'ninja-y1Title')
                 .attr('transform', 'rotate(-90)')
                 .style('text-anchor', 'middle');
@@ -393,21 +343,21 @@ namespace ninjaPixel {
                 .duration(this._transitionDuration)
                 .remove();
             // transition
-            var horizontalOffset = this._margin.left * 0.4;
+            let horizontalOffset = this._margin.left * 0.4;
             if (this._yTitleHorizontalOffset) {
                 horizontalOffset = this._yTitleHorizontalOffset;
             }
-            yTitleSvg1.transition()
+            yTitleSvg1.merge(enterYTitleSvg1).transition()
                 .duration(this._transitionDuration)
                 .text(this._yAxis1Title)
                 .attr('x', -(this._chartHeight / 2) - this._margin.top)
                 .attr('y', horizontalOffset);
 
             // x title
-            var xTitleSvg = this._svg.select('.ninja-xTitle')
+            const xTitleSvg = this._svg.select('.ninja-xTitle')
                 .selectAll('text.ninja-xTitle').data(arr);
             // enter
-            xTitleSvg.enter().append('text')
+            const enterXTitleSvg = xTitleSvg.enter().append('text')
                 .attr('class', 'ninja-xTitle')
                 .style('text-anchor', 'middle');
             // exit
@@ -415,13 +365,13 @@ namespace ninjaPixel {
                 .duration(this._transitionDuration)
                 .remove();
             // transition
-            var xPos = (this._chartWidth / 2) + Number(this._margin.left);
-            var verticalOffset = this._margin.bottom / 1.5;
+            const xPos = (this._chartWidth / 2) + Number(this._margin.left);
+            let verticalOffset = this._margin.bottom / 1.5;
             if (this._xTitleVerticalOffset) {
                 verticalOffset = this._xTitleVerticalOffset;
             }
             var yPos = this._chartHeight + this._margin.top + verticalOffset;
-            xTitleSvg.transition()
+            xTitleSvg.merge(enterXTitleSvg).transition()
                 .duration(this._transitionDuration)
                 .text(this._xAxisTitle)
                 .attr('y', yPos)

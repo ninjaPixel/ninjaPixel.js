@@ -11,21 +11,26 @@
         stroke: black;
         shape-rendering: crispEdges;
     }
-    .ninja-background{
+
+    .ninja-background {
         fill: #333333;
         stroke: black;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -36,6 +41,7 @@
         width: 100px;
     }
     /* Creates a small triangle extender for the tip */
+
     .d3-tip:after {
         box-sizing: border-box;
         display: inline;
@@ -48,15 +54,16 @@
         text-align: center;
     }
     /* Style northward tooltips differently */
+
     .d3-tip.n:after {
         margin: -1px 0 0 0;
         top: 100%;
         left: 0;
     }
 
-    .ninja-horizontalGridTopping g.tick line{
+    .ninja-horizontalGridTopping g.tick line {
         stroke: #333333;
-        color:white;
+        color: white;
         /*opacity: 0.7; */
     }
 </style>
@@ -79,31 +86,37 @@
             left: 60,
             right: 30
         })
-    .plotBackground(true)
-    .y1Max(12)
-    .transitionDelay(function(d,i){return i*30;})
-    .onMouseover(function (d, i) {
+        .plotBackground(true)
+        .y1Max(12)
+        .transitionDelay(function(d, i) {
+            return i * 30;
+        })
+        .onMouseover(function(d, i) {
             d3.select('#message').text(d.x);
         })
-    .height(500)
-//    .plotHorizontalGrid(true)
-//    .plotVerticalGrid(true)
-    .plotHorizontalGridTopping(true)
-    .cornerRounding(0)
-    .title('UK Christmas Number Ones')
-    .yAxis1Title('Weeks at Number 1')
-    .mouseOverItemOpacity(function(d,i){return d.opacity;})
-    .xAxisTextTransform('rotate(-90) translate(-10,-13)');
-    
+        .height(500)
+        //    .plotHorizontalGrid(true)
+        //    .plotVerticalGrid(true)
+        .plotHorizontalGridTopping(true)
+        .cornerRounding(0)
+        .title('UK Christmas Number Ones')
+        .yAxis1Title('Weeks at Number 1')
+        .mouseOverItemOpacity(function(d, i) {
+            return d.opacity;
+        })
+        .xAxisTextTransform('rotate(-90) translate(-10,-13)');
+
     var toolTip = barChart.toolTip();
-    toolTip.html(function(d){return '<i>'+d.artist + '</i><br/>'+ d.song});
+    toolTip.html(function(d) {
+        return '<i>' + d.artist + '</i><br/>' + d.song
+    });
     barChart.toolTip(toolTip);
 
 
     topHits = [];
 
     queue()
-        .defer(d3.csv, "xmas-number-ones.csv", function (d) {
+        .defer(d3.csv, "xmas-number-ones.csv", function(d) {
             topHits.push({
                 x: d.Artist + " ... " + d.Year,
                 y: +d.Weeks,
@@ -118,7 +131,7 @@
 
     function ready(error) {
 
-        var filteredData = topHits.filter(function (d) {
+        var filteredData = topHits.filter(function(d) {
             if (d.year >= 1970 & d.year < 2012) return d;
         });
 

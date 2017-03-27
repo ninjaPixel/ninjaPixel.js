@@ -1,26 +1,23 @@
 {
-  "typeRoots": [
-    "./src/typescript_definitions",
-    "./node_modules/@types"
-  ],
-  "types": [
-    "d3",
-    "d3-plugins",
-    "ninjaTypes"
-  ],
-  "files": [
-    "./src/chart.ts",
-    "./src/barChart.ts",
-    "./src/lollipop.ts",
-    "./src/horizontalBarChart.ts",
-    "./src/lineChart.ts",
-    "./src/bubbleChart.ts"
-  ],
-  "compilerOptions": {
-    "declaration": false,
-    // set to true to crete .d.ts files
-    "sourceMap": true
-    // set to true to create map files
-  }
+    "typeRoots": [
+        "./src/typescript_definitions",
+        "./node_modules/@types"
+    ],
+    "types": [
+        "d3",
+        "d3-plugins",
+        "ninjaTypes"
+    ],
+    "files": [
+        "./src/chart.ts",
+        "./src/barChart.ts",
+        "./src/lollipop.ts",
+        "./src/horizontalBarChart.ts",
+        "./src/lineChart.ts",
+        "./src/bubbleChart.ts"
+    ],
+    "compilerOptions": {
+        "declaration": false,
+        "sourceMap": true
+    }
 }
-

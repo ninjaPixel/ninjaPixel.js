@@ -17660,10 +17660,6 @@ var ninjaPixel;
                 {
                     value: 1E3,
                     suffix: "K"
-                },
-                {
-                    value: 1,
-                    suffix: ""
                 }
             ];
             var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
@@ -17678,6 +17674,7 @@ var ninjaPixel;
                         return value + notation.suffix;
                     }
                 }
+                return num.toFixed(digits);
             };
         };
         return Formatter;
@@ -18726,6 +18723,128 @@ var ninjaPixel;
         return LineChart;
     }(ninjaPixel.Chart));
     ninjaPixel.LineChart = LineChart;
+})(ninjaPixel || (ninjaPixel = {}));
+//
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Histogram = (function (_super) {
+        __extends(Histogram, _super);
+        function Histogram() {
+            var _this = _super.call(this) || this;
+            _this._cornerRounding = 1;
+            _this._plotFrequency = true;
+            _this._histogramFunction = d3.histogram();
+            return _this;
+        }
+        Histogram.prototype.cornerRounding = function (_x) {
+            if (!arguments.length)
+                return this._cornerRounding;
+            this._cornerRounding = _x;
+            return this;
+        };
+        Histogram.prototype.bins = function (_x) {
+            if (!arguments.length)
+                return this._bins;
+            this._bins = _x;
+            return this;
+        };
+        Histogram.prototype.plotFrequency = function (_x) {
+            if (!arguments.length)
+                return this._plotFrequency;
+            this._plotFrequency = _x;
+            return this;
+        };
+        Histogram.prototype.plot = function (_selection) {
+            var _this = this;
+            var average = function (v1, v2) {
+                return (v1 + v2) / 2;
+            };
+            _selection.each(function (_data) {
+                _this._init(_selection);
+                var functor = _this._functor;
+                var myToolTip = _this._toolTip;
+                if (_this._bins != null) {
+                }
+                _data = _this._histogramFunction(_data);
+                var xScale = d3.scaleBand()
+                    .domain(_data.map(function (d) {
+                    return d.x1;
+                }));
+                xScale.range([0, _this._chartWidth])
+                    .padding(0.1);
+                var barWidth = xScale.bandwidth();
+                console.log('barwidth', barWidth);
+                var yMax = 0;
+                if (_this._y1Max != null) {
+                    yMax = _this._y1Max;
+                }
+                else {
+                    yMax = d3.max(_data, function (d) { return d.length; });
+                }
+                console.log('histo _data', _data);
+                console.log('histo yMax', yMax);
+                var yScale = d3.scaleLinear()
+                    .domain([0, yMax])
+                    .range([_this._chartHeight, 0]);
+                var bar = _this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .selectAll('.bars')
+                    .data(_data);
+                var enterBar = bar.enter().append('rect')
+                    .classed('bars', true)
+                    .attrs({
+                    'x': function (d) {
+                        return xScale(d.x1);
+                    },
+                    'y': function (d) {
+                        return yScale(0);
+                    },
+                    'height': function (d) {
+                        return 0;
+                    },
+                    'width': function (d) {
+                        return barWidth;
+                    },
+                    fill: function (d, i) { return functor(_this._itemFill, d, i); },
+                    rx: _this._cornerRounding,
+                    ry: _this._cornerRounding,
+                    opacity: function (d, i) { return functor(_this._itemOpacity, d, i); }
+                });
+                bar.exit().remove();
+                bar.merge(enterBar).transition()
+                    .duration(_this._transitionDuration)
+                    .ease(_this._transitionEase)
+                    .attrs({
+                    'x': function (d) {
+                        return xScale(d.x1);
+                    },
+                    'y': function (d) {
+                        return yScale(d.length);
+                    },
+                    'height': function (d) {
+                        return yScale(0) - yScale(d.length);
+                    },
+                    fill: function (d, i) { return functor(_this._itemFill, d, i); },
+                    opacity: function (d, i) { return functor(_this._itemOpacity, d, i); }
+                });
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+            });
+        };
+        return Histogram;
+    }(ninjaPixel.Chart));
+    ninjaPixel.Histogram = Histogram;
 })(ninjaPixel || (ninjaPixel = {}));
 //
 var __extends = (this && this.__extends) || (function () {

@@ -29,7 +29,10 @@
     <div id="chart"></div>
     <div id="message"></div>
 </body>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 <script>
     function irwinHallDistribution(n, m) {
         var distribution = [];
@@ -41,26 +44,30 @@
         }
         return distribution;
     }
+    var myFormatter = new ninjaPixel.Formatter().Financial;
 
     var chart = new ninjaPixel.Histogram();
     chart.transitionDuration(2000)
         .margin({
             top: 100,
-            bottom: 50,
+            bottom: 100,
             left: 60,
             right: 30
         })
         .height(500)
         .axesOrigin({x:0.4, y:0})
         .plotFrequency(false)
-        .bins(d3.scale.linear().ticks(15))
-        .title('An Irwin-Hall Distribution');
+        // .bins(d3.scale.linear().ticks(15))
+        .title('An Irwin-Hall Distribution')
+        .xAxisTickFormat(myFormatter(2))      
+        .xAxisTextTransform('rotate(-90) translate(-10,-13)');
+
 
 
 
     function ready() {
         var data = irwinHallDistribution(10000, 3);
-//        console.log(data);
+      //  console.log(data);
         chart.plot(d3.select("#chart")
             .datum(data));
     }

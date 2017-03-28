@@ -15,7 +15,8 @@
         "./src/lollipop.ts",
         "./src/horizontalBarChart.ts",
         "./src/lineChart.ts",
-        "./src/bubbleChart.ts"
+        "./src/bubbleChart.ts",
+        "./src/histogram.ts"
     ],
     "compilerOptions": {
         "declaration": false,

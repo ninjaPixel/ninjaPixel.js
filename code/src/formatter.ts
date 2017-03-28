@@ -18,10 +18,6 @@ namespace ninjaPixel {
                 {
                     value: 1E3,
                     suffix: "K"
-                },
-                {
-                    value: 1,
-                    suffix: ""
                 }
             ];
 
@@ -38,6 +34,8 @@ namespace ninjaPixel {
                         return value + notation.suffix;
                     }
                 }
+                // fallback
+                return num.toFixed(digits);
             };
         }
     }

@@ -57,9 +57,10 @@
         .height(500)
         .axesOrigin({x:0.4, y:0})
         .plotFrequency(false)
-        // .bins(d3.scale.linear().ticks(15))
+        .bins(10)
         .title('An Irwin-Hall Distribution')
-        .xAxisTickFormat(myFormatter(2))      
+        .xAxisTickFormat(myFormatter(2))
+        .xAxisTicks(5)
         .xAxisTextTransform('rotate(-90) translate(-10,-13)');
 
 

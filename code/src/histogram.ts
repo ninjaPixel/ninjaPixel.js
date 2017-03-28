@@ -29,9 +29,7 @@ namespace ninjaPixel{
 
 
      plot(_selection){
-       const average = (v1:number, v2:number):number=>{
-         return (v1+v2)/2;
-       };
+
         _selection.each((_data) => {
             this._init(_selection);
             let functor = this._functor;
@@ -40,19 +38,22 @@ namespace ninjaPixel{
 
             // Compute the histogram.
             if(this._bins != null){
-            //  this._histogramFunction.bins(this._bins);
+            this._histogramFunction.thresholds(d3.scaleLinear().ticks(this._bins));
             }
+
+            let xScale = d3.scaleBand()
+            .range([0, this._chartWidth])
+            .padding(0.1);
+
             // this._histogramFunction.frequency(this._plotFrequency);
             _data = this._histogramFunction(_data);
 
             // Update the x-scale.
-            let xScale = d3.scaleBand()
-                .domain(_data.map(function (d) {
+                xScale.domain(_data.map(function (d) {
                   // return average(d.x1, d.x0);
-                  return d.x1;
+                  return d.x0;
             }));
-            xScale.range([0, this._chartWidth])
-            .padding(0.1);
+
             // let barWidth = xScale.rangeBand();
             let barWidth = xScale.bandwidth();
 console.log('barwidth',barWidth)
@@ -84,7 +85,7 @@ console.log('barwidth',barWidth)
                 .classed('bars', true)
                 .attrs({
                     'x': function (d) {
-                        return xScale(d.x1);
+                        return xScale(d.x0);
                     },
                     'y': function (d) {
                         return yScale(0);
@@ -107,7 +108,7 @@ console.log('barwidth',barWidth)
                 .attrs({
                     'x': function (d) {
                       // return xScale(average(d.x0,d.x1));
-                      return xScale(d.x1);
+                      return xScale(d.x0);
 
                     },
                     'y': function (d) {

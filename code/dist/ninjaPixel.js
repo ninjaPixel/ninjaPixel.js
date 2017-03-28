@@ -1787,22 +1787,20 @@ var ninjaPixel;
         };
         Histogram.prototype.plot = function (_selection) {
             var _this = this;
-            var average = function (v1, v2) {
-                return (v1 + v2) / 2;
-            };
             _selection.each(function (_data) {
                 _this._init(_selection);
                 var functor = _this._functor;
                 var myToolTip = _this._toolTip;
                 if (_this._bins != null) {
+                    _this._histogramFunction.thresholds(d3.scaleLinear().ticks(_this._bins));
                 }
-                _data = _this._histogramFunction(_data);
                 var xScale = d3.scaleBand()
-                    .domain(_data.map(function (d) {
-                    return d.x1;
-                }));
-                xScale.range([0, _this._chartWidth])
+                    .range([0, _this._chartWidth])
                     .padding(0.1);
+                _data = _this._histogramFunction(_data);
+                xScale.domain(_data.map(function (d) {
+                    return d.x0;
+                }));
                 var barWidth = xScale.bandwidth();
                 console.log('barwidth', barWidth);
                 var yMax = 0;
@@ -1825,7 +1823,7 @@ var ninjaPixel;
                     .classed('bars', true)
                     .attrs({
                     'x': function (d) {
-                        return xScale(d.x1);
+                        return xScale(d.x0);
                     },
                     'y': function (d) {
                         return yScale(0);
@@ -1847,7 +1845,7 @@ var ninjaPixel;
                     .ease(_this._transitionEase)
                     .attrs({
                     'x': function (d) {
-                        return xScale(d.x1);
+                        return xScale(d.x0);
                     },
                     'y': function (d) {
                         return yScale(d.length);

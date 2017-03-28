@@ -10,6 +10,7 @@
     ],
     "files": [
         "./src/chart.ts",
+        "./src/formatter.ts",
         "./src/barChart.ts",
         "./src/lollipop.ts",
         "./src/horizontalBarChart.ts",

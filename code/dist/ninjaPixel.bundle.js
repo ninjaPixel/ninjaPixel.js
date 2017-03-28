@@ -16979,7 +16979,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.15';
+    ninjaPixel.version = '0.0.16.1';
     var Category;
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -17101,7 +17101,6 @@ var ninjaPixel;
                 }
             };
             var transformAxis = function () {
-                console.log('this._axesOrigin', _this._axesOrigin);
                 if (_this._axesOrigin != null) {
                     var yPosition = yScale(_this._axesOrigin.y);
                     if (!yPosition) {
@@ -17319,28 +17318,32 @@ var ninjaPixel;
                 return variable;
             }
         };
-        Chart.prototype._genericMouseoverBehaviour = function (that, d, i) {
+        Chart.prototype._genericMouseoverBehaviour = function (that, d, i, mouseOverItemOpacity, mouseOverItemStroke) {
             var _this = this;
+            if (mouseOverItemOpacity === void 0) { mouseOverItemOpacity = this._mouseOverItemOpacity; }
+            if (mouseOverItemStroke === void 0) { mouseOverItemStroke = this._mouseOverItemStroke; }
             d3.select(that)
                 .style('opacity', function (d, i) {
-                return _this._functor(_this._mouseOverItemOpacity, d, i);
+                return _this._functor(mouseOverItemOpacity, d, i);
             })
                 .style('stroke', function (d, i) {
-                return _this._functor(_this._mouseOverItemStroke, d, i);
+                return _this._functor(mouseOverItemStroke, d, i);
             });
             if (this._toolTip) {
                 this._toolTip.show(d);
             }
             this._onMouseover(d);
         };
-        Chart.prototype._genericMouseoutBehaviour = function (that, d, i) {
+        Chart.prototype._genericMouseoutBehaviour = function (that, d, i, itemOpacity, itemStroke) {
             var _this = this;
+            if (itemOpacity === void 0) { itemOpacity = this._itemOpacity; }
+            if (itemStroke === void 0) { itemStroke = this._itemStroke; }
             d3.select(that)
                 .style('opacity', function (d, i) {
-                return _this._functor(_this._itemOpacity, d, i);
+                return _this._functor(itemOpacity, d, i);
             })
                 .style('stroke', function (d, i) {
-                return _this._functor(_this._itemStroke, d, i);
+                return _this._functor(itemStroke, d, i);
             });
             if (this._toolTip) {
                 this._toolTip.hide();
@@ -17632,6 +17635,54 @@ var ninjaPixel;
         return Chart;
     }());
     ninjaPixel.Chart = Chart;
+})(ninjaPixel || (ninjaPixel = {}));
+//
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Formatter = (function () {
+        function Formatter() {
+        }
+        Formatter.prototype.Financial = function (digits) {
+            if (digits === void 0) { digits = 2; }
+            var notations = [
+                {
+                    value: 1E12,
+                    suffix: "T"
+                },
+                {
+                    value: 1E9,
+                    suffix: "B"
+                },
+                {
+                    value: 1E6,
+                    suffix: "M"
+                },
+                {
+                    value: 1E3,
+                    suffix: "K"
+                },
+                {
+                    value: 1,
+                    suffix: ""
+                }
+            ];
+            var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+            return function (num) {
+                var notation;
+                for (var i = 0; i < notations.length; i++) {
+                    notation = notations[i];
+                    if (num >= notation.value) {
+                        var value = num / notation.value;
+                        value = value.toFixed(digits);
+                        value = value.replace(rx, "$1");
+                        return value + notation.suffix;
+                    }
+                }
+            };
+        };
+        return Formatter;
+    }());
+    ninjaPixel.Formatter = Formatter;
 })(ninjaPixel || (ninjaPixel = {}));
 //
 var __extends = (this && this.__extends) || (function () {
@@ -18740,7 +18791,7 @@ var ninjaPixel;
         Lollipop.prototype.headMouseOverItemOpacity = function (_x) {
             if (!arguments.length)
                 return this._itemFill;
-            this._itemFill = _x;
+            this._headMouseOverItemOpacity = _x;
             return this;
         };
         Lollipop.prototype.headMouseOverStroke = function (_x) {
@@ -18785,10 +18836,10 @@ var ninjaPixel;
                 var enterBubbles = bubbles.enter().append('circle')
                     .classed('lollipop-head', true)
                     .on('mouseover', function (d, i) {
-                    genericMouseoverBehaviour(this, d, i);
+                    genericMouseoverBehaviour(this, d, i, mouseOverOpacity, mouseOverStroke);
                 })
                     .on('mouseout', function (d, i) {
-                    genericMouseoutBehaviour(this, d, i);
+                    genericMouseoutBehaviour(this, d, i, itemOpacity, itemStroke);
                 })
                     .on('click', function (d) {
                     onClick(d);

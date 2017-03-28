@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>ninjaPixel.js Bar Chart</title>
+    <title>ninjaPixel.js Lollipop Chart</title>
 </head>
 <style>
     .ninja-axis path,
@@ -96,11 +96,11 @@
             })
             .headFill('#333333')
             .headStroke('white')
-            .headMouseOverStroke('#ededed')
+            .headMouseOverStroke('steelblue')
+            .headMouseOverItemOpacity(1)
             .headRadius(30)
             .y1Max(12)
             .plotBackground(false)
-            //    .itemOpacity(0.5)
             .itemStroke('none')
             .itemFill('#333333')
             .transitionEase(d3.easeLinear)
@@ -112,9 +112,8 @@
             .title('Lollipop Sales')
             .yAxis1Title('Items Sold')
             .stickWidth(10)
-            .mouseOverItemOpacity(function (d, i) {
-                return d.opacity;
-            })
+            .mouseOverItemOpacity(0.8)
+
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {

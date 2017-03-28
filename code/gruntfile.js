@@ -18,6 +18,7 @@ module.exports = function (grunt) {
                 src: [
                     // 'src/js/d3.tip.js',
                     'src/js/chart.js',
+                    'src/js/formatter.js',
                     'src/js/barChart.js',
                     'src/js/horizontalBarChart.js',
                     'src/js/groupedBarChart.js',
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
                 tsconfig: true,
                 "outDir": "./src/js"
             }
-            
+
         },
         rename: {
             moveDefinitions: {
@@ -66,13 +67,13 @@ module.exports = function (grunt) {
             }
         }
     });
-    
+
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-rename');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    
+
     // Default task(s).
     grunt.registerTask('default', ['ts', 'concat', 'uglify']);
 };

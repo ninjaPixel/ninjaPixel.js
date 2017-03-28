@@ -50,7 +50,7 @@ namespace ninjaPixel {
 
         headMouseOverItemOpacity(_x): any {
             if (!arguments.length) return this._itemFill;
-            this._itemFill = _x;
+            this._headMouseOverItemOpacity = _x;
             return this;
         }
 
@@ -66,7 +66,7 @@ namespace ninjaPixel {
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             // .transitionDuration(300)
-            .html(function () {
+            .html(function() {
                 return 'Tooltip HTML not defined';
             })
             .direction('n');
@@ -82,21 +82,21 @@ namespace ninjaPixel {
             _selection.each((_data) => {
                 super.plot(_selection, this._stickWidth);
 
-                var functor = this._functor;
-                var mouseOverOpacity = this._headMouseOverItemOpacity;
-                var mouseOverStroke = this._headMouseOverStroke;
-                var itemOpacity = this._headOpacity
-                var onMouseover = this._onMouseover;
-                var onMouseout = this._onMouseout;
-                var onClick = this._onClick;
-                var itemStroke: any = this._headStroke;
-                var myToolTip = this._headToolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
+                let functor = this._functor;
+                let mouseOverOpacity = this._headMouseOverItemOpacity;
+                let mouseOverStroke = this._headMouseOverStroke;
+                let itemOpacity = this._headOpacity
+                let onMouseover = this._onMouseover;
+                let onMouseout = this._onMouseout;
+                let onClick = this._onClick;
+                let itemStroke: any = this._headStroke;
+                let myToolTip = this._headToolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
                 const genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
                 const genericMouseoutBehaviour = this._genericMouseoutBehaviour.bind(this);
 
                 const superXScale = this._xScaleAdjusted;
 
-                var dx = this._stickWidth / 2;
+                let dx = this._stickWidth / 2;
 
                 function xScale(x) {
                     return superXScale(x) + dx;
@@ -115,13 +115,13 @@ namespace ninjaPixel {
                 // enter
                 const enterBubbles = bubbles.enter().append('circle')
                     .classed('lollipop-head', true)
-                    .on('mouseover', function (d, i) {
-                        genericMouseoverBehaviour(this, d, i)
+                    .on('mouseover', function(d, i) {
+                        genericMouseoverBehaviour(this, d, i, mouseOverOpacity, mouseOverStroke)
                     })
-                    .on('mouseout', function (d, i) {
-                        genericMouseoutBehaviour(this, d, i);
+                    .on('mouseout', function(d, i) {
+                        genericMouseoutBehaviour(this, d, i, itemOpacity,itemStroke);
                     })
-                    .on('click', function (d) {
+                    .on('click', function(d) {
                         onClick(d);
                     })
                     .attrs({

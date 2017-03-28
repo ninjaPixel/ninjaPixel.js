@@ -1,7 +1,7 @@
 /// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
 
 namespace ninjaPixel {
-    export var version: string = '0.0.15';
+    export const version: string = '0.0.16.1';
 
     export enum Category {
         xy = 0,
@@ -44,21 +44,21 @@ namespace ninjaPixel {
         _xAxisTickFormat: any;
         _xTitleVerticalOffset: number;
         _yTitleHorizontalOffset: number;
-//        _yAxisTextTransform: string;
+        //        _yAxisTextTransform: string;
         _yAxisTickFormat: any;
-        _onMouseover: any = ()=> {
+        _onMouseover: any = () => {
         };
-        _onMouseout: any = ()=> {
+        _onMouseout: any = () => {
         };
-        _onClick: any = ()=> {
+        _onClick: any = () => {
         };
         _plotBackground: boolean = false;
         _y1Max: number;
         _y2Max: number;
         _y1Min: number;
         _y2Min: number;
-        _xMax: number|Date;
-        _xMin: number|Date;
+        _xMax: number | Date;
+        _xMin: number | Date;
         _mouseOverItemOpacity: ninjaTypes.numberOrFunction = 0.3;// function or value
         _mouseOverItemStroke: ninjaTypes.stringOrFunction = 'none';// function or value
         _itemOpacity: ninjaTypes.numberOrFunction = 1;// function or value
@@ -70,7 +70,7 @@ namespace ninjaPixel {
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             // .transitionDuration(300)
-            .html(function () {
+            .html(function() {
                 return null;
             })
             .direction('n');
@@ -90,7 +90,7 @@ namespace ninjaPixel {
         _init(_selection: any, category = Category.xy) {
 
             const mouseOverFn = this._onMouseover;
-            this._onMouseover = function (d) {
+            this._onMouseover = function(d) {
                 mouseOverFn(d);
                 if (this._toolTip.getBoundingBox) {
                     this._toolTip.getBoundingBox();
@@ -151,7 +151,7 @@ namespace ninjaPixel {
         _plotXAxis(xScale: any, yScale: any) {
             const top = this._xAxisTextOrientation === 'top';
 
-            const setTickSizeInner = ()=> {
+            const setTickSizeInner = () => {
                 if (top) {
                     xAxis.tickSizeInner(-this._chartHeight);
 
@@ -161,8 +161,7 @@ namespace ninjaPixel {
                 }
             };
 
-            const transformAxis = ()=> {
-                console.log('this._axesOrigin', this._axesOrigin);
+            const transformAxis = () => {
                 if (this._axesOrigin != null) {
                     let yPosition = yScale(this._axesOrigin.y);
                     if (!yPosition) {
@@ -252,7 +251,7 @@ namespace ninjaPixel {
                 .transition()
                 .ease(this._labelEase)
                 .attrs({
-                    transform: ()=> {
+                    transform: () => {
                         if (this._axesOrigin != null) {
                             return 'translate(' + xScale(this._axesOrigin.x) + ',0)';
                         } else {
@@ -441,14 +440,14 @@ namespace ninjaPixel {
             }
         }
 
-        _genericMouseoverBehaviour(that, d, i) {
+        _genericMouseoverBehaviour(that, d, i, mouseOverItemOpacity = this._mouseOverItemOpacity, mouseOverItemStroke = this._mouseOverItemStroke) {
             d3.select(that)
                 .style(
-                    'opacity', (d, i) => {
-                        return this._functor(this._mouseOverItemOpacity, d, i);
-                    })
+                'opacity', (d, i) => {
+                    return this._functor(mouseOverItemOpacity, d, i);
+                })
                 .style('stroke', (d, i) => {
-                    return this._functor(this._mouseOverItemStroke, d, i);
+                    return this._functor(mouseOverItemStroke, d, i);
                 });
 
             if (this._toolTip) {
@@ -457,13 +456,13 @@ namespace ninjaPixel {
             this._onMouseover(d);
         }
 
-        _genericMouseoutBehaviour(that, d, i) {
+        _genericMouseoutBehaviour(that, d, i, itemOpacity = this._itemOpacity, itemStroke = this._itemStroke) {
             d3.select(that)
                 .style('opacity', (d, i) => {
-                    return this._functor(this._itemOpacity, d, i);
+                    return this._functor(itemOpacity, d, i);
                 })
                 .style('stroke', (d, i) => {
-                    return this._functor(this._itemStroke, d, i);
+                    return this._functor(itemStroke, d, i);
                 });
 
             if (this._toolTip) {
@@ -759,7 +758,7 @@ namespace ninjaPixel {
     }
 
 
-    // var formatBillionsWithB = function () {
+    // const formatBillionsWithB = function ():void {
     //     // Change D3's SI prefix to more business friendly units
     //     //      K = thousands
     //     //      M = millions
@@ -770,8 +769,24 @@ namespace ninjaPixel {
     //     // small decimals are handled with e-n formatting. e-3 rather than 'm' - which looks like a million
     //     var d3_formatPrefixes = ["e-24", "e-21", "e-18", "e-15", "e-12", "e-9", "e-6", "e-3", "", "K", "M", "B", "T", "P", "E", "Z", "Y"].map(d3_formatPrefix);
     //
+    //     function d3_formatPrefix(d:any, i:number) {
+    //         var k = Math.pow(10, Math.abs(8 - i) * 3);
+    //         return {
+    //             scale: i > 8 ? function (d) {
+    //                 return d / k;
+    //             } : function (d) {
+    //                 return d * k;
+    //             },
+    //             symbol: d
+    //         };
+    //     }
+    //
+    //     function d3_format_precision(x:number, p:number) {
+    //         return p - (x ? Math.ceil(Math.log(x) / Math.LN10) : 1);
+    //     }
+    //
     //     // Override d3's formatPrefix function
-    //     d3.formatPrefix = function (value, precision) {
+    //     d3.formatPrefix = function (value:number, precision:number) {
     //         var i = 0;
     //         if (value) {
     //             if (value < 0) {
@@ -786,22 +801,7 @@ namespace ninjaPixel {
     //         return d3_formatPrefixes[8 + i / 3];
     //     };
     //
-    //     function d3_formatPrefix(d, i) {
-    //         var k = Math.pow(10, Math.abs(8 - i) * 3);
-    //         return {
-    //             scale: i > 8 ? function (d) {
-    //                 return d / k;
-    //             } : function (d) {
-    //                 return d * k;
-    //             },
-    //             symbol: d
-    //         };
-    //     }
     //
-    //     function d3_format_precision(x, p) {
-    //         return p - (x ? Math.ceil(Math.log(x) / Math.LN10) : 1);
-    //     }
     // }
     // formatBillionsWithB();
 }
-

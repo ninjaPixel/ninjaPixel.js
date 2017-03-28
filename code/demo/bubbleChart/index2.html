@@ -11,21 +11,26 @@
         stroke: black;
         shape-rendering: crispEdges;
     }
-    .ninja-background{
+
+    .ninja-background {
         fill: none;
         stroke: #333333;
     }
+
     text {
         font: 12px sans-serif;
         position: absolute;
     }
+
     .ninja-chartTitle {
         font: 18px sans-serif;
     }
+
     .yTitle,
     .xTitle {
         font: 16px sans-serif;
     }
+
     .d3-tip {
         line-height: 1;
         padding: 8px;
@@ -36,6 +41,7 @@
         width: 100px;
     }
     /* Creates a small triangle extender for the tip */
+
     .d3-tip:after {
         box-sizing: border-box;
         display: inline;
@@ -48,19 +54,22 @@
         text-align: center;
     }
     /* Style northward tooltips differently */
+
     .d3-tip.n:after {
         margin: -1px 0 0 0;
         top: 100%;
         left: 0;
     }
-    .ninja-horizontalGrid,
-    .ninja-verticalGrid {
-        stroke: lightgrey;
-        opacity: 0.7;
+
+    .ninja-horizontalGrid line,
+    .ninja-verticalGrid line {
+        stroke: lightgrey !important;
+        opacity: 0.7 !important;
     }
+
     .ninja-horizontalGrid text,
-    .ninja-verticalGrid text{
-           font: 0px sans-serif;
+    .ninja-verticalGrid text {
+        font: 0px sans-serif;
     }
 </style>
 
@@ -68,22 +77,26 @@
     <div id="chart"></div>
     <div id="message"></div>
 </body>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 <script>
     function randomBubbleData() {
         function randomNumber(maxAbsoluteValue) {
-            return~~ (Math.random() * maxAbsoluteValue)+1;
+            return ~~(Math.random() * maxAbsoluteValue) + 1;
         }
         var numberOfBubbles = 100,
             bubbleData = [],
-            colors = d3.scale.category20();
+            colors = d3.scaleOrdinal(d3.schemeCategory20);
+
 
 
         for (var i = 0; i < numberOfBubbles; i++) {
             var x = randomNumber(10),
                 y = randomNumber(60),
-                r = 1;//Math.abs(randomNumber(30)),
-                color = colors(i);
+                r = 1; //Math.abs(randomNumber(30)),
+            color = colors(i);
 
             bubbleData.push({
                 x: x,
@@ -93,23 +106,10 @@
             });
         }
         for (var i = 0; i < numberOfBubbles; i++) {
-            var x = randomNumber(90000),
+            var x = randomNumber(1000),
                 y = randomNumber(80),
-                r = 2;//Math.abs(randomNumber(30)),
-                color = colors(i);
-
-            bubbleData.push({
-                x: x,
-                y: y,
-                r: r,
-                color: color
-            });
-        }
-            for (var i = 0; i < numberOfBubbles; i++) {
-            var x = randomNumber(6000),
-                y = randomNumber(60),
-                r = 3;//Math.abs(randomNumber(30)),
-                color = colors(i);
+                r = 2; //Math.abs(randomNumber(30)),
+            color = colors(i);
 
             bubbleData.push({
                 x: x,
@@ -119,10 +119,23 @@
             });
         }
         for (var i = 0; i < numberOfBubbles; i++) {
-            var x = randomNumber(900000),
+            var x = randomNumber(100000),
+                y = randomNumber(60),
+                r = 3; //Math.abs(randomNumber(30)),
+            color = colors(i);
+
+            bubbleData.push({
+                x: x,
+                y: y,
+                r: r,
+                color: color
+            });
+        }
+        for (var i = 0; i < numberOfBubbles; i++) {
+            var x = randomNumber(900000000),
                 y = randomNumber(100),
-                r = 2;//Math.abs(randomNumber(30)),
-                color = colors(i);
+                r = 2; //Math.abs(randomNumber(30)),
+            color = colors(i);
 
             bubbleData.push({
                 x: x,
@@ -135,6 +148,7 @@
         return bubbleData;
     }
 
+    var myFormatter = new ninjaPixel.Formatter().Financial;
     var bubbleChart = new ninjaPixel.BubbleChart();
     bubbleChart.transitionDuration(1000)
         .margin({
@@ -144,8 +158,8 @@
             right: 30
         })
         .plotBackground(false)
-        .transitionEase('cubic')
-        .transitionDelay(function (d, i) {
+        .transitionEase(d3.easeCubic)
+        .transitionDelay(function(d, i) {
             return i * 2;
         })
         .height(600)
@@ -156,24 +170,25 @@
         .title('Random Bubbles')
         .yAxis1Title('Y Title')
         .xAxisTitle('X Title')
-        .itemStroke('white')  
-        .itemFill(function(d){return d.color;})
+        .itemStroke('white')
+        .itemFill(function(d) {
+            return d.color;
+        })
         .allowBubblesToSpillOffChart(true)
         .y1Max(120)
         .y1Min(0)
         .xMin(1)
-        .xMax(3000000)
+        .xMax(3000000000)
         .itemOpacity(0.5)
         .mouseOverItemOpacity(0.9)
         .mouseOverItemStroke('#333333')
-        //.axesOrigin({x:0, y:0})
         .xAxisLogScale(true)
-        .xAxisTickFormat(d3.format('s'))
+        .xAxisTickFormat(myFormatter(2))
         .xAxisTicks(20)
         .xAxisTextTransform('rotate(-90) translate(-10,-13)');
 
     var toolTip = bubbleChart.toolTip();
-    toolTip.html(function (d) {
+    toolTip.html(function(d) {
         return 'x: ' + d.x + ', y: ' + d.y + ', r: ' + d.r;
     });
     bubbleChart.toolTip(toolTip);

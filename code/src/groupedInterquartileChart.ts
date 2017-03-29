@@ -1,51 +1,51 @@
-/// <reference path="typescript_definitions/d3.d.ts" />
+/// <reference path="../node_modules/@types/d3/index.d.ts" />
 /// <reference path="chart.ts" />
-//declare var d3: D3.Base;
+
 namespace ninjaPixel {
     interface singleItem {
-        yMax:number;
-        yMed:number;
-        yMin:number;
-        group:string;
-        color?:string;
-        medColor?:string;
+        yMax: number;
+        yMed: number;
+        yMin: number;
+        group: string;
+        color?: string;
+        medColor?: string;
     }
     interface groupedBarChartDataItem {
-        x:any; //string or datetime
-        data:Array<singleItem>;
+        x: any; //string or datetime
+        data: Array<singleItem>;
     }
 
     export class GroupedInterquartileChart extends ninjaPixel.Chart {
-        _cornerRounding:number = 1;
-        _xScale:any;
-        _yScale:any;
-        _barScale:any;
-        _xScaleAdjusted:any;
-        _medianWidth:number = 8;
+        _cornerRounding: number = 1;
+        _xScale: any;
+        _yScale: any;
+        _barScale: any;
+        _xScaleAdjusted: any;
+        _medianWidth: number = 8;
 
-        cornerRounding(_x:number):any {
+        cornerRounding(_x: number): any {
             if (!arguments.length) return this._cornerRounding;
             this._cornerRounding = _x;
             return this;
         }
 
-        medianWidth(_x:number):any {
+        medianWidth(_x: number): any {
             if (!arguments.length) return this._medianWidth;
             this._medianWidth = _x;
             return this;
         }
 
-        private _isTimeseries:boolean = false;
+        private _isTimeseries: boolean = false;
 
-        isTimeseries(_x):any {
+        isTimeseries(_x): any {
             if (!arguments.length) return this._isTimeseries;
             this._isTimeseries = _x;
             return this;
         }
 
-        private _barWidth:number;
+        private _barWidth: number;
 
-        barWidth(_x):any {
+        barWidth(_x): any {
             if (!arguments.length) return this._barWidth;
             this._barWidth = _x;
             return this;
@@ -55,39 +55,39 @@ namespace ninjaPixel {
             super();
         }
 
-        plot(_selection, barWidth?:number) {
+        plot(_selection, barWidth?: number) {
             this._init(_selection);
-            var functor = this._functor;
-            var myToolTip = this._toolTip; //need to reference this variable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
-            var onMouseover = this._onMouseover;
-            var onMouseout = this._onMouseout;
-            var onClick = this._onClick;
-            var mouseOverBarOpacity:any = this._mouseOverItemOpacity;
-            var defaultBarOpacity:any = this._itemOpacity;
-            var mouseOverBarStroke = this._mouseOverItemStroke;
-            var defaultStroke = this._itemStroke;
-            var barFill = this._itemFill;
-            var barFill2 = this._itemFill2;
-            var medianWidth = this._medianWidth;
-            var itemStrokeWidth = this._itemStrokeWidth;
+            let functor = this._functor;
+            let myToolTip = this._toolTip; //need to reference this letiable in local scope as when I come to call the tooltip, it is within a function that is referencing a differnt 'this'
+            let onClick = this._onClick;
+            let mouseOverBarOpacity: any = this._mouseOverItemOpacity;
+            let defaultBarOpacity: any = this._itemOpacity;
+            let mouseOverBarStroke = this._mouseOverItemStroke;
+            let defaultStroke = this._itemStroke;
+            let barFill = this._itemFill;
+            let barFill2 = this._itemFill2;
+            let medianWidth = this._medianWidth;
+            let itemStrokeWidth = this._itemStrokeWidth;
+            const genericMouseoverBehaviour = this._simpleMouseoverBehaviour.bind(this);
+            const genericMouseoutBehaviour = this._simpleMouseoutBehaviour.bind(this);
 
             function getMinDate(theData) {
-                return d3.min(theData, (d:{x:number}) => {
+                return d3.min(theData, (d: { x: number }) => {
                     return new Date(d.x).getTime();
                 });
             }
 
             function getMaxDate(theData) {
-                return d3.max(theData, (d:{x:number}) => {
+                return d3.max(theData, (d: { x: number }) => {
                     return new Date(d.x).getTime();
                 });
             }
 
             _selection.each((_data) => {
                 // find the unique groups
-                var distinctGroups = [];
-                _data.forEach(function (d:groupedBarChartDataItem) {
-                    d.data.forEach(function (e:singleItem) {
+                let distinctGroups = [];
+                _data.forEach(function(d: groupedBarChartDataItem) {
+                    d.data.forEach(function(e: singleItem) {
                         if (distinctGroups.indexOf(e.group) < 0) {
                             distinctGroups.push(e.group);
                         }
@@ -95,7 +95,7 @@ namespace ninjaPixel {
                 });
 
 
-                var barW:number;
+                let barW: number;
                 if (barWidth != null) {
                     // set by other functions e.g. lollipop chart
                     barW = barWidth;
@@ -108,18 +108,18 @@ namespace ninjaPixel {
                     if (this._isTimeseries) {
                         barW = 0.9 * this._chartWidth / (_data.length + 1);
                     } else {
-                        barW = 0; // revisit this once we have xScale and do:  xScale.rangeBand();
+                        barW = 0; // revisit this once we have xScale and do:  xScale.bandwidth();
                     }
                 }
-                var minData:any = 0;
-                var maxData:any = 0;
+                let minData: any = 0;
+                let maxData: any = 0;
 
-                // TODO: check if yMed is the max or min value                            
+                // TODO: check if yMed is the max or min value
                 if (this._y1Min != null) {
                     minData = this._y1Min;
                 } else {
-                    _data.forEach(function (dd:groupedBarChartDataItem) {
-                        var d3MinY = d3.min(dd.data, (d:singleItem) => d.yMin);
+                    _data.forEach(function(dd: groupedBarChartDataItem) {
+                        let d3MinY = d3.min(dd.data, (d: singleItem) => d.yMin);
                         if (d3MinY < minData) {
                             minData = d3MinY;
                         }
@@ -129,8 +129,8 @@ namespace ninjaPixel {
                     maxData = this._y1Max;
                 } else {
 
-                    _data.forEach(function (dd:groupedBarChartDataItem) {
-                        var d3MaxY = d3.max(dd.data, (d:singleItem) => d.yMax);
+                    _data.forEach(function(dd: groupedBarChartDataItem) {
+                        let d3MaxY = d3.max(dd.data, (d: singleItem) => d.yMax);
                         if (d3MaxY > maxData) {
                             maxData = d3MaxY;
                         }
@@ -143,27 +143,18 @@ namespace ninjaPixel {
                 }
 
                 if (this._isTimeseries) {
-                    var minX, maxX;
-                    if (this._xMin != null) {
-                        minX = new Date(this._xMin).getTime();
-                    } else {
-                        minX = getMinDate(_data);
-                    }
-                    if (this._xMax != null) {
-                        maxX = new Date(this._xMax).getTime();
-                    } else {
-                        maxX = getMaxDate(_data);
-                    }
+                    const {min, max} = this._getMinMaxX(_data, this._isTimeseries);
 
-                    this._xScale = d3.time.scale()
-                        .domain([minX, maxX])
+                    this._xScale = d3.scaleTime()
+                        .domain([min, max])
                         .range([0 + barW, this._chartWidth - barW]);
                 } else {
-                    this._xScale = d3.scaleOrdinal()
-                        .domain(_data.map(function (d, i) {
+                    this._xScale = d3.scaleBand()
+                        .domain(_data.map(function(d, i) {
                             return d.x;
                         }))
-                        .rangeRoundBands([0, this._chartWidth], 0.1);
+                        .range([0, this._chartWidth])
+                        .padding(0.1);
                 }
 
 
@@ -175,26 +166,26 @@ namespace ninjaPixel {
                     .domain([Math.abs(maxData - minData), 0])
                     .range([this._chartHeight, 0]);
 
-                var xScale = this._xScale;
-                var yScale = this._yScale;
-                var barScale = this._barScale;
-                var xGroupScale = d3.scaleOrdinal();
+                let xScale = this._xScale;
+                let yScale = this._yScale;
+                let barScale = this._barScale;
+                let xGroupScale = d3.scaleBand();
 
 
                 if (barW <= 0) {
-                    barW = xScale.rangeBand();
+                    barW = xScale.bandwidth();
                 }
-                xGroupScale.domain(distinctGroups).rangeRoundBands([0, barW]);
+                xGroupScale.domain(distinctGroups).rangeRound([0, barW]);
 
-                var barAdjustmentX = 0;
+                let barAdjustmentX = 0;
                 if (this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
 
-                var calculateBarWidth = function (d, i) {
+                let calculateBarWidth = function(d, i) {
                     return xGroupScale(d.group)
                 };
-                var widthFactor = 0.95;
+                let widthFactor = 0.95;
 
                 function xScaleAdjusted(x) {
                     return xScale(x) + barAdjustmentX;
@@ -203,24 +194,24 @@ namespace ninjaPixel {
                 this._xScaleAdjusted = xScaleAdjusted;
 
                 // Enter, Update, Exit on bars
-                var yScale0 = yScale(0);
-                var barsRoot = this._svg.select('.ninja-chartGroup')
+                let yScale0 = yScale(0);
+                let barsRoot = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.g')
-                    .data(_data, function (d) {
+                    .data(_data, function(d) {
                         return d.x;
                     });
 
-                barsRoot.enter().append("g")
+                const barsRootEnter = barsRoot.enter().append("g")
                     .attr("class", "g")
-                    .attr("transform", function (d) {
+                    .attr("transform", function(d) {
                         return "translate(" + xScaleAdjusted(d.x) + ",0)"
                     });
 
 
-                barsRoot.transition()
+                barsRoot.merge(barsRootEnter).transition()
                     .duration(this._transitionDuration)
-                    .attr("transform", function (d) {
+                    .attr("transform", function(d) {
                         return "translate(" + xScaleAdjusted(d.x) + ",0)"
                     });
 
@@ -230,19 +221,19 @@ namespace ninjaPixel {
 
 
                 // interquartile range bar
-                var bars = barsRoot.selectAll(".bar")
-                    .data(function (d) {
+                let bars = barsRoot.selectAll(".bar")
+                    .data(function(d) {
                         return d.data;
                     });
 
-                bars.enter().append('rect')
+                const iqBarsEnter = bars.enter().append('rect')
                     .classed('bar', true)
                     .attrs({
-                        x: function (d, i) {
+                        x: function(d, i) {
                             return xGroupScale(d.group);
                         },
-                        width: function (d, i) {
-                            return widthFactor * xGroupScale.rangeBand();
+                        width: function(d, i) {
+                            return widthFactor * xGroupScale.bandwidth();
                         },
                         y: yScale0,
                         height: 0,
@@ -254,29 +245,17 @@ namespace ninjaPixel {
                         }
 
                     })
-                    .on('mouseover', function (d, i) {
-                        // d3.select(this)
-                        // .styles({
-                        //     opacity: (d, i) => { return functor(mouseOverBarOpacity, d, i);},
-                        //     stroke:  (d,i) => {return functor(mouseOverBarStroke, d, i);},
-                        // });
-                        myToolTip.show(d);
-                        onMouseover(d, myToolTip.getBoundingBox());
+                    .on('mouseover', function(d, i) {
+                        genericMouseoverBehaviour(d);
                     })
-                    .on('mouseout', function (d, i) {
-                        // d3.select(this)
-                        //     .styles({
-                        //         opacity: (d, i) => {return functor(defaultBarOpacity,d, i);}, // Re-sets the opacity
-                        //         stroke:  (d,i) => {return functor(defaultStroke, d, i);}
-                        //     });
-                        myToolTip.hide();
-                        onMouseout(d);
+                    .on('mouseout', function(d, i) {
+                        genericMouseoutBehaviour(d);
                     })
-                    .on('click', function (d, i) {
+                    .on('click', function(d, i) {
                         onClick(d);
                     });
 
-                bars.transition()
+                bars.merge(iqBarsEnter).transition()
                     .duration(this._transitionDuration)
                     .delay((d, i) => {
                         return functor(this._transitionDelay, d, i);
@@ -296,21 +275,21 @@ namespace ninjaPixel {
 
                     })
                     .attrs({
-                        x: function (d, i) {
+                        x: function(d, i) {
                             return xGroupScale(d.group);
                         },
-                        width: function (d, i) {
-                            return widthFactor * xGroupScale.rangeBand();
+                        width: function(d, i) {
+                            return widthFactor * xGroupScale.bandwidth();
                         },
-                        y: function (d) {
+                        y: function(d) {
                             if (d.yMax > 0) {
                                 return yScale(d.yMax);
                             } else {
                                 return yScale(0);
                             }
                         },
-                        height: function (d) {
-                            var height = Math.abs(barScale(d.yMax) - barScale(d.yMin));
+                        height: function(d) {
+                            let height = Math.abs(barScale(d.yMax) - barScale(d.yMin));
                             if (isNaN(height)) {
                                 height = 0;
                             }
@@ -325,15 +304,15 @@ namespace ninjaPixel {
                     })
                     .ease(this._transitionEase)
                     .attrs({
-                        y: function (d) {
+                        y: function(d) {
                             if (d.yMax > 0) {
                                 return yScale(0);
                             } else {
                                 return yScale(0);
                             }
                         },
-                        height: function (d) {
-                            var height = Math.abs(barScale(0));
+                        height: function(d) {
+                            let height = Math.abs(barScale(0));
                             if (isNaN(height)) {
                                 height = 0;
                             }
@@ -346,19 +325,19 @@ namespace ninjaPixel {
                     .remove();
 
                 // median line/bar
-                var medianBar = barsRoot.selectAll(".bar-median")
-                    .data(function (d) {
+                let medianBar = barsRoot.selectAll(".bar-median")
+                    .data(function(d) {
                         return d.data;
                     });
 
-                medianBar.enter().append('rect')
+                const medianBarEnter = medianBar.enter().append('rect')
                     .classed('bar-median', true)
                     .attrs({
-                        x: function (d, i) {
+                        x: function(d, i) {
                             return xGroupScale(d.group);
                         },
-                        width: function (d, i) {
-                            return widthFactor * xGroupScale.rangeBand();
+                        width: function(d, i) {
+                            return widthFactor * xGroupScale.bandwidth();
                         },
                         y: yScale0,
                         height: 0,
@@ -368,37 +347,17 @@ namespace ninjaPixel {
                         rx: this._cornerRounding,
                         ry: this._cornerRounding
                     })
-                    .on('mouseover', function (d, i) {
-                        d3.select(this)
-                            .styles({
-                                opacity: (d, i) => {
-                                    return functor(mouseOverBarOpacity, d, i);
-                                },
-                                stroke: (d, i) => {
-                                    return functor(mouseOverBarStroke, d, i);
-                                }
-                            });
-                        myToolTip.show(d);
-                        onMouseover(d, myToolTip.getBoundingBox());
+                    .on('mouseover', function(d, i) {
+                        genericMouseoverBehaviour(d);
                     })
-                    .on('mouseout', function (d, i) {
-                        d3.select(this)
-                            .styles({
-                                opacity: (d, i) => {
-                                    return functor(defaultBarOpacity, d, i);
-                                }, // Re-sets the opacity
-                                stroke: (d, i) => {
-                                    return functor(defaultStroke, d, i);
-                                }
-                            });
-                        myToolTip.hide();
-                        onMouseout(d);
+                    .on('mouseout', function(d, i) {
+                        genericMouseoutBehaviour(d);
                     })
-                    .on('click', function (d, i) {
+                    .on('click', function(d, i) {
                         onClick(d);
                     });
 
-                medianBar.transition()
+                medianBar.merge(medianBarEnter).transition()
                     .duration(this._transitionDuration)
                     .delay((d, i) => {
                         return functor(this._transitionDelay, d, i);
@@ -416,20 +375,20 @@ namespace ninjaPixel {
                         }
                     })
                     .attrs({
-                        x: function (d, i) {
+                        x: function(d, i) {
                             return xGroupScale(d.group);
                         },
-                        width: function (d, i) {
-                            return widthFactor * xGroupScale.rangeBand();
+                        width: function(d, i) {
+                            return widthFactor * xGroupScale.bandwidth();
                         },
-                        y: function (d) {
+                        y: function(d) {
                             if (d.yMax > 0) {
                                 return yScale(d.yMed) - medianWidth / 2;
                             } else {
                                 return yScale(0);
                             }
                         },
-                        height: function (d) {
+                        height: function(d) {
                             if (isNaN(d.yMed)) {
                                 return 0;
                             }
@@ -444,15 +403,15 @@ namespace ninjaPixel {
                     })
                     .ease(this._transitionEase)
                     .attrs({
-                        y: function (d) {
+                        y: function(d) {
                             if (d.yMax > 0) {
                                 return yScale(0);
                             } else {
                                 return yScale(0);
                             }
                         },
-                        height: function (d) {
-                            var height = Math.abs(barScale(0));
+                        height: function(d) {
+                            let height = Math.abs(barScale(0));
                             if (isNaN(height)) {
                                 height = 0;
                             }
@@ -466,13 +425,10 @@ namespace ninjaPixel {
 
 
                 this._plotLabels();
-                this._plotXAxis(xScale, yScale);
-                this._plotYAxis(xScale, yScale);
-//            this._plotGrids(xScale, yScale);
-
+                this._plotXYAxes(xScale, yScale);
                 // end data loop
             });
-            //end BarChart            
+            //end BarChart
         }
 
 

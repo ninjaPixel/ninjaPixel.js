@@ -274,6 +274,5 @@ namespace ninjaPixel {
             //end BarChart
         }
 
-
     }
 }

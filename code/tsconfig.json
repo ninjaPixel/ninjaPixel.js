@@ -13,6 +13,7 @@
         "./src/formatter.ts",
         "./src/barChart.ts",
         "./src/groupedBarChart.ts",
+        "./src/groupedInterquartileChart.ts",
         "./src/lollipop.ts",
         "./src/horizontalBarChart.ts",
         "./src/lineChart.ts",

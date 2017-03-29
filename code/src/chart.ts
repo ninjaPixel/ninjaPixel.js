@@ -149,7 +149,7 @@ namespace ninjaPixel {
             this._plotTheBackground();
         }
 
-        _getMinMaxX(data: [{ x }], isTimeseries: Boolean = false): {min:number, max:number} {
+        _getMinMaxX(data: [{ x }], isTimeseries: Boolean = false): { min: number, max: number } {
 
             const mapXToDate = (d: { x: number }) => {
                 return new Date(d.x).getTime();
@@ -179,20 +179,20 @@ namespace ninjaPixel {
                 } else {
                     maxX = getMaxDate(data);
                 }
-                return {min:minX, max:maxX};
-            }else{
-              let minX=0, maxX=1;
-              if (this._xMin != null) {
-                  minX = Number(this._xMin);
-              } else {
-                  minX = data.map(d=>d.x).sort(sortAsc)[0];
-              }
-              if (this._xMax != null) {
-                  maxX = Number(this._xMax);
-              } else {
-                  maxX = data.map(d=>d.x).sort(sortDesc)[0];
-              }
-              return {min:minX, max:maxX};
+                return { min: minX, max: maxX };
+            } else {
+                let minX = 0, maxX = 1;
+                if (this._xMin != null) {
+                    minX = Number(this._xMin);
+                } else {
+                    minX = data.map(d => d.x).sort(sortAsc)[0];
+                }
+                if (this._xMax != null) {
+                    maxX = Number(this._xMax);
+                } else {
+                    maxX = data.map(d => d.x).sort(sortDesc)[0];
+                }
+                return { min: minX, max: maxX };
             }
         }
 
@@ -513,6 +513,20 @@ namespace ninjaPixel {
                     return this._functor(itemStroke, d, i);
                 });
 
+            if (this._toolTip) {
+                this._toolTip.hide();
+            }
+            this._onMouseout(d);
+        }
+
+        _simpleMouseoverBehaviour(d) {
+            if (this._toolTip) {
+                this._toolTip.show(d);
+            }
+            this._onMouseover(d);
+        }
+
+        _simpleMouseoutBehaviour(d) {
             if (this._toolTip) {
                 this._toolTip.hide();
             }

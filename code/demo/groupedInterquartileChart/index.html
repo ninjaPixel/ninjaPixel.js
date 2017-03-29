@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>ninjaPixel.js Bar Chart</title>
+    <title>ninjaPixel.js Interquartile Grouped Bar Chart</title>
 </head>
 <style>
     .ninja-axis path,
@@ -71,9 +71,10 @@
 <div id="chart"></div>
 <div id="message"></div>
 </body>
-<script src="../../code/node_modules/moment/moment.js"></script>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
-<script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 <script>
 
 
@@ -86,7 +87,6 @@
                 right: 30
             })
             .plotBackground(true)
-            .transitionEase('linear')
             .transitionDelay(function (d, i) {
                 return i * 30;
             })
@@ -97,7 +97,6 @@
             .height(500)
             .plotHorizontalGridTopping(true)
             .cornerRounding(3)
-            .isTimeseries(false)
             .itemFill(function (d, i) {
                 return d.color;
             })
@@ -112,7 +111,7 @@
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {
-        return d.y;
+        return `<div>Median: ${d.yMed}</div>`;
     });
     barChart.toolTip(toolTip);
 
@@ -120,7 +119,7 @@
     setTimeout(function run() {
         ready();
         setTimeout(run, 30000);
-    }, 3000);
+    }, 1000);
 
     function menWomenData(sex, color) {
         var medColor = 'pink';
@@ -139,7 +138,6 @@
         barChart.plot(d3.select("#chart")
                 .datum(data));
 
-        console.log(data);
     }
 </script>
 

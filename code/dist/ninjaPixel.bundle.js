@@ -18825,15 +18825,12 @@ var ninjaPixel;
                     return { x: d };
                 });
                 var _a = _this._getMinMaxX(xObjects), min = _a.min, max = _a.max;
-                console.log('xDomain', min, max);
                 xScale.domain([min, max]);
                 if (_this._bins != null) {
                     xScale.ticks(_this._bins);
                     _this._histogramFunction.thresholds(xScale.ticks());
                 }
                 var bins = _this._histogramFunction.domain([min, max])(_data);
-                var barWidth = 0.9 * _this._chartWidth / bins.length;
-                console.log('barwidth', barWidth);
                 var yMax = 0;
                 if (_this._y1Max != null) {
                     yMax = _this._y1Max;
@@ -18841,8 +18838,6 @@ var ninjaPixel;
                 else {
                     yMax = d3.max(bins, function (d) { return d.length; });
                 }
-                console.log('histo bins', bins);
-                console.log('histo yMax', yMax);
                 var yScale = d3.scaleLinear()
                     .domain([0, yMax])
                     .range([_this._chartHeight, 0]);
@@ -18863,7 +18858,7 @@ var ninjaPixel;
                         return 0;
                     },
                     'width': function (d) {
-                        return barWidth;
+                        return xScale(d.x1 - d.x0);
                     },
                     fill: function (d, i) { return functor(_this._itemFill, d, i); },
                     rx: _this._cornerRounding,
@@ -18877,6 +18872,9 @@ var ninjaPixel;
                     .attrs({
                     'x': function (d) {
                         return xScale(d.x0);
+                    },
+                    'width': function (d) {
+                        return xScale(d.x1 - d.x0);
                     },
                     'y': function (d) {
                         return yScale(d.length);

@@ -1,0 +1,1 @@
+src/chart.ts src/formatter.ts src/barChart.ts src/lollipop.ts src/horizontalBarChart.ts src/lineChart.ts src/bubbleChart.ts src/histogram.ts src/.baseDir.ts --sourcemap --removeComments --target ES5 --outDir ./src/js

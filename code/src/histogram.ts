@@ -48,20 +48,16 @@ namespace ninjaPixel {
                     return { x: d };
                 });
                 const {min, max} = this._getMinMaxX(xObjects);
-                console.log('xDomain', min, max)
-                xScale.domain([min,max]);
+                xScale.domain([min, max]);
 
                 // Compute the histogram.
                 if (this._bins != null) {
-                  xScale.ticks(this._bins);
+                    xScale.ticks(this._bins);
                     this._histogramFunction.thresholds(xScale.ticks());
                 }
-                const bins = this._histogramFunction.domain([min,max])(_data);
+                const bins = this._histogramFunction.domain([min, max])(_data);
+                // let barWidth = 0.9 * this._chartWidth / bins.length;
 
-                // let barWidth = xScale.rangeBand();
-                // let barWidth =  xScale.bandwidth();
-                let barWidth = 0.9 * this._chartWidth / bins.length;
-                console.log('barwidth', barWidth)
 
                 // Update the y-scale.
                 let yMax: number = 0;
@@ -70,8 +66,6 @@ namespace ninjaPixel {
                 } else {
                     yMax = d3.max(bins, (d: number[]) => d.length);
                 }
-                console.log('histo bins', bins);
-                console.log('histo yMax', yMax);
 
                 let yScale = d3.scaleLinear()
                     .domain([0, yMax])
@@ -95,8 +89,8 @@ namespace ninjaPixel {
                         'height': function(d) {
                             return 0;
                         },
-                        'width': function(d) {
-                            return barWidth;
+                        'width': function(d){
+                          return xScale(d.x1-d.x0);
                         },
                         fill: (d, i) => { return functor(this._itemFill, d, i); },
                         rx: this._cornerRounding,
@@ -109,9 +103,10 @@ namespace ninjaPixel {
                     .ease(this._transitionEase)
                     .attrs({
                         'x': function(d) {
-                            // return xScale(average(d.x0,d.x1));
                             return xScale(d.x0);
-
+                        },
+                        'width': function(d){
+                          return xScale(d.x1-d.x0);
                         },
                         'y': function(d) {
                             return yScale(d.length);

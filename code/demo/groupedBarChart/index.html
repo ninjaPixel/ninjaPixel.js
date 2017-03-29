@@ -56,7 +56,7 @@
 
     .ninja-yAxisGroup.ninja-axis g.tick line{
         stroke: #333333;
-        opacity: 0.7; 
+        opacity: 0.7;
     }
 </style>
 
@@ -64,12 +64,14 @@
     <div id="chart"></div>
     <div id="message"></div>
 </body>
-    <script src="../../code/node_modules/moment/moment.js"></script>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
-<script src="../../code/node_modules/queue-async/queue.js" charset="utf-8"></script>
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
+<script src="../../node_modules/queue-async/build/queue.js" charset="utf-8"></script>
 <script>
 
-    
+
     var barChart = new ninjaPixel.GroupedBarChart();
     barChart.transitionDuration(2000)
         .margin({
@@ -79,7 +81,6 @@
             right: 30
         })
     .plotBackground(true)
-    .transitionEase('linear')
     .transitionDelay(function(d,i){return i*30;})
     .onMouseover(function (d, i) {
             d3.select('#message').text(d.x);
@@ -94,18 +95,18 @@
 
     var toolTip = barChart.toolTip();
     toolTip.html(function (d) {
-        return d.y;
+        return `<div>${d.group}</div><div>${d.y}</div>`;
     });
     barChart.toolTip(toolTip);
-    
+
     ready();
-        setTimeout(function run() { 
+        setTimeout(function run() {
          ready();
         setTimeout(run, 5000);
     }, 3000);
 
     function menWomenData(sex, color){
-        return {group: sex, y: Math.random() * (10), color: color};
+        return {group: sex, y: Math.round(Math.random() * (10),2), color: color};
     }
     function ready(error) {
         var data = [

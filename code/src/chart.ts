@@ -93,7 +93,7 @@ namespace ninjaPixel {
             const mouseOverFn = this._onMouseover;
             this._onMouseover = function(d) {
                 mouseOverFn(d);
-                if (this._toolTip.getBoundingBox) {
+                if (this._toolTip && this._toolTip.getBoundingBox) {
                     this._toolTip.getBoundingBox();
                 }
             };

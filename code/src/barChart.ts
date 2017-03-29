@@ -115,21 +115,10 @@ namespace ninjaPixel {
                 }
 
                 if (this._isTimeseries) {
-                    var minX, maxX;
-                    if (this._xMin != null) {
-                        minX = new Date(this._xMin).getTime();
-                    } else {
-                        minX = getMinDate(_data);
-                    }
-                    if (this._xMax != null) {
-                        maxX = new Date(this._xMax).getTime();
-                    } else {
-                        maxX = getMaxDate(_data);
-                    }
-
+                    const {min, max} = this._getMinMaxX(_data, this._isTimeseries);
                     this._xScale = d3.scaleTime()
                         .range([0 + barW, this._chartWidth - barW])
-                        .domain([minX, maxX]);
+                        .domain([min, max]);
                 } else {
                     this._xScale = d3.scaleBand()
                         .domain(_data.map(function(d, i) {

@@ -1,16 +1,17 @@
-/// <reference path="typescript_definitions/d3.d.ts" />
+/// <reference path="../node_modules/@types/d3/index.d.ts" />
 /// <reference path="chart.ts" />
+
 namespace ninjaPixel{
     interface donutDataItem {
         color?: string;
         x: string;
-        y: number;        
+        y: number;
     }
  export class Donut extends ninjaPixel.Chart{
- 
+
      private _outerRadius: number = 80;
      private _innerRadius: number = 50;
-     
+
     outerRadius(_x: number):any {
         if (!arguments.length) return this._outerRadius;
         this._outerRadius = _x;
@@ -21,15 +22,15 @@ namespace ninjaPixel{
         this._innerRadius = _x;
         return this;
     }
-     
 
-     
+
+
     constructor(){super();}
-     
-    plot(_selection){        
+
+    plot(_selection){
         _selection.each((_data) => {
             this._init(_selection, Category.donut);
-            
+
             var arc = d3.svg.arc()
                 .outerRadius(this._outerRadius)
                 .innerRadius(this._innerRadius);
@@ -39,19 +40,19 @@ namespace ninjaPixel{
                 .value(function(d: any) {
                     return d.y;
                 });
-          
+
             var path = this._svg.select('.ninja-chartGroup')
                 .selectAll('path')
                 .data(pie(_data));
-            
+
             path.enter()
                 .append('path')
                 .styles({
-                    opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
+                    opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);},
                     stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
                     fill:    (d, i) => {return this._functor(this._itemFill, d, i);}
                 })
-                .attr('d', arc)            
+                .attr('d', arc)
                 .each(function(d) {
                     this._current = d;
                 });
@@ -60,7 +61,7 @@ namespace ninjaPixel{
             path.transition()
                 .duration(this._transitionDuration)
                 .styles({
-                    opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);}, 
+                    opacity: (d, i) => {return this._functor(this._itemOpacity, d, i);},
                     stroke:  (d, i) => {return this._functor(this._itemStroke, d, i);},
                     fill:    (d, i) => {return this._functor(this._itemFill, d, i);}
                 })
@@ -68,10 +69,10 @@ namespace ninjaPixel{
                 .attrTween('d', arcTween);
 
 
-    
+
             plotDonutLabels(this);
             this._plotLabels();
-            
+
             // Store the displayed angles in _current.
             // Then, interpolate from _current to the new angles.
             // During the transition, _current is updated in-place by d3.interpolate.
@@ -81,14 +82,14 @@ namespace ninjaPixel{
                 return function(t) {
                     return arc(<any>i(t));
                 };}
-            
+
             function plotDonutLabels(that){
                 var labels = that._svg.select('.ninja-chartGroup')
                     .selectAll('text.donut-label')
                     .data(pie(_data));
 
                 labels.enter().append('text')
-                    .classed('donut-label', true)                
+                    .classed('donut-label', true)
                     .attr('dy', '.35em')
                     .style('text-anchor', 'middle')
                     .attr('transform', function(d) { return 'translate(' + arc.centroid(d) + ')'; });
@@ -103,11 +104,11 @@ namespace ninjaPixel{
                     .duration(that._transitionDuration)
                     .remove();
             }
-            
+
             // end data loop
-         }); 
+         });
      }
-     
+
     }
-    
+
 }

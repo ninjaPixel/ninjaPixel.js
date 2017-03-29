@@ -23,15 +23,16 @@ namespace ninjaPixel {
 
             const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
 
-            return function(num: number) {
+            return function(num: number | string) {
                 let notation;
+                num = Number(num);
                 for (var i = 0; i < notations.length; i++) {
                     notation = notations[i];
                     if (num >= notation.value) {
-                        let value: number | string = num / notation.value;
-                        value = value.toFixed(digits);
-                        value = value.replace(rx, "$1");
-                        return value + notation.suffix;
+                        const value: number = num / notation.value;
+                        let valueText:string = value.toFixed(digits);
+                        valueText = valueText.replace(rx, "$1");
+                        return valueText + notation.suffix;
                     }
                 }
                 // fallback

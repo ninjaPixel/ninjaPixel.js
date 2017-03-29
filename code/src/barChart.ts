@@ -59,17 +59,11 @@ namespace ninjaPixel {
             const sortDesc = (a: number, b: number) => b - a;
 
             function getMinDate(theData) {
-                // return d3.min(theData, (d:{x:number}) => {
-                //     return new Date(d.x).getTime();
-                // });
                 const sortedByDate = theData.map(mapXToDate).sort(sortAsc);
                 return sortedByDate[0];
             }
 
             function getMaxDate(theData) {
-                // return d3.max(theData, (d:{x:number}) => {
-                //     return new Date(d.x).getTime();
-                // });
                 const sortedByDate = theData.map(mapXToDate).sort(sortDesc);
                 return sortedByDate[0];
             }

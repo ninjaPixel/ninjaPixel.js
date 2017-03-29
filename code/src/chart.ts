@@ -1,3 +1,4 @@
+/// <reference path="../node_modules/@types/d3/index.d.ts" />
 /// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
 
 namespace ninjaPixel {
@@ -146,6 +147,53 @@ namespace ninjaPixel {
 
 
             this._plotTheBackground();
+        }
+
+        _getMinMaxX(data: [{ x }], isTimeseries: Boolean = false): {min:number, max:number} {
+
+            const mapXToDate = (d: { x: number }) => {
+                return new Date(d.x).getTime();
+            };
+            const sortAsc = (a: number, b: number) => a - b;
+            const sortDesc = (a: number, b: number) => b - a;
+
+            function getMinDate(theData): Number {
+                const sortedByDate = theData.map(mapXToDate).sort(sortAsc);
+                return sortedByDate[0];
+            }
+
+            function getMaxDate(theData): Number {
+                const sortedByDate = theData.map(mapXToDate).sort(sortDesc);
+                return sortedByDate[0];
+            }
+
+            if (isTimeseries) {
+                let minX, maxX;
+                if (this._xMin != null) {
+                    minX = new Date(this._xMin).getTime();
+                } else {
+                    minX = getMinDate(data);
+                }
+                if (this._xMax != null) {
+                    maxX = new Date(this._xMax).getTime();
+                } else {
+                    maxX = getMaxDate(data);
+                }
+                return {min:minX, max:maxX};
+            }else{
+              let minX=0, maxX=1;
+              if (this._xMin != null) {
+                  minX = Number(this._xMin);
+              } else {
+                  minX = data.map(d=>d.x).sort(sortAsc)[0];
+              }
+              if (this._xMax != null) {
+                  maxX = Number(this._xMax);
+              } else {
+                  maxX = data.map(d=>d.x).sort(sortDesc)[0];
+              }
+              return {min:minX, max:maxX};
+            }
         }
 
         _plotXAxis(xScale: any, yScale: any) {

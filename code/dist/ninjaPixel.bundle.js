@@ -17089,6 +17089,54 @@ var ninjaPixel;
             }
             this._plotTheBackground();
         };
+        Chart.prototype._getMinMaxX = function (data, isTimeseries) {
+            if (isTimeseries === void 0) { isTimeseries = false; }
+            var mapXToDate = function (d) {
+                return new Date(d.x).getTime();
+            };
+            var sortAsc = function (a, b) { return a - b; };
+            var sortDesc = function (a, b) { return b - a; };
+            function getMinDate(theData) {
+                var sortedByDate = theData.map(mapXToDate).sort(sortAsc);
+                return sortedByDate[0];
+            }
+            function getMaxDate(theData) {
+                var sortedByDate = theData.map(mapXToDate).sort(sortDesc);
+                return sortedByDate[0];
+            }
+            if (isTimeseries) {
+                var minX = void 0, maxX = void 0;
+                if (this._xMin != null) {
+                    minX = new Date(this._xMin).getTime();
+                }
+                else {
+                    minX = getMinDate(data);
+                }
+                if (this._xMax != null) {
+                    maxX = new Date(this._xMax).getTime();
+                }
+                else {
+                    maxX = getMaxDate(data);
+                }
+                return { min: minX, max: maxX };
+            }
+            else {
+                var minX = 0, maxX = 1;
+                if (this._xMin != null) {
+                    minX = Number(this._xMin);
+                }
+                else {
+                    minX = data.map(function (d) { return d.x; }).sort(sortAsc)[0];
+                }
+                if (this._xMax != null) {
+                    maxX = Number(this._xMax);
+                }
+                else {
+                    maxX = data.map(function (d) { return d.x; }).sort(sortDesc)[0];
+                }
+                return { min: minX, max: maxX };
+            }
+        };
         Chart.prototype._plotXAxis = function (xScale, yScale) {
             var _this = this;
             var top = this._xAxisTextOrientation === 'top';
@@ -17665,13 +17713,14 @@ var ninjaPixel;
             var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
             return function (num) {
                 var notation;
+                num = Number(num);
                 for (var i = 0; i < notations.length; i++) {
                     notation = notations[i];
                     if (num >= notation.value) {
                         var value = num / notation.value;
-                        value = value.toFixed(digits);
-                        value = value.replace(rx, "$1");
-                        return value + notation.suffix;
+                        var valueText = value.toFixed(digits);
+                        valueText = valueText.replace(rx, "$1");
+                        return valueText + notation.suffix;
                     }
                 }
                 return num.toFixed(digits);
@@ -18770,26 +18819,29 @@ var ninjaPixel;
                 _this._init(_selection);
                 var functor = _this._functor;
                 var myToolTip = _this._toolTip;
+                var xScale = d3.scaleLinear()
+                    .range([0, _this._chartWidth]);
+                var xObjects = _data.map(function (d) {
+                    return { x: d };
+                });
+                var _a = _this._getMinMaxX(xObjects), min = _a.min, max = _a.max;
+                console.log('xDomain', min, max);
+                xScale.domain([min, max]);
                 if (_this._bins != null) {
-                    _this._histogramFunction.thresholds(d3.scaleLinear().ticks(_this._bins));
+                    xScale.ticks(_this._bins);
+                    _this._histogramFunction.thresholds(xScale.ticks());
                 }
-                var xScale = d3.scaleBand()
-                    .range([0, _this._chartWidth])
-                    .padding(0.1);
-                _data = _this._histogramFunction(_data);
-                xScale.domain(_data.map(function (d) {
-                    return d.x0;
-                }));
-                var barWidth = xScale.bandwidth();
+                var bins = _this._histogramFunction.domain([min, max])(_data);
+                var barWidth = 0.9 * _this._chartWidth / bins.length;
                 console.log('barwidth', barWidth);
                 var yMax = 0;
                 if (_this._y1Max != null) {
                     yMax = _this._y1Max;
                 }
                 else {
-                    yMax = d3.max(_data, function (d) { return d.length; });
+                    yMax = d3.max(bins, function (d) { return d.length; });
                 }
-                console.log('histo _data', _data);
+                console.log('histo bins', bins);
                 console.log('histo yMax', yMax);
                 var yScale = d3.scaleLinear()
                     .domain([0, yMax])
@@ -18797,7 +18849,7 @@ var ninjaPixel;
                 var bar = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.bars')
-                    .data(_data);
+                    .data(bins);
                 var enterBar = bar.enter().append('rect')
                     .classed('bars', true)
                     .attrs({

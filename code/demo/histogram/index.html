@@ -64,7 +64,11 @@
         .xAxisTextTransform('rotate(-90) translate(-10,-13)');
 
 
-
+        var toolTip = chart.toolTip();
+        toolTip.html(function(d) {
+            return `x0: ${d.x0} x1:${d.x1}`;
+        });
+        chart.toolTip(toolTip);
 
     function ready() {
         var data = irwinHallDistribution(10000, 3);

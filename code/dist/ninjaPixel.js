@@ -2553,6 +2553,107 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var ninjaPixel;
 (function (ninjaPixel) {
+    var Donut = (function (_super) {
+        __extends(Donut, _super);
+        function Donut() {
+            var _this = _super.call(this) || this;
+            _this._outerRadius = 80;
+            _this._innerRadius = 50;
+            return _this;
+        }
+        Donut.prototype.outerRadius = function (_x) {
+            if (!arguments.length)
+                return this._outerRadius;
+            this._outerRadius = _x;
+            return this;
+        };
+        Donut.prototype.innerRadius = function (_x) {
+            if (!arguments.length)
+                return this._innerRadius;
+            this._innerRadius = _x;
+            return this;
+        };
+        Donut.prototype.plot = function (_selection) {
+            var _this = this;
+            _selection.each(function (_data) {
+                _this._init(_selection, ninjaPixel.Category.donut);
+                var arc = d3.arc()
+                    .outerRadius(_this._outerRadius)
+                    .innerRadius(_this._innerRadius);
+                var pie = d3.pie()
+                    .sort(null)
+                    .value(function (d) {
+                    return d.y;
+                });
+                var path = _this._svg.select('.ninja-chartGroup')
+                    .selectAll('path')
+                    .data(pie(_data));
+                path.enter()
+                    .append('path')
+                    .styles({
+                    opacity: function (d, i) { return _this._functor(_this._itemOpacity, d, i); },
+                    stroke: function (d, i) { return _this._functor(_this._itemStroke, d, i); },
+                    fill: function (d, i) { return _this._functor(_this._itemFill, d, i); }
+                })
+                    .attr('d', arc)
+                    .each(function (d) {
+                    this._current = d;
+                });
+                path.transition()
+                    .duration(_this._transitionDuration)
+                    .styles({
+                    opacity: function (d, i) { return _this._functor(_this._itemOpacity, d, i); },
+                    stroke: function (d, i) { return _this._functor(_this._itemStroke, d, i); },
+                    fill: function (d, i) { return _this._functor(_this._itemFill, d, i); }
+                })
+                    .attr('d', arc)
+                    .attrTween('d', arcTween);
+                plotDonutLabels(_this);
+                _this._plotLabels();
+                function arcTween(a) {
+                    var i = d3.interpolate(this._current, a);
+                    this._current = i(0);
+                    return function (t) {
+                        return arc(i(t));
+                    };
+                }
+                function plotDonutLabels(that) {
+                    var labels = that._svg.select('.ninja-chartGroup')
+                        .selectAll('text.donut-label')
+                        .data(pie(_data));
+                    labels.enter().append('text')
+                        .classed('donut-label', true)
+                        .attr('dy', '.35em')
+                        .style('text-anchor', 'middle')
+                        .attr('transform', function (d) { return 'translate(' + arc.centroid(d) + ')'; });
+                    labels.transition()
+                        .duration(that._transitionDuration)
+                        .attr('transform', function (d) { return 'translate(' + arc.centroid(d) + ')'; })
+                        .text(function (d) { return d.data.x; });
+                    labels.exit()
+                        .transition()
+                        .duration(that._transitionDuration)
+                        .remove();
+                }
+            });
+        };
+        return Donut;
+    }(ninjaPixel.Chart));
+    ninjaPixel.Donut = Donut;
+})(ninjaPixel || (ninjaPixel = {}));
+//
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
     var Lollipop = (function (_super) {
         __extends(Lollipop, _super);
         function Lollipop() {

@@ -18,7 +18,8 @@
         "./src/horizontalBarChart.ts",
         "./src/lineChart.ts",
         "./src/bubbleChart.ts",
-        "./src/histogram.ts"
+        "./src/histogram.ts",
+        "./src/donut.ts"
     ],
     "compilerOptions": {
         "declaration": false,

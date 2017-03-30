@@ -30,12 +30,12 @@ namespace ninjaPixel{
     plot(_selection){
         _selection.each((_data) => {
             this._init(_selection, Category.donut);
-
-            var arc = d3.svg.arc()
+//asfasdf
+            var arc = d3.arc()
                 .outerRadius(this._outerRadius)
                 .innerRadius(this._innerRadius);
 
-            var pie = d3.layout.pie()
+            var pie = d3.pie()
                 .sort(null)
                 .value(function(d: any) {
                     return d.y;

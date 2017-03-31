@@ -2806,4 +2806,178 @@ var ninjaPixel;
     ninjaPixel.Lollipop = Lollipop;
 })(ninjaPixel || (ninjaPixel = {}));
 //
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
+    var Treemap = (function (_super) {
+        __extends(Treemap, _super);
+        function Treemap() {
+            var _this = _super.call(this) || this;
+            _this._nodeText = '';
+            _this._itemFontSize = '8px';
+            _this._itemTextOffsetLeft = 1;
+            _this._itemTextOffsetTop = 10;
+            return _this;
+        }
+        Treemap.prototype.nodeText = function (_x) {
+            if (!arguments.length)
+                return this._nodeText;
+            this._nodeText = _x;
+            return this;
+        };
+        Treemap.prototype.itemFontSize = function (_x) {
+            if (!arguments.length)
+                return this._itemFontSize;
+            this._itemFontSize = _x;
+            return this;
+        };
+        Treemap.prototype.itemTextOffsetLeft = function (_x) {
+            if (!arguments.length)
+                return this._itemTextOffsetLeft;
+            this._itemTextOffsetLeft = _x;
+            return this;
+        };
+        Treemap.prototype.itemTextOffsetTop = function (_x) {
+            if (!arguments.length)
+                return this._itemTextOffsetTop;
+            this._itemTextOffsetTop = _x;
+            return this;
+        };
+        Treemap.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection, ninjaPixel.Category.treemap);
+            var functor = this._functor;
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            var onClick = this._onClick;
+            var mouseOverOpacity = this._mouseOverItemOpacity;
+            var defaultOpacity = this._itemOpacity;
+            var mouseOverStroke = this._mouseOverItemStroke;
+            var defaultStroke = this._itemStroke;
+            var nodeFill = this._itemFill;
+            var nodeText = this._nodeText;
+            var fontSize = this._itemFontSize;
+            var nodeTextOffsetLeft = this._itemTextOffsetLeft;
+            var nodeTextOffsetTop = this._itemTextOffsetTop;
+            var genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
+            var genericMouseoutBehaviour = this._genericMouseoutBehaviour.bind(this);
+            _selection.each(function (_data) {
+                var myTreemap = d3.treemap();
+                var treemapLayout = myTreemap
+                    .size([_this._chartWidth, _this._chartHeight]);
+                var treemapNode = _this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .datum(_data)
+                    .selectAll('.treemap-node')
+                    .data(treemapLayout.nodes);
+                var treemapText = _this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .datum(_data)
+                    .selectAll('.treemap-text')
+                    .data(treemapLayout.nodes);
+                var drawEmptyTreemap = false;
+                if (_data.area == 0) {
+                    console.log('The data area is 0. Cannot draw a treemap.');
+                    drawEmptyTreemap = true;
+                }
+                var enterTreemapNode = treemapNode.enter().append('rect')
+                    .attr('class', 'treemap-node')
+                    .attrs({
+                    x: function (d) { return d.x; },
+                    width: function (d) { return Math.max(0, d.dx - 1); },
+                    y: function (d) { return d.y; },
+                    height: 0,
+                    fill: function (d, i) { return functor(nodeFill, d, i); }
+                })
+                    .styles({
+                    opacity: function (d, i) { return functor(defaultOpacity, d, i); },
+                    stroke: function (d, i) { return functor(defaultStroke, d, i); }
+                })
+                    .on('mouseover', function (d, i) {
+                    genericMouseoverBehaviour(this, d, i);
+                })
+                    .on('mouseout', function (d, i) {
+                    genericMouseoutBehaviour(this, d, i);
+                })
+                    .on('click', function (d, i) {
+                    onClick(d);
+                });
+                treemapNode.merge(enterTreemapNode).transition()
+                    .duration(_this._transitionDuration)
+                    .attrs({
+                    x: function (d) { return d.x; },
+                    width: function (d) {
+                        if (drawEmptyTreemap) {
+                            return 0;
+                        }
+                        return Math.max(0, d.dx - 1);
+                    },
+                    y: function (d) { return d.y; },
+                    height: function (d) {
+                        if (drawEmptyTreemap) {
+                            return 0;
+                        }
+                        return Math.max(0, d.dy - 1);
+                    },
+                    fill: function (d, i) { return functor(_this._itemFill, d, i); }
+                })
+                    .styles({
+                    opacity: function (d, i) { return functor(defaultOpacity, d, i); },
+                    stroke: function (d, i) { return functor(defaultStroke, d, i); }
+                });
+                treemapNode.exit().transition().remove();
+                var textEnter = treemapText.enter().append('text')
+                    .attr('class', 'treemap-text')
+                    .attrs({
+                    fill: function (d, i) { return functor(_this._itemTextLabelColor, d, i); },
+                })
+                    .styles({
+                    opacity: function (d, i) { return functor(defaultOpacity, d, i); },
+                })
+                    .on('mouseover', function (d, i) {
+                    d3.select(this);
+                    myToolTip.show(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
+                })
+                    .on('mouseout', function (d, i) {
+                    d3.select(this);
+                    myToolTip.hide();
+                    onMouseout(d);
+                })
+                    .on('click', function (d, i) {
+                    onClick(d);
+                });
+                treemapText.merge(textEnter).transition()
+                    .duration(_this._transitionDuration)
+                    .attrs({
+                    x: function (d, i) { return d.x + functor(nodeTextOffsetLeft, d, i); },
+                    y: function (d, i) { return d.y + functor(nodeTextOffsetTop, d, i); },
+                    'font-size': function (d, i) {
+                        if (drawEmptyTreemap) {
+                            return 0;
+                        }
+                        return functor(fontSize, d, i);
+                    }
+                })
+                    .text(function (d, i) {
+                    return functor(nodeText, d, i);
+                });
+                treemapText.exit().transition().remove();
+            });
+        };
+        return Treemap;
+    }(ninjaPixel.Chart));
+    ninjaPixel.Treemap = Treemap;
+})(ninjaPixel || (ninjaPixel = {}));
+//
 //# sourceMappingURL=ninjaPixel.js.map

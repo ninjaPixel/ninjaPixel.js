@@ -30,12 +30,15 @@
         top: 100%;
         left: 0;
     }
-    
+
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 </style>
-
+<script src="../../node_modules/d3/build/d3.js"></script>
+<script src="../../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+<script src="../../node_modules/d3-tip/index.js"></script>
+<script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 <body>
     <h3>Top Selling Albums</h3>
     <div id="chart"></div>
@@ -43,7 +46,7 @@ body {
     <input type="checkbox" id="useNullData" onclick="ready();">Try drawing an empty treemap</input>
     <p>Data from <a href="http://en.wikipedia.org/wiki/List_of_best-selling_albums">wikipedia</a>.</p>
 </body>
-<script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
+
 <script>
     var fontSize = function(d) {
         var size = 1.6 * d.dx / d.name.length;
@@ -53,7 +56,7 @@ body {
         }
         return Math.ceil(size);
     };
-            
+
     var chart = new ninjaPixel.Treemap();
     chart.transitionDuration(800)
         .margin({
@@ -64,19 +67,19 @@ body {
         })
     .transitionEase('linear')
     .itemStroke('white')
-    .height(500)    
-    .width(800)    
+    .height(500)
+    .width(800)
     .itemFill(function(d, i){
-        
+
         var parentColor = function(d){
          if(d.itemColor){
-          return d.itemColor;   
+          return d.itemColor;
          } else if(d.parent){
-          return parentColor(d.parent);   
+          return parentColor(d.parent);
          } else {
              return 'white';
          }
-        }        
+        }
         return parentColor(d);
     })
     .itemTextLabelColor('light-gray')
@@ -91,7 +94,7 @@ body {
     })
     .itemFontSize(function(d, i) {
         return fontSize(d) + 'px';
-    })            
+    })
     .nodeText(function(d, i) {
         var text = '';
         text = d.children ? null : d.name;
@@ -101,16 +104,16 @@ body {
         return text;
     });
 
-    
+
     var toolTip = chart.toolTip();
     toolTip.html(function(d){return d.Artist + '<br/>'+d.name + '<br/><i>'+d.Genre+' - ' + d.size +'m albums</i>'})
         .offset([0,0]);
     chart.toolTip(toolTip);
-    
-    
 
 
-    
+
+
+
 
 ready();
 
@@ -146,11 +149,11 @@ ready();
                     {"Artist":"Alanis Morissette","Genre":"Rock","size":33,"name":"Jagged Little Pill"},
                     {"Artist":"Fleetwood Mac","Genre":"Rock","size":40,"name":"Rumours"},
                     {"Artist":"Eagles","Genre":"Rock","size":42,"name":"Their Greatest Hits (1971–1975)"},
-                    {"Artist":"James Horner","Genre":"Soundtrack","size":30,"name":"Titanic: Music from the Motion Picture"}];  
-        
-        
+                    {"Artist":"James Horner","Genre":"Soundtrack","size":30,"name":"Titanic: Music from the Motion Picture"}];
 
-        
+
+
+
         var genres = d3.set(
             rawData.map(function(d) {
                 return d.Genre;
@@ -159,14 +162,18 @@ ready();
                 return (typeof d !== "undefined") ? d !== null : false
             })
             ).values();
-        
-        var color = d3.scale.ordinal()
-            .domain(genres)
-            .range(d3.range(genres.length).map(d3.scale.linear()
-                .domain([0, genres.length - 1])
-                .range(['#e08214', '#8073ac'])
-                .interpolate(d3.interpolateLab)));
-        
+        console.log('genres', genres);
+
+
+        let colorMap = d3.scaleBand()
+          .domain(genres)
+          .range([0,1]);
+
+        let interpolator = d3.interpolateLab('#e08214', '#8073ac');
+        const color = (genre)=>{
+          return interpolator(colorMap(genre));
+        };
+
         var treemapData = [];
         var useNulls = d3.select('#useNullData').property('checked');
         genres.forEach(function(d) {
@@ -186,13 +193,14 @@ ready();
                 'children': thisGenre
             });
         });
-        
+
 
         var albumData = {
             'name': 'albums',
             'children': treemapData
         }
-        
+        console.log('albumData', albumData);
+
 
         chart.plot(d3.select("#chart")
         .datum(albumData));

@@ -23,9 +23,9 @@ namespace ninjaPixel{
         return this;
     }
 
-
-
-    constructor(){super();}
+    constructor(){
+      super();
+    }
 
     plot(_selection){
         _selection.each((_data) => {

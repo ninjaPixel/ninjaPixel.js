@@ -723,8 +723,8 @@ var ninjaPixel;
     var Formatter = (function () {
         function Formatter() {
         }
-        Formatter.prototype.Financial = function (digits) {
-            if (digits === void 0) { digits = 2; }
+        Formatter.prototype.Financial = function (_a) {
+            var _b = _a.prefix, prefix = _b === void 0 ? '' : _b, _c = _a.digits, digits = _c === void 0 ? 0 : _c;
             var notations = [
                 {
                     value: 1E12,
@@ -753,10 +753,10 @@ var ninjaPixel;
                         var value = num / notation.value;
                         var valueText = value.toFixed(digits);
                         valueText = valueText.replace(rx, "$1");
-                        return valueText + notation.suffix;
+                        return prefix + valueText + notation.suffix;
                     }
                 }
-                return num.toFixed(digits);
+                return prefix + num.toFixed(digits);
             };
         };
         return Formatter;

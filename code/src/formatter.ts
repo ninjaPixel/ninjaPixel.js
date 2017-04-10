@@ -1,7 +1,8 @@
 namespace ninjaPixel {
     export class Formatter {
         constructor() { }
-        Financial(digits: number = 2): any {
+        Financial({prefix='',digits=0}: {prefix?: string; digits?: number}): any {
+
             const notations = [
                 {
                     value: 1E12,
@@ -32,12 +33,14 @@ namespace ninjaPixel {
                         const value: number = num / notation.value;
                         let valueText:string = value.toFixed(digits);
                         valueText = valueText.replace(rx, "$1");
-                        return valueText + notation.suffix;
+                        return prefix + valueText + notation.suffix;
                     }
                 }
+
                 // fallback
-                return num.toFixed(digits);
+                return prefix + num.toFixed(digits);
             };
         }
+
     }
 }

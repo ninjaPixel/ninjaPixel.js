@@ -17,6 +17,7 @@ namespace ninjaPixel{
         this._outerRadius = _x;
         return this;
     }
+    
     innerRadius(_x: number):any {
         if (!arguments.length) return this._innerRadius;
         this._innerRadius = _x;

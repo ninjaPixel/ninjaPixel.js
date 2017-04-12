@@ -16690,6 +16690,20 @@ d3Transition.transition.prototype.styles = transition_styles;
       document.body.appendChild(node)
     }
 
+    tip.getBoundingBox = function () { //ninjaPixel
+
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop,
+          scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+      var bbox = getScreenBBox();
+      var bbox_w = (bbox.e.x - bbox.w.x);
+      return {
+        top: Math.floor(bbox.n.y) + scrollTop,
+        left: Math.floor(bbox.n.x + scrollLeft - bbox_w / 2),
+        width: Math.floor(bbox.e.x - bbox.w.x),
+        height: Math.floor(bbox.s.y - bbox.n.y)
+      }
+    };
+
     // Public - show the tooltip on the screen
     //
     // Returns a tip
@@ -16964,7 +16978,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
       return bbox
     }
-    
+
     // Private - replace D3JS 3.X d3.functor() function
     function functor(v) {
     	return typeof v === "function" ? v : function() {
@@ -16979,7 +16993,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.16.1';
+    ninjaPixel.version = '0.0.17.0';
     var Category;
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -17040,9 +17054,11 @@ var ninjaPixel;
             if (category === void 0) { category = Category.xy; }
             var mouseOverFn = this._onMouseover;
             this._onMouseover = function (d) {
-                mouseOverFn(d);
                 if (this._toolTip && this._toolTip.getBoundingBox) {
-                    this._toolTip.getBoundingBox();
+                    mouseOverFn(d, this._toolTip.getBoundingBox());
+                }
+                else {
+                    mouseOverFn(d);
                 }
             };
             this._category = category;
@@ -17703,39 +17719,13 @@ var ninjaPixel;
         function Formatter() {
         }
         Formatter.prototype.Financial = function (_a) {
-            var _b = _a.prefix, prefix = _b === void 0 ? '' : _b, _c = _a.digits, digits = _c === void 0 ? 0 : _c;
-            var notations = [
-                {
-                    value: 1E12,
-                    suffix: "T"
-                },
-                {
-                    value: 1E9,
-                    suffix: "B"
-                },
-                {
-                    value: 1E6,
-                    suffix: "M"
-                },
-                {
-                    value: 1E3,
-                    suffix: "K"
-                }
-            ];
-            var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+            var _b = _a.prefix, prefix = _b === void 0 ? '' : _b, _c = _a.suffix, suffix = _c === void 0 ? '' : _c, _d = _a.digits, digits = _d === void 0 ? 0 : _d;
             return function (num) {
-                var notation;
-                num = Number(num);
-                for (var i = 0; i < notations.length; i++) {
-                    notation = notations[i];
-                    if (num >= notation.value) {
-                        var value = num / notation.value;
-                        var valueText = value.toFixed(digits);
-                        valueText = valueText.replace(rx, "$1");
-                        return prefix + valueText + notation.suffix;
-                    }
+                var out = d3.format("." + digits + "s")(num);
+                if (out.slice(-1) === 'G') {
+                    out = out.slice(0, -1) + 'B';
                 }
-                return prefix + num.toFixed(digits);
+                return "" + prefix + out + suffix;
             };
         };
         return Formatter;

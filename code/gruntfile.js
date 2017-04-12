@@ -39,7 +39,7 @@ module.exports = function (grunt) {
                 src: [
                     'node_modules/d3/build/d3.js',
                     'node_modules/d3-selection-multi/build/d3-selection-multi.js',
-                    'node_modules/d3-tip/index.js',
+                    'node_modules/d3-tooltip-ninjapixel/index.js',
                     'dist/ninjaPixel.js'
                 ],
                 dest: 'dist/ninjaPixel.bundle.js',

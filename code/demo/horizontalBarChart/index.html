@@ -77,6 +77,8 @@
 <script src="../../dist/ninjaPixel.js" charset="utf-8"></script>
 
 <script>
+var myFormatter = new ninjaPixel.Formatter().Financial;
+
     var barChart = new ninjaPixel.HorizontalBarChart();
     barChart.transitionDuration(2000)
             .margin({
@@ -103,6 +105,7 @@
             })
             .plotVerticalGrid(true)
             .xAxisTextOrientation('top')
+            .xAxisTickFormat(myFormatter({digits:3, suffix:' units'}))
             .axesOrigin({
                 x: 0,
                 y: 0

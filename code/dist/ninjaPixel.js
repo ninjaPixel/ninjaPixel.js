@@ -1,6 +1,6 @@
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.16.1';
+    ninjaPixel.version = '0.0.17.0';
     var Category;
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -61,9 +61,11 @@ var ninjaPixel;
             if (category === void 0) { category = Category.xy; }
             var mouseOverFn = this._onMouseover;
             this._onMouseover = function (d) {
-                mouseOverFn(d);
                 if (this._toolTip && this._toolTip.getBoundingBox) {
-                    this._toolTip.getBoundingBox();
+                    mouseOverFn(d, this._toolTip.getBoundingBox());
+                }
+                else {
+                    mouseOverFn(d);
                 }
             };
             this._category = category;
@@ -724,39 +726,13 @@ var ninjaPixel;
         function Formatter() {
         }
         Formatter.prototype.Financial = function (_a) {
-            var _b = _a.prefix, prefix = _b === void 0 ? '' : _b, _c = _a.digits, digits = _c === void 0 ? 0 : _c;
-            var notations = [
-                {
-                    value: 1E12,
-                    suffix: "T"
-                },
-                {
-                    value: 1E9,
-                    suffix: "B"
-                },
-                {
-                    value: 1E6,
-                    suffix: "M"
-                },
-                {
-                    value: 1E3,
-                    suffix: "K"
-                }
-            ];
-            var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+            var _b = _a.prefix, prefix = _b === void 0 ? '' : _b, _c = _a.suffix, suffix = _c === void 0 ? '' : _c, _d = _a.digits, digits = _d === void 0 ? 0 : _d;
             return function (num) {
-                var notation;
-                num = Number(num);
-                for (var i = 0; i < notations.length; i++) {
-                    notation = notations[i];
-                    if (num >= notation.value) {
-                        var value = num / notation.value;
-                        var valueText = value.toFixed(digits);
-                        valueText = valueText.replace(rx, "$1");
-                        return prefix + valueText + notation.suffix;
-                    }
+                var out = d3.format("." + digits + "s")(num);
+                if (out.slice(-1) === 'G') {
+                    out = out.slice(0, -1) + 'B';
                 }
-                return prefix + num.toFixed(digits);
+                return "" + prefix + out + suffix;
             };
         };
         return Formatter;

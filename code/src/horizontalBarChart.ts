@@ -209,7 +209,7 @@ namespace ninjaPixel {
                         genericMouseoverBehaviour(this, d, i);
                     })
                     .on('mouseout', function (d, i) {
-                        genericMouseoverBehaviour(this,d,i);
+                        genericMouseoutBehaviour(this,d,i);
                     })
                     .on('click', function (d, i) {
                         onClick(d);
@@ -273,7 +273,7 @@ namespace ninjaPixel {
                 this._plotXYAxes(xScale, yScale);
 
             });
-            //end BarChart            
+            //end BarChart
         }
 
 

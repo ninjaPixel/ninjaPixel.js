@@ -18158,7 +18158,7 @@ var ninjaPixel;
                     genericMouseoverBehaviour(this, d, i);
                 })
                     .on('mouseout', function (d, i) {
-                    genericMouseoverBehaviour(this, d, i);
+                    genericMouseoutBehaviour(this, d, i);
                 })
                     .on('click', function (d, i) {
                     onClick(d);

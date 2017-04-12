@@ -1869,6 +1869,146 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var ninjaPixel;
 (function (ninjaPixel) {
+    var StackedBarChart = (function (_super) {
+        __extends(StackedBarChart, _super);
+        function StackedBarChart() {
+            return _super.call(this) || this;
+        }
+        StackedBarChart.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection);
+            var functor = this._functor;
+            var myToolTip = this._toolTip;
+            var onMouseover = this._onMouseover;
+            var onMouseout = this._onMouseout;
+            var onClick = this._onClick;
+            var mouseOverBarOpacity = this._mouseOverItemOpacity;
+            var defaultBarOpacity = this._itemOpacity;
+            var mouseOverBarStroke = this._mouseOverItemStroke;
+            var defaultStroke = this._itemStroke;
+            var barFill = this._itemFill;
+            _selection.each(function (_data) {
+                var stack = d3.layout.stack();
+                stack(_data.data);
+                console.log('this is the stack', _data);
+                var minData = 0;
+                var maxData = 0;
+                if (_this._y1Max != null) {
+                    maxData = _this._y1Max;
+                }
+                else {
+                }
+                if (_this._y1Min != null) {
+                    minData = _this._y1Min;
+                }
+                else {
+                }
+                console.log('maxData', maxData, 'minData', minData);
+                var xScale = d3.scale.ordinal()
+                    .domain(_data.data[0].map(function (d, i) {
+                    return d.x;
+                }))
+                    .rangeRoundBands([0, _this._chartWidth], 0);
+                var barWidth = xScale.rangeBand();
+                var yScale = d3.scale.linear()
+                    .domain([minData, maxData])
+                    .range([_this._chartHeight, 0]);
+                var barScale = d3.scale.linear()
+                    .domain([Math.abs(maxData - minData), 0])
+                    .range([_this._chartHeight, 0]);
+                var yScale0 = yScale(0);
+                var bars = _this._svg.select('.ninja-chartGroup')
+                    .call(myToolTip)
+                    .selectAll('.bar')
+                    .data(_data);
+                bars.enter().append('rect')
+                    .classed('bar', true)
+                    .attr({
+                    x: function (d, i) {
+                        return xScale(d.data.x);
+                    },
+                    width: barWidth,
+                    y: yScale0,
+                    height: 0,
+                    fill: function (d, i) { return functor(_this._itemFill, d, i); },
+                    rx: _this._cornerRounding,
+                    ry: _this._cornerRounding
+                })
+                    .on('mouseover', function (d, i) {
+                    d3.select(this)
+                        .style({
+                        opacity: function (d, i) { return functor(mouseOverBarOpacity, d, i); },
+                        stroke: function (d, i) { return functor(mouseOverBarStroke, d, i); }
+                    });
+                    myToolTip.show(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
+                })
+                    .on('mouseout', function (d, i) {
+                    d3.select(this)
+                        .style({
+                        opacity: function (d, i) { return functor(defaultBarOpacity, d, i); },
+                        stroke: function (d, i) { return functor(defaultStroke, d, i); }
+                    });
+                    myToolTip.hide();
+                    onMouseout(d);
+                })
+                    .on('click', function (d, i) {
+                    onClick(d);
+                });
+                bars.transition()
+                    .duration(_this._transitionDuration)
+                    .delay(function (d, i) { return functor(_this._transitionDelay, d, i); })
+                    .ease(_this._transitionEase)
+                    .style({
+                    opacity: function (d, i) { return functor(defaultBarOpacity, d, i); },
+                    stroke: function (d, i) { return functor(defaultStroke, d, i); },
+                    fill: function (d, i) { return functor(barFill, d, i); }
+                })
+                    .attr({
+                    x: function (d, i) {
+                        return xScale(d.x);
+                    },
+                    width: barWidth,
+                    y: function (d) {
+                        if (d.y > 0) {
+                            return yScale(d.y);
+                        }
+                        else {
+                            return yScale(0);
+                        }
+                    },
+                    height: function (d) {
+                        barScale(5);
+                    },
+                });
+                bars.exit()
+                    .transition()
+                    .style({
+                    opacity: 0
+                })
+                    .remove();
+                _this._plotLabels();
+                _this._plotXAxis(xScale, yScale);
+                _this._plotYAxis(xScale, yScale);
+            });
+        };
+        return StackedBarChart;
+    }(ninjaPixel.BarChart));
+    ninjaPixel.StackedBarChart = StackedBarChart;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
     var BubbleChart = (function (_super) {
         __extends(BubbleChart, _super);
         function BubbleChart() {
@@ -2794,6 +2934,75 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var ninjaPixel;
 (function (ninjaPixel) {
+    var SimpleTreemap = (function (_super) {
+        __extends(SimpleTreemap, _super);
+        function SimpleTreemap() {
+            return _super.call(this) || this;
+        }
+        SimpleTreemap.prototype.plot = function (_selection) {
+            var _this = this;
+            this._init(_selection, ninjaPixel.Category.simpleTreemap);
+            function position() {
+                this.style('left', function (d) {
+                    return d.x + 'px';
+                })
+                    .style('top', function (d) {
+                    return d.y + 'px';
+                })
+                    .style('width', function (d) {
+                    return Math.max(0, d.dx - 1) + 'px';
+                })
+                    .style('height', function (d) {
+                    return Math.max(0, d.dy - 1) + 'px';
+                });
+            }
+            var color = d3.scale.category20c();
+            _selection.each(function (_data) {
+                var myTreemap = d3.layout.treemap();
+                var treemapLayout = myTreemap
+                    .size([_this._chartWidth, _this._chartHeight])
+                    .sticky(true)
+                    .value(function (d) {
+                    return d.size;
+                });
+                var treemap = _this._svg.select('.ninja-containerGroup')
+                    .append('div')
+                    .style('position', 'relative')
+                    .datum(_data)
+                    .selectAll('.treemap-node')
+                    .data(treemapLayout.nodes);
+                treemap.enter().append('div')
+                    .attr('class', 'treemap-node')
+                    .call(position)
+                    .style('background', function (d) {
+                    var bgColor = d.children ? color(d.name) : null;
+                    return bgColor;
+                })
+                    .text(function (d) {
+                    return d.children ? null : d.name;
+                });
+                treemap.transition()
+                    .duration(_this._transitionDuration)
+                    .call(position);
+            });
+        };
+        return SimpleTreemap;
+    }(ninjaPixel.Chart));
+    ninjaPixel.SimpleTreemap = SimpleTreemap;
+})(ninjaPixel || (ninjaPixel = {}));
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var ninjaPixel;
+(function (ninjaPixel) {
     var Treemap = (function (_super) {
         __extends(Treemap, _super);
         function Treemap() {
@@ -2845,12 +3054,14 @@ var ninjaPixel;
             var fontSize = this._itemFontSize;
             var nodeTextOffsetLeft = this._itemTextOffsetLeft;
             var nodeTextOffsetTop = this._itemTextOffsetTop;
-            var genericMouseoverBehaviour = this._genericMouseoverBehaviour.bind(this);
-            var genericMouseoutBehaviour = this._genericMouseoutBehaviour.bind(this);
             _selection.each(function (_data) {
-                var myTreemap = d3.treemap();
+                var myTreemap = d3.layout.treemap();
                 var treemapLayout = myTreemap
-                    .size([_this._chartWidth, _this._chartHeight]);
+                    .size([_this._chartWidth, _this._chartHeight])
+                    .sticky(true)
+                    .value(function (d) {
+                    return d.size;
+                });
                 var treemapNode = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .datum(_data)
@@ -2866,31 +3077,43 @@ var ninjaPixel;
                     console.log('The data area is 0. Cannot draw a treemap.');
                     drawEmptyTreemap = true;
                 }
-                var enterTreemapNode = treemapNode.enter().append('rect')
+                treemapNode.enter().append('rect')
                     .attr('class', 'treemap-node')
-                    .attrs({
+                    .attr({
                     x: function (d) { return d.x; },
                     width: function (d) { return Math.max(0, d.dx - 1); },
                     y: function (d) { return d.y; },
                     height: 0,
                     fill: function (d, i) { return functor(nodeFill, d, i); }
                 })
-                    .styles({
+                    .style({
                     opacity: function (d, i) { return functor(defaultOpacity, d, i); },
                     stroke: function (d, i) { return functor(defaultStroke, d, i); }
                 })
                     .on('mouseover', function (d, i) {
-                    genericMouseoverBehaviour(this, d, i);
+                    d3.select(this)
+                        .style({
+                        opacity: function (d, i) { return functor(mouseOverOpacity, d, i); },
+                        stroke: function (d, i) { return functor(mouseOverStroke, d, i); }
+                    });
+                    myToolTip.show(d);
+                    onMouseover(d, myToolTip.getBoundingBox());
                 })
                     .on('mouseout', function (d, i) {
-                    genericMouseoutBehaviour(this, d, i);
+                    d3.select(this)
+                        .style({
+                        opacity: function (d, i) { return functor(defaultOpacity, d, i); },
+                        stroke: function (d, i) { return functor(defaultStroke, d, i); }
+                    });
+                    myToolTip.hide();
+                    onMouseout(d);
                 })
                     .on('click', function (d, i) {
                     onClick(d);
                 });
-                treemapNode.merge(enterTreemapNode).transition()
+                treemapNode.transition()
                     .duration(_this._transitionDuration)
-                    .attrs({
+                    .attr({
                     x: function (d) { return d.x; },
                     width: function (d) {
                         if (drawEmptyTreemap) {
@@ -2907,17 +3130,17 @@ var ninjaPixel;
                     },
                     fill: function (d, i) { return functor(_this._itemFill, d, i); }
                 })
-                    .styles({
+                    .style({
                     opacity: function (d, i) { return functor(defaultOpacity, d, i); },
                     stroke: function (d, i) { return functor(defaultStroke, d, i); }
                 });
                 treemapNode.exit().transition().remove();
-                var textEnter = treemapText.enter().append('text')
+                treemapText.enter().append('text')
                     .attr('class', 'treemap-text')
-                    .attrs({
+                    .attr({
                     fill: function (d, i) { return functor(_this._itemTextLabelColor, d, i); },
                 })
-                    .styles({
+                    .style({
                     opacity: function (d, i) { return functor(defaultOpacity, d, i); },
                 })
                     .on('mouseover', function (d, i) {
@@ -2933,9 +3156,9 @@ var ninjaPixel;
                     .on('click', function (d, i) {
                     onClick(d);
                 });
-                treemapText.merge(textEnter).transition()
+                treemapText.transition()
                     .duration(_this._transitionDuration)
-                    .attrs({
+                    .attr({
                     x: function (d, i) { return d.x + functor(nodeTextOffsetLeft, d, i); },
                     y: function (d, i) { return d.y + functor(nodeTextOffsetTop, d, i); },
                     'font-size': function (d, i) {
@@ -2955,5 +3178,5 @@ var ninjaPixel;
     }(ninjaPixel.Chart));
     ninjaPixel.Treemap = Treemap;
 })(ninjaPixel || (ninjaPixel = {}));
-//
+
 //# sourceMappingURL=ninjaPixel.js.map

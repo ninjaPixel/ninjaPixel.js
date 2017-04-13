@@ -18,6 +18,7 @@ namespace ninjaPixel {
         _yScale: any;
         _barScale: any;
         _xScaleAdjusted: any;
+        _plotCount:number;
 
         cornerRounding(_x: number): any {
             if (!arguments.length) return this._cornerRounding;
@@ -41,6 +42,7 @@ namespace ninjaPixel {
 
         constructor() {
             super();
+            this._plotCount = 0;
         }
 
         plot(_selection, barWidth?: number) {
@@ -67,7 +69,6 @@ namespace ninjaPixel {
             }
 
             _selection.each((_data) => {
-              console.log('%c_data', 'background:black;color:green;', _data);
                 // find the unique groups
                 var distinctGroups = [];
                 _data.forEach(function(d: groupedBarChartDataItem) {
@@ -194,8 +195,20 @@ namespace ninjaPixel {
                     .remove();
 
                 var widthFactor = 0.95;
-                const bars = barsRootEnter.selectAll(".bar")
-                    .data(function(d) { return d.data; });
+
+                let barsRootObject;
+                if(this._plotCount++ ===0){
+                  barsRootObject = barsRootEnter;
+                }else{
+                  barsRootObject = barsRoot;
+                }
+                const bars = barsRootObject
+                    .selectAll(".bar")
+                    .data(function(d) {
+                      return d.data;
+                    }, function(d){
+                      return d.group
+                    });
 
                 const barsEnter = bars.enter().append('rect')
                     .classed('bar', true)
@@ -241,7 +254,6 @@ namespace ninjaPixel {
                             } else {
                                 y= yScale(0);
                             }
-                            console.log('y',y)
                             return y;
                         },
                         height: function(d) {
@@ -273,6 +285,7 @@ namespace ninjaPixel {
 
                 this._plotLabels();
                 this._plotXYAxes(xScale, yScale);
+
                         // end data loop
             });
             //end BarChart

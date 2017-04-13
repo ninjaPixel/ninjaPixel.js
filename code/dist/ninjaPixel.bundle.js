@@ -18243,6 +18243,7 @@ var ninjaPixel;
             var _this = _super.call(this) || this;
             _this._cornerRounding = 1;
             _this._isTimeseries = false;
+            _this._plotCount = 0;
             return _this;
         }
         GroupedBarChart.prototype.cornerRounding = function (_x) {
@@ -18285,7 +18286,6 @@ var ninjaPixel;
                 return d3.max(theData, function (d) { return new Date(d.x).getTime(); });
             }
             _selection.each(function (_data) {
-                console.log('%c_data', 'background:black;color:green;', _data);
                 var distinctGroups = [];
                 _data.forEach(function (d) {
                     d.data.forEach(function (e) {
@@ -18387,8 +18387,20 @@ var ninjaPixel;
                     .transition()
                     .remove();
                 var widthFactor = 0.95;
-                var bars = barsRootEnter.selectAll(".bar")
-                    .data(function (d) { return d.data; });
+                var barsRootObject;
+                if (_this._plotCount++ === 0) {
+                    barsRootObject = barsRootEnter;
+                }
+                else {
+                    barsRootObject = barsRoot;
+                }
+                var bars = barsRootObject
+                    .selectAll(".bar")
+                    .data(function (d) {
+                    return d.data;
+                }, function (d) {
+                    return d.group;
+                });
                 var barsEnter = bars.enter().append('rect')
                     .classed('bar', true)
                     .attrs({
@@ -18433,7 +18445,6 @@ var ninjaPixel;
                         else {
                             y = yScale(0);
                         }
-                        console.log('y', y);
                         return y;
                     },
                     height: function (d) {
@@ -18487,6 +18498,7 @@ var ninjaPixel;
             _this._cornerRounding = 1;
             _this._medianWidth = 8;
             _this._isTimeseries = false;
+            _this._plotCount = 0;
             return _this;
         }
         GroupedInterquartileChart.prototype.cornerRounding = function (_x) {
@@ -18650,7 +18662,14 @@ var ninjaPixel;
                 barsRoot.exit()
                     .transition()
                     .remove();
-                var bars = barsRootEnter.selectAll(".bar")
+                var barsRootObject;
+                if (_this._plotCount++ === 0) {
+                    barsRootObject = barsRootEnter;
+                }
+                else {
+                    barsRootObject = barsRoot;
+                }
+                var bars = barsRootObject.selectAll(".bar")
                     .data(function (d) {
                     return d.data;
                 });
@@ -18749,7 +18768,7 @@ var ninjaPixel;
                     return functor(_this._removeDelay, d, i);
                 })
                     .remove();
-                var medianBar = barsRootEnter.selectAll(".bar-median")
+                var medianBar = barsRootObject.selectAll(".bar-median")
                     .data(function (d) {
                     return d.data;
                 });

@@ -22,6 +22,7 @@ namespace ninjaPixel {
         _barScale: any;
         _xScaleAdjusted: any;
         _medianWidth: number = 8;
+        _plotCount:number;
 
         cornerRounding(_x: number): any {
             if (!arguments.length) return this._cornerRounding;
@@ -53,6 +54,7 @@ namespace ninjaPixel {
 
         constructor() {
             super();
+            this._plotCount=0;
         }
 
         plot(_selection, barWidth?: number) {
@@ -220,8 +222,15 @@ namespace ninjaPixel {
                     .remove()
 
 
+                    let barsRootObject;
+                    if(this._plotCount++ ===0){
+                      barsRootObject = barsRootEnter;
+                    }else{
+                      barsRootObject = barsRoot;
+                    }
+
                 // interquartile range bar
-                let bars = barsRootEnter.selectAll(".bar")
+                let bars = barsRootObject.selectAll(".bar")
                     .data(function(d) {
                         return d.data;
                     });
@@ -325,7 +334,7 @@ namespace ninjaPixel {
                     .remove();
 
                 // median line/bar
-                let medianBar = barsRootEnter.selectAll(".bar-median")
+                let medianBar = barsRootObject.selectAll(".bar-median")
                     .data(function(d) {
                         return d.data;
                     });

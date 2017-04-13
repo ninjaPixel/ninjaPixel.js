@@ -118,7 +118,7 @@
     ready();
     setTimeout(function run() {
         ready();
-        // setTimeout(run, 5000);
+        setTimeout(run, 10000);
     }, 5000);
 
     function menWomenData(sex, color) {
@@ -127,10 +127,8 @@
 
         var yMax = randMed + Math.random() * (2);
         var yMin = randMed - Math.random() * (2);
-        // var randMed = (yMax +yMin) * (Math.random()*2)/2
 
         var out= {group: sex, yMax: yMax, yMed: randMed, yMin: yMin, color: color, color2: medColor};
-        console.log(out);
         return out;
     }
     function ready(error) {
@@ -139,6 +137,7 @@
             {x: 'Guernsey', data: [menWomenData('men', '#fc8d59'), menWomenData('women', '#91cf60')]},
             {x: 'Sark', data: [menWomenData('men', '#fc8d59'), menWomenData('women', '#91cf60')]}
         ];
+        console.log('%cdata', 'background:black;color:green;', data);
 
         barChart.plot(d3.select("#chart")
                 .datum(data));

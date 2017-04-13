@@ -221,7 +221,7 @@ namespace ninjaPixel {
 
 
                 // interquartile range bar
-                let bars = barsRoot.selectAll(".bar")
+                let bars = barsRootEnter.selectAll(".bar")
                     .data(function(d) {
                         return d.data;
                     });
@@ -325,7 +325,7 @@ namespace ninjaPixel {
                     .remove();
 
                 // median line/bar
-                let medianBar = barsRoot.selectAll(".bar-median")
+                let medianBar = barsRootEnter.selectAll(".bar-median")
                     .data(function(d) {
                         return d.data;
                     });

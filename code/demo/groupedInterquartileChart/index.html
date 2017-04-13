@@ -118,15 +118,20 @@
     ready();
     setTimeout(function run() {
         ready();
-        setTimeout(run, 30000);
-    }, 1000);
+        // setTimeout(run, 5000);
+    }, 5000);
 
     function menWomenData(sex, color) {
         var medColor = 'pink';
         var randMed = 2 + Math.random() * (10);
+
         var yMax = randMed + Math.random() * (2);
         var yMin = randMed - Math.random() * (2);
-        return {group: sex, yMax: yMax, yMed: randMed, yMin: yMin, color: color, color2: medColor};
+        // var randMed = (yMax +yMin) * (Math.random()*2)/2
+
+        var out= {group: sex, yMax: yMax, yMed: randMed, yMin: yMin, color: color, color2: medColor};
+        console.log(out);
+        return out;
     }
     function ready(error) {
         var data = [

@@ -67,6 +67,7 @@ namespace ninjaPixel {
             }
 
             _selection.each((_data) => {
+              console.log('%c_data', 'background:black;color:green;', _data);
                 // find the unique groups
                 var distinctGroups = [];
                 _data.forEach(function(d: groupedBarChartDataItem) {
@@ -176,11 +177,11 @@ namespace ninjaPixel {
                 const yScale0 = yScale(0);
                 const barsRoot = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
-                    .selectAll('.g')
+                    .selectAll('.barGroup')
                     .data(_data, function(d) { return d.x; });
 
                 const barsRootEnter = barsRoot.enter().append("g")
-                    .attr("class", "g")
+                    .attr("class", "barGroup")
                     .attr("transform", function(d) { return "translate(" + xScaleAdjusted(d.x) + ",0)" });
 
 
@@ -193,7 +194,7 @@ namespace ninjaPixel {
                     .remove();
 
                 var widthFactor = 0.95;
-                const bars = barsRoot.selectAll(".bar")
+                const bars = barsRootEnter.selectAll(".bar")
                     .data(function(d) { return d.data; });
 
                 const barsEnter = bars.enter().append('rect')
@@ -234,11 +235,14 @@ namespace ninjaPixel {
                         },
                         width: function(d, i) { return widthFactor * xGroupScale.bandwidth(); },
                         y: function(d) {
+                          let y;
                             if (d.y > 0) {
-                                return yScale(d.y);
+                                y= yScale(d.y);
                             } else {
-                                return yScale(0);
+                                y= yScale(0);
                             }
+                            console.log('y',y)
+                            return y;
                         },
                         height: function(d) {
                             return Math.abs(barScale(d.y));

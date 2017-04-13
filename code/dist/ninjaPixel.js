@@ -1292,6 +1292,7 @@ var ninjaPixel;
                 return d3.max(theData, function (d) { return new Date(d.x).getTime(); });
             }
             _selection.each(function (_data) {
+                console.log('%c_data', 'background:black;color:green;', _data);
                 var distinctGroups = [];
                 _data.forEach(function (d) {
                     d.data.forEach(function (e) {
@@ -1381,10 +1382,10 @@ var ninjaPixel;
                 var yScale0 = yScale(0);
                 var barsRoot = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
-                    .selectAll('.g')
+                    .selectAll('.barGroup')
                     .data(_data, function (d) { return d.x; });
                 var barsRootEnter = barsRoot.enter().append("g")
-                    .attr("class", "g")
+                    .attr("class", "barGroup")
                     .attr("transform", function (d) { return "translate(" + xScaleAdjusted(d.x) + ",0)"; });
                 barsRoot.merge(barsRootEnter).transition()
                     .duration(_this._transitionDuration)
@@ -1393,7 +1394,7 @@ var ninjaPixel;
                     .transition()
                     .remove();
                 var widthFactor = 0.95;
-                var bars = barsRoot.selectAll(".bar")
+                var bars = barsRootEnter.selectAll(".bar")
                     .data(function (d) { return d.data; });
                 var barsEnter = bars.enter().append('rect')
                     .classed('bar', true)
@@ -1432,12 +1433,15 @@ var ninjaPixel;
                     },
                     width: function (d, i) { return widthFactor * xGroupScale.bandwidth(); },
                     y: function (d) {
+                        var y;
                         if (d.y > 0) {
-                            return yScale(d.y);
+                            y = yScale(d.y);
                         }
                         else {
-                            return yScale(0);
+                            y = yScale(0);
                         }
+                        console.log('y', y);
+                        return y;
                     },
                     height: function (d) {
                         return Math.abs(barScale(d.y));
@@ -1653,7 +1657,7 @@ var ninjaPixel;
                 barsRoot.exit()
                     .transition()
                     .remove();
-                var bars = barsRoot.selectAll(".bar")
+                var bars = barsRootEnter.selectAll(".bar")
                     .data(function (d) {
                     return d.data;
                 });
@@ -1752,7 +1756,7 @@ var ninjaPixel;
                     return functor(_this._removeDelay, d, i);
                 })
                     .remove();
-                var medianBar = barsRoot.selectAll(".bar-median")
+                var medianBar = barsRootEnter.selectAll(".bar-median")
                     .data(function (d) {
                     return d.data;
                 });

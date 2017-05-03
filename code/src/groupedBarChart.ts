@@ -18,7 +18,7 @@ namespace ninjaPixel {
         _yScale: any;
         _barScale: any;
         _xScaleAdjusted: any;
-        _plotCount:number;
+        _plotCount: number;
 
         cornerRounding(_x: number): any {
             if (!arguments.length) return this._cornerRounding;
@@ -162,24 +162,30 @@ namespace ninjaPixel {
 
                 xGroupScale.domain(distinctGroups).rangeRound([0, barW]);
 
-
-
                 var barAdjustmentX = 0;
                 if (this._isTimeseries) {
                     barAdjustmentX = -barW / 2;
                 }
 
-                function xScaleAdjusted(x:any):number {
+                function xScaleAdjusted(x: any): number {
                     return xScale(x) + barAdjustmentX;
                 }
                 this._xScaleAdjusted = xScaleAdjusted;
+
+                const indexKey = d=> {
+
+                    let out = d.x;
+                    const keys = d.data.map(i=>i.group);
+                    out =  out+':'+keys.toString();
+                    return out;
+                };
 
                 // Enter, Update, Exit on bars
                 const yScale0 = yScale(0);
                 const barsRoot = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.barGroup')
-                    .data(_data, function(d) { return d.x; });
+                    .data(_data, indexKey);
 
                 const barsRootEnter = barsRoot.enter().append("g")
                     .attr("class", "barGroup")
@@ -192,23 +198,23 @@ namespace ninjaPixel {
 
                 barsRoot.exit()
                     .transition()
+                    .styles({
+                        opacity: (d, i) => { return 0; },
+                    })
                     .remove();
 
                 var widthFactor = 0.95;
 
-                let barsRootObject;
-                if(this._plotCount++ ===0){
-                  barsRootObject = barsRootEnter;
-                }else{
-                  barsRootObject = barsRoot;
-                }
+                const barsRootObject = this._svg.select('.ninja-chartGroup').selectAll('.barGroup');
+
                 const bars = barsRootObject
                     .selectAll(".bar")
                     .data(function(d) {
-                      return d.data;
-                    }, function(d){
-                      return d.group
+                        return d.data;
+                    }, function(d) {
+                        return d.group;
                     });
+
 
                 const barsEnter = bars.enter().append('rect')
                     .classed('bar', true)
@@ -248,11 +254,11 @@ namespace ninjaPixel {
                         },
                         width: function(d, i) { return widthFactor * xGroupScale.bandwidth(); },
                         y: function(d) {
-                          let y;
+                            let y;
                             if (d.y > 0) {
-                                y= yScale(d.y);
+                                y = yScale(d.y);
                             } else {
-                                y= yScale(0);
+                                y = yScale(0);
                             }
                             return y;
                         },
@@ -286,7 +292,7 @@ namespace ninjaPixel {
                 this._plotLabels();
                 this._plotXYAxes(xScale, yScale);
 
-                        // end data loop
+                // end data loop
             });
             //end BarChart
         }

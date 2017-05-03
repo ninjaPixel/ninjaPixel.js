@@ -2,7 +2,7 @@
 /// <reference path="./typescript_definitions/ninjaTypes/index.d.ts" />
 
 namespace ninjaPixel {
-    export const version: string = '0.0.17.0';
+    export const version: string = '0.0.18.0';
 
     export enum Category {
         xy = 0,

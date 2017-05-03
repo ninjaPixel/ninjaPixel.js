@@ -16993,7 +16993,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 var ninjaPixel;
 (function (ninjaPixel) {
-    ninjaPixel.version = '0.0.17.0';
+    ninjaPixel.version = '0.0.18.0';
     var Category;
     (function (Category) {
         Category[Category["xy"] = 0] = "xy";
@@ -18372,11 +18372,17 @@ var ninjaPixel;
                     return xScale(x) + barAdjustmentX;
                 }
                 _this._xScaleAdjusted = xScaleAdjusted;
+                var indexKey = function (d) {
+                    var out = d.x;
+                    var keys = d.data.map(function (i) { return i.group; });
+                    out = out + ':' + keys.toString();
+                    return out;
+                };
                 var yScale0 = yScale(0);
                 var barsRoot = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.barGroup')
-                    .data(_data, function (d) { return d.x; });
+                    .data(_data, indexKey);
                 var barsRootEnter = barsRoot.enter().append("g")
                     .attr("class", "barGroup")
                     .attr("transform", function (d) { return "translate(" + xScaleAdjusted(d.x) + ",0)"; });
@@ -18385,15 +18391,12 @@ var ninjaPixel;
                     .attr("transform", function (d) { return "translate(" + xScaleAdjusted(d.x) + ",0)"; });
                 barsRoot.exit()
                     .transition()
+                    .styles({
+                    opacity: function (d, i) { return 0; },
+                })
                     .remove();
                 var widthFactor = 0.95;
-                var barsRootObject;
-                if (_this._plotCount++ === 0) {
-                    barsRootObject = barsRootEnter;
-                }
-                else {
-                    barsRootObject = barsRoot;
-                }
+                var barsRootObject = _this._svg.select('.ninja-chartGroup').selectAll('.barGroup');
                 var bars = barsRootObject
                     .selectAll(".bar")
                     .data(function (d) {

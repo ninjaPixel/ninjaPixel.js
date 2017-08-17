@@ -18,7 +18,6 @@ namespace ninjaPixel {
         _yScale: any;
         _barScale: any;
         _xScaleAdjusted: any;
-        _plotCount: number;
 
         cornerRounding(_x: number): any {
             if (!arguments.length) return this._cornerRounding;
@@ -42,7 +41,6 @@ namespace ninjaPixel {
 
         constructor() {
             super();
-            this._plotCount = 0;
         }
 
         plot(_selection, barWidth?: number) {
@@ -172,20 +170,13 @@ namespace ninjaPixel {
                 }
                 this._xScaleAdjusted = xScaleAdjusted;
 
-                const indexKey = d=> {
-
-                    let out = d.x;
-                    const keys = d.data.map(i=>i.group);
-                    out =  out+':'+keys.toString();
-                    return out;
-                };
 
                 // Enter, Update, Exit on bars
                 const yScale0 = yScale(0);
                 const barsRoot = this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.barGroup')
-                    .data(_data, indexKey);
+                    .data(_data, d=>d.x);
 
                 const barsRootEnter = barsRoot.enter().append("g")
                     .attr("class", "barGroup")
@@ -206,7 +197,6 @@ namespace ninjaPixel {
                 var widthFactor = 0.95;
 
                 const barsRootObject = this._svg.select('.ninja-chartGroup').selectAll('.barGroup');
-
                 const bars = barsRootObject
                     .selectAll(".bar")
                     .data(function(d) {

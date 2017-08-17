@@ -18243,7 +18243,6 @@ var ninjaPixel;
             var _this = _super.call(this) || this;
             _this._cornerRounding = 1;
             _this._isTimeseries = false;
-            _this._plotCount = 0;
             return _this;
         }
         GroupedBarChart.prototype.cornerRounding = function (_x) {
@@ -18372,17 +18371,11 @@ var ninjaPixel;
                     return xScale(x) + barAdjustmentX;
                 }
                 _this._xScaleAdjusted = xScaleAdjusted;
-                var indexKey = function (d) {
-                    var out = d.x;
-                    var keys = d.data.map(function (i) { return i.group; });
-                    out = out + ':' + keys.toString();
-                    return out;
-                };
                 var yScale0 = yScale(0);
                 var barsRoot = _this._svg.select('.ninja-chartGroup')
                     .call(myToolTip)
                     .selectAll('.barGroup')
-                    .data(_data, indexKey);
+                    .data(_data, function (d) { return d.x; });
                 var barsRootEnter = barsRoot.enter().append("g")
                     .attr("class", "barGroup")
                     .attr("transform", function (d) { return "translate(" + xScaleAdjusted(d.x) + ",0)"; });
@@ -18653,7 +18646,7 @@ var ninjaPixel;
                     return d.x;
                 });
                 var barsRootEnter = barsRoot.enter().append("g")
-                    .attr("class", "g")
+                    .attr("class", "barGroup")
                     .attr("transform", function (d) {
                     return "translate(" + xScaleAdjusted(d.x) + ",0)";
                 });
@@ -18664,17 +18657,16 @@ var ninjaPixel;
                 });
                 barsRoot.exit()
                     .transition()
+                    .styles({
+                    opacity: function (d, i) { return 0; },
+                })
                     .remove();
-                var barsRootObject;
-                if (_this._plotCount++ === 0) {
-                    barsRootObject = barsRootEnter;
-                }
-                else {
-                    barsRootObject = barsRoot;
-                }
+                var barsRootObject = _this._svg.select('.ninja-chartGroup').selectAll('.barGroup');
                 var bars = barsRootObject.selectAll(".bar")
                     .data(function (d) {
                     return d.data;
+                }, function (d) {
+                    return d.group;
                 });
                 var iqBarsEnter = bars.enter().append('rect')
                     .classed('bar', true)
@@ -18774,6 +18766,8 @@ var ninjaPixel;
                 var medianBar = barsRootObject.selectAll(".bar-median")
                     .data(function (d) {
                     return d.data;
+                }, function (d) {
+                    return d.group;
                 });
                 var medianBarEnter = medianBar.enter().append('rect')
                     .classed('bar-median', true)

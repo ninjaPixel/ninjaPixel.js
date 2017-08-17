@@ -205,7 +205,7 @@ namespace ninjaPixel {
                     });
 
                 const barsRootEnter = barsRoot.enter().append("g")
-                    .attr("class", "g")
+                    .attr("class", "barGroup")
                     .attr("transform", function(d) {
                         return "translate(" + xScaleAdjusted(d.x) + ",0)"
                     });
@@ -219,20 +219,30 @@ namespace ninjaPixel {
 
                 barsRoot.exit()
                     .transition()
+                    .styles({
+                        opacity: (d, i) => { return 0; },
+                    })
                     .remove()
 
 
-                    let barsRootObject;
-                    if(this._plotCount++ ===0){
-                      barsRootObject = barsRootEnter;
-                    }else{
-                      barsRootObject = barsRoot;
-                    }
+                    // let barsRootObject;
+                    // if(this._plotCount++ ===0){
+                    //   barsRootObject = barsRootEnter;
+                    // }else{
+                    //   barsRootObject = barsRoot;
+                    // }
+                    const barsRootObject = this._svg.select('.ninja-chartGroup').selectAll('.barGroup');
+
 
                 // interquartile range bar
                 let bars = barsRootObject.selectAll(".bar")
+                    // .data(function(d) {
+                    //     return d.data;
+                    // });
                     .data(function(d) {
                         return d.data;
+                    }, function(d) {
+                        return d.group;
                     });
 
                 const iqBarsEnter = bars.enter().append('rect')
@@ -335,8 +345,13 @@ namespace ninjaPixel {
 
                 // median line/bar
                 let medianBar = barsRootObject.selectAll(".bar-median")
+                    // .data(function(d) {
+                    //     return d.data;
+                    // });
                     .data(function(d) {
                         return d.data;
+                    }, function(d) {
+                        return d.group;
                     });
 
                 const medianBarEnter = medianBar.enter().append('rect')

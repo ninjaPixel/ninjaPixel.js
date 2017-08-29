@@ -38,6 +38,7 @@ body {
 
 <body>
     <h3>Top Selling Albums</h3>
+    <p>Here we use the <code>.textWrap(true)</code> flag.</p>
     <div id="chart"></div>
     <div id="message"></div>
     <input type="checkbox" id="useNullData" onclick="ready();">Try drawing an empty treemap</input>
@@ -46,12 +47,13 @@ body {
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script>
     var fontSize = function(d) {
-        var size = 1.6 * d.dx / d.name.length;
-        var sizeMax = 14;
-        if (size > sizeMax) {
-            size = sizeMax;
-        }
-        return Math.ceil(size);
+//        var size = 1.6 * d.dx / d.name.length;
+//        var sizeMax = 14;
+//        if (size > sizeMax) {
+//            size = sizeMax;
+//        }
+//        return Math.ceil(size);
+      return 16;
     };
             
     var chart = new ninjaPixel.Treemap();
@@ -91,11 +93,11 @@ body {
     })
     .itemFontSize(function(d, i) {
         return fontSize(d) + 'px';
-    })            
+    })
+         .useHtmlText(false)
+         .textWrap(true)
     .nodeText(function(d, i) {
-
-
-      var text = '';
+        var text = '';
         text = d.children ? null : d.name;
         if (d.size < 0) {
             text = '';

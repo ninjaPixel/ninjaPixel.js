@@ -14,11 +14,11 @@ module.exports = function (grunt) {
                 //                separator: ';',
             },
             basic: {
-                src: ['src/js/d3.tip.js', 'src/js/chart.js', 'src/js/barChart.js','src/js/horizontalBarChart.js','src/js/groupedBarChart.js','src/js/groupedInterquartileChart.js', 'src/js/stackedBarChart.js', 'src/js/bubbleChart.js', 'src/js/lineChart.js', 'src/js/histogram.js', 'src/js/donut.js', 'src/js/lollipop.js', 'src/js/simpleTreemap.js', 'src/js/treemap.js'],
+                src: ['src/js/d3.tip.js','src/js/d3.textwrap.js', 'src/js/chart.js', 'src/js/barChart.js','src/js/horizontalBarChart.js','src/js/groupedBarChart.js','src/js/groupedInterquartileChart.js', 'src/js/stackedBarChart.js', 'src/js/bubbleChart.js', 'src/js/lineChart.js', 'src/js/histogram.js', 'src/js/donut.js', 'src/js/lollipop.js', 'src/js/simpleTreemap.js', 'src/js/treemap.js'],
                 dest: 'dist/ninjaPixel.js',
             },
             bundle: {
-                src: ['node_modules/d3/d3.js', 'src/js/d3.tip.js', 'dist/ninjaPixel.js'],
+                src: ['node_modules/d3/d3.js', 'src/js/d3.tip.js','src/js/d3.textwrap.js', 'dist/ninjaPixel.js'],
                 dest: 'dist/ninjaPixel.bundle.js',
             }
         },

@@ -13033,8 +13033,8 @@ var ninjaPixel;
                             var fontFactor = 0.7;
                             var charsPerLine = Math.floor(data.dx / (fontFactor * _fontSize));
                             var reg = new RegExp("(\\S(.{0," + charsPerLine + "}\\S)?)\\s+", "g");
-                            var wordwrapped = data.name.trim().replace(reg, '$1\n');
-                            wordwrapped.split('\n').forEach(function (line0) {
+                            var wordwrapped = data.name.trim().replace(reg, '$1🤠');
+                            wordwrapped.split('🤠').forEach(function (line0) {
                                 var line = line0;
                                 if (line.length > charsPerLine) {
                                     if (that._textWrap === 'hide') {
@@ -13042,12 +13042,11 @@ var ninjaPixel;
                                         return;
                                     }
                                     else if (that._textWrap === 'crop') {
-                                        var tooManyChars = line.length - charsPerLine;
-                                        if (tooManyChars > 3) {
-                                            line = line.slice(0, charsPerLine - 1) + '...';
+                                        if (line.length > 4) {
+                                            line = line.slice(0, charsPerLine - 2) + '...';
                                         }
-                                        else if (tooManyChars > 2) {
-                                            line = line.slice(0, charsPerLine + 0) + '..';
+                                        else if (line.length > 3) {
+                                            line = line.slice(0, charsPerLine - 0) + '..';
                                         }
                                         else {
                                             line = line.slice(0, charsPerLine + 1);
@@ -13058,7 +13057,7 @@ var ninjaPixel;
                                 var y = data.y + lineOffset;
                                 var obj = {
                                     name: line,
-                                    _index: data.name + lineCount,
+                                    _index: line + lineCount,
                                     x: data.x,
                                     y0: data.y,
                                     y: y,
@@ -13089,10 +13088,10 @@ var ninjaPixel;
                         },
                     }).style({
                         opacity: function (d, i) {
-                            return functor(defaultOpacity, d, i);
+                            return 0;
                         },
                     });
-                    svgText.transition().duration(_this._transitionDuration).attr({
+                    svgText.transition().duration(that._transitionDuration).attr({
                         x: function (d, i) {
                             return d.x + functor(nodeTextOffsetLeft, d, i);
                         },
@@ -13105,6 +13104,10 @@ var ninjaPixel;
                             }
                             return functor(fontSize, d, i);
                         }
+                    }).style({
+                        opacity: function (d, i) {
+                            return functor(defaultOpacity, d, i);
+                        },
                     }).text(function (d, i) {
                         return functor(nodeText, d, i);
                     });

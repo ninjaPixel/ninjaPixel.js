@@ -3237,23 +3237,55 @@ var ninjaPixel;
                 });
                 treemapNode.exit().transition().remove();
                 if (_this._textWrap) {
-                    console.log('_data', _data);
                     var textWrapData = [];
-                    var addTreemapTextToArray = function (data) {
+                    var addTreemapTextToArray = function (data, i) {
                         if (data.name) {
                             var lineCount = 0;
-                            var lineHeight = 16;
-                            data.name.split(' ').forEach(function (line) {
-                                textWrapData.push({
+                            var lineSpacing = 1.05;
+                            var _fontSize = Number(functor(fontSize, data, i).split('px')[0]);
+                            var fontFactor = 0.7;
+                            var charsPerLine = Math.floor(data.dx / (fontFactor * _fontSize));
+                            var reg = new RegExp("(\\S(.{0," + charsPerLine + "}\\S)?)\\s+", "g");
+                            var wordwrapped = data.name.trim().replace(reg, '$1\n');
+                            wordwrapped.split('\n').forEach(function (line0) {
+                                var line = line0;
+                                if (line.length > charsPerLine) {
+                                    if (that._textWrap === 'hide') {
+                                        console.log(line, "is too long to fit into this block");
+                                        return;
+                                    }
+                                    else if (that._textWrap === 'crop') {
+                                        var tooManyChars = line.length - charsPerLine;
+                                        if (tooManyChars > 3) {
+                                            line = line.slice(0, charsPerLine - 1) + '...';
+                                        }
+                                        else if (tooManyChars > 2) {
+                                            line = line.slice(0, charsPerLine + 0) + '..';
+                                        }
+                                        else {
+                                            line = line.slice(0, charsPerLine + 1);
+                                        }
+                                    }
+                                }
+                                var lineOffset = lineCount * _fontSize * lineSpacing;
+                                var y = data.y + lineOffset;
+                                var obj = {
                                     name: line,
                                     _index: data.name + lineCount,
                                     x: data.x,
-                                    y: data.y + (lineCount * lineHeight),
+                                    y0: data.y,
+                                    y: y,
                                     dx: data.dx,
                                     dy: data.dy,
                                     children: data.children ? true : false
-                                });
+                                };
                                 lineCount++;
+                                var newLineOffset = lineCount * _fontSize * lineSpacing;
+                                if ((newLineOffset) <= data.dy) {
+                                    textWrapData.push(obj);
+                                }
+                                else {
+                                }
                             });
                         }
                         if (data.children) {
@@ -3261,7 +3293,6 @@ var ninjaPixel;
                         }
                     };
                     _data.children.forEach(addTreemapTextToArray);
-                    console.log('textWrapData', textWrapData);
                     var svgText = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.treemap-text').data(textWrapData, function (d) {
                         return d._index;
                     });
@@ -3295,7 +3326,6 @@ var ninjaPixel;
                 else if (_this._useHtmlText) {
                     var htmlText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.tweetText').data(treemapLayout.nodes);
                     htmlText.enter().append('foreignObject').append("xhtml:div").attr('class', 'tweetText').attr('x', function (d, i) {
-                        console.log('d', d);
                         return d.x;
                     }).attr('y', function (d, i) {
                         return d.y;
@@ -3304,10 +3334,9 @@ var ninjaPixel;
                     }).attr('height', function (d) {
                         return d.dy;
                     }).style('opacity', 1).html(function (d, i) {
-                        var fontSize = 12;
+                        var fontSize = functor(fontSize, d, i);
                         var text = functor(nodeText, d, i);
                         if (text) {
-                            console.log('text', text);
                             return "<div style=\"color: #ededed; font-size:" + fontSize + "px; padding:" + that._htmlTextPadding + "\">" + text + "</div>";
                         }
                     });
@@ -3315,7 +3344,6 @@ var ninjaPixel;
                     htmlText.transition().ease(_this._transitionEase).duration(_this._transitionDuration).delay(function (d, i) {
                         return functor(_this._transitionDelay, d, i);
                     }).attr('x', function (d, i) {
-                        console.log('d', d);
                         return d.x;
                     }).attr('y', function (d, i) {
                         return d.y;
@@ -3324,10 +3352,9 @@ var ninjaPixel;
                     }).attr('height', function (d) {
                         return d.dy;
                     }).style('opacity', 1).html(function (d, i) {
-                        var fontSize = 12;
+                        var fontSize = functor(fontSize, d, i);
                         var text = functor(nodeText, d, i);
                         if (text) {
-                            console.log('text', text);
                             return "<div style=\"color: #ededed; font-size:" + fontSize + "px; padding:" + that._htmlTextPadding + "\">" + text + "</div>";
                         }
                     });

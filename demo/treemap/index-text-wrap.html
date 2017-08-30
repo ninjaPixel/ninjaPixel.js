@@ -12,6 +12,7 @@
         border-radius: 2px;
         font: 12px sans-serif;
     }
+
     /* Creates a small triangle extender for the tip */
     .d3-tip:after {
         box-sizing: border-box;
@@ -24,184 +25,188 @@
         position: absolute;
         text-align: center;
     }
+
     /* Style northward tooltips differently */
     .d3-tip.n:after {
         margin: -1px 0 0 0;
         top: 100%;
         left: 0;
     }
-    
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
 </style>
 
 <body>
-    <h3>Top Selling Albums</h3>
-    <p>Here we use the <code>.textWrap(true)</code> flag.</p>
-    <div id="chart"></div>
-    <div id="message"></div>
-    <input type="checkbox" id="useNullData" onclick="ready();">Try drawing an empty treemap</input>
-    <p>Data from <a href="http://en.wikipedia.org/wiki/List_of_best-selling_albums">wikipedia</a>.</p>
+<h3>Top Selling Albums</h3>
+<p>Here we use the <code>.textWrap('crop'). </code> flag. You can also supply the <code>'hide'</code> flag but it's super janky at the moment.</p>
+<div id="chart"></div>
+<div id="message"></div>
+<input type="checkbox" id="shuffle" onclick="shuffle();">Shuffle the data</input>
+<input type="checkbox" id="useNullData" onclick="ready();">Try drawing an empty treemap</input>
+<p>Data from <a href="http://en.wikipedia.org/wiki/List_of_best-selling_albums">wikipedia</a>.</p>
 </body>
 <script src="../../code/dist/ninjaPixel.bundle.js" charset="utf-8"></script>
 <script>
-    var fontSize = function(d) {
+  var fontSize = function(d) {
 //        var size = 1.6 * d.dx / d.name.length;
 //        var sizeMax = 14;
 //        if (size > sizeMax) {
 //            size = sizeMax;
 //        }
 //        return Math.ceil(size);
-      return 16;
-    };
-            
-    var chart = new ninjaPixel.Treemap();
-    chart.transitionDuration(800)
-        .margin({
-            top: 40,
-            bottom: 40,
-            left: 40,
-            right: 40
-        })
-    .transitionEase('linear')
-    .itemStroke('white')
-    .height(500)    
-    .width(800)    
-    .itemFill(function(d, i){
-        
-        var parentColor = function(d){
-         if(d.itemColor){
-          return d.itemColor;   
-         } else if(d.parent){
-          return parentColor(d.parent);   
-         } else {
+    return 16;
+  };
+
+  var chart = new ninjaPixel.Treemap();
+  chart.transitionDuration(800)
+       .margin({
+                 top: 40,
+                 bottom: 40,
+                 left: 40,
+                 right: 40,
+               })
+       .transitionEase('linear')
+       .itemStroke('white')
+       .height(500)
+       .width(800)
+       .itemFill(function(d, i) {
+
+         var parentColor = function(d) {
+           if (d.itemColor) {
+             return d.itemColor;
+           } else if (d.parent) {
+             return parentColor(d.parent);
+           } else {
              return 'white';
+           }
+         };
+         return parentColor(d);
+       })
+       .itemTextLabelColor('light-gray')
+       .itemStroke('white')
+       .itemStrokeWidth('1px')
+       .itemOpacity(1)
+       .mouseOverItemOpacity(0.8)
+       .mouseOverItemStroke('white')
+       .itemTextOffsetLeft(3)
+       .itemTextOffsetTop(function(d, i) {
+         return fontSize(d) + 1;
+       })
+       .itemFontSize(function(d, i) {
+         return fontSize(d) + 'px';
+       })
+       .useHtmlText(false)
+       .textWrap('crop')
+       .nodeText(function(d, i) {
+         var text = '';
+         text = d.children ? null : d.name;
+         if (d.size < 0) {
+           text = '';
          }
-        }        
-        return parentColor(d);
+         return text;
+       });
+
+  var toolTip = chart.toolTip();
+  toolTip.html(function(d) {
+    return d.Artist + '<br/>' + d.name + '<br/><i>' + d.Genre + ' - ' + d.size + 'm albums</i>';
+  })
+         .offset([0, 0]);
+  chart.toolTip(toolTip);
+
+  var rawData = [
+    { 'Artist': 'Shania Twain', 'Genre': 'Country', 'size': 39, 'name': 'Come On Over' },
+    { 'Artist': 'Metallica', 'Genre': 'Hard Rock', 'size': 30, 'name': 'Metallica' },
+    { 'Artist': 'Nirvana', 'Genre': 'Hard Rock', 'size': 30, 'name': 'Nevermind' },
+    { 'Artist': 'Pink Floyd', 'Genre': 'Hard Rock', 'size': 30, 'name': 'The Wall' },
+    { 'Artist': 'Guns N\' Roses', 'Genre': 'Hard Rock', 'size': 30, 'name': 'Appetite for Destruction' },
+    { 'Artist': 'Led Zeppelin', 'Genre': 'Hard Rock', 'size': 37, 'name': 'Led Zeppelin IV' },
+    { 'Artist': 'AC/DC', 'Genre': 'Hard Rock', 'size': 40, 'name': 'Back in Black' },
+    { 'Artist': 'Meat Loaf', 'Genre': 'Hard Rock', 'size': 43, 'name': 'Bat Out of Hell' },
+    { 'Artist': 'Pink Floyd', 'Genre': 'Hard Rock', 'size': 45, 'name': 'The Dark Side of the Moon' },
+    { 'Artist': 'Adele', 'Genre': 'Pop', 'size': 30, 'name': '21' },
+    { 'Artist': 'Madonna', 'Genre': 'Pop', 'size': 30, 'name': 'The Immaculate Collection' },
+    { 'Artist': 'Michael Jackson', 'Genre': 'Pop', 'size': 30, 'name': 'Bad' },
+    { 'Artist': 'Michael Jackson', 'Genre': 'Pop', 'size': 30, 'name': 'Dangerous' },
+    { 'Artist': 'Celine Dion', 'Genre': 'Pop', 'size': 31, 'name': 'Let\'s Talk About Love' },
+    { 'Artist': 'Celine Dion', 'Genre': 'Pop', 'size': 32, 'name': 'Falling into You' },
+    { 'Artist': 'Mariah Carey', 'Genre': 'Pop', 'size': 32, 'name': 'Music Box' },
+    { 'Artist': 'Various artists', 'Genre': 'Pop', 'size': 32, 'name': 'Dirty Dancing' },
+    { 'Artist': 'Bee Gees / Various artists', 'Genre': 'Pop', 'size': 40, 'name': 'Saturday Night Fever' },
+    { 'Artist': 'Michael Jackson', 'Genre': 'Pop', 'size': 51, 'name': 'Thriller' },
+    { 'Artist': 'Whitney Houston', 'Genre': 'R&B', 'size': 25, 'name': 'Whitney Houston' },
+    { 'Artist': 'Whitney Houston / Various artists', 'Genre': 'R&B', 'size': 44, 'name': 'The Bodyguard' },
+    { 'Artist': 'The Beatles', 'Genre': 'Rock', 'size': 30, 'name': 'Abbey Road' },
+    { 'Artist': 'Bruce Springsteen', 'Genre': 'Rock', 'size': 30, 'name': 'Born in the U.S.A.' },
+    { 'Artist': 'Dire Straits', 'Genre': 'Rock', 'size': 30, 'name': 'Brothers in Arms' },
+    { 'Artist': 'Santana', 'Genre': 'Rock', 'size': 30, 'name': 'Supernatural' },
+    { 'Artist': 'The Beatles', 'Genre': 'Rock', 'size': 31, 'name': '1' },
+    { 'Artist': 'The Beatles', 'Genre': 'Rock', 'size': 32, 'name': 'Sgt. Pepper\'s Lonely Hearts Club Band' },
+    { 'Artist': 'Eagles', 'Genre': 'Rock', 'size': 32, 'name': 'Hotel California' },
+    { 'Artist': 'Alanis Morissette', 'Genre': 'Rock', 'size': 33, 'name': 'Jagged Little Pill' },
+    { 'Artist': 'Fleetwood Mac', 'Genre': 'Rock', 'size': 40, 'name': 'Rumours' },
+    { 'Artist': 'Eagles', 'Genre': 'Rock', 'size': 42, 'name': 'Their Greatest Hits (1971–1975)' },
+    { 'Artist': 'James Horner', 'Genre': 'Soundtrack', 'size': 30, 'name': 'Titanic: Music from the Motion Picture' }];
+
+function shuffle(){
+    rawData.forEach(function(d){
+      d.size=Math.random();
     })
-    .itemTextLabelColor('light-gray')
-    .itemStroke('white')
-    .itemStrokeWidth('1px')
-    .itemOpacity(1)
-    .mouseOverItemOpacity(0.8)
-    .mouseOverItemStroke('white')
-    .itemTextOffsetLeft(3)
-    .itemTextOffsetTop(function(d, i) {
-        return fontSize(d) + 1;
-    })
-    .itemFontSize(function(d, i) {
-        return fontSize(d) + 'px';
-    })
-         .useHtmlText(false)
-         .textWrap(true)
-    .nodeText(function(d, i) {
-        var text = '';
-        text = d.children ? null : d.name;
-        if (d.size < 0) {
-            text = '';
+    ready();
+  }
+
+  function ready () {
+
+    var genres = d3.set(
+      rawData.map(function(d) {
+        return d.Genre;
+      })
+             .filter(function(d) {
+               return (typeof d !== 'undefined') ? d !== null : false;
+             })
+    ).values();
+
+    var color = d3.scale.ordinal()
+                  .domain(genres)
+                  .range(d3.range(genres.length).map(d3.scale.linear()
+                                                       .domain([0, genres.length - 1])
+                                                       .range(['#e08214', '#8073ac'])
+                                                       .interpolate(d3.interpolateLab)));
+
+    var treemapData = [];
+    var useNulls = d3.select('#useNullData').property('checked');
+    genres.forEach(function(d) {
+      var thisGenre = rawData.filter(function(e) {
+        return e.Genre === d;
+      });
+
+      thisGenre.forEach(function(f) {
+        f.itemColor = color(f.Genre);
+        if (useNulls) {
+          f.size = 0; //testing
         }
-        return text;
+      });
+
+      treemapData.push({
+                         'name': d,
+                         'children': thisGenre,
+                       });
     });
 
-    
-    var toolTip = chart.toolTip();
-    toolTip.html(function(d){return d.Artist + '<br/>'+d.name + '<br/><i>'+d.Genre+' - ' + d.size +'m albums</i>'})
-        .offset([0,0]);
-    chart.toolTip(toolTip);
-    
-    
+    var albumData = {
+      'name': 'albums',
+      'children': treemapData,
+    };
+
+    chart.plot(d3.select('#chart')
+                 .datum(albumData));
+
+  }
 
 
-    
+    ready();
 
-ready();
-
-    function ready() {
-        var rawData = [{"Artist":"Shania Twain","Genre":"Country","size":39,"name":"Come On Over"},
-                    {"Artist":"Metallica","Genre":"Hard Rock","size":30,"name":"Metallica"},
-                    {"Artist":"Nirvana","Genre":"Hard Rock","size":30,"name":"Nevermind"},
-                    {"Artist":"Pink Floyd","Genre":"Hard Rock","size":30,"name":"The Wall"},
-                    {"Artist":"Guns N' Roses","Genre":"Hard Rock","size":30,"name":"Appetite for Destruction"},
-                    {"Artist":"Led Zeppelin","Genre":"Hard Rock","size":37,"name":"Led Zeppelin IV"},
-                    {"Artist":"AC/DC","Genre":"Hard Rock","size":40,"name":"Back in Black"},
-                    {"Artist":"Meat Loaf","Genre":"Hard Rock","size":43,"name":"Bat Out of Hell"},
-                    {"Artist":"Pink Floyd","Genre":"Hard Rock","size":45,"name":"The Dark Side of the Moon"},
-                    {"Artist":"Adele","Genre":"Pop","size":30,"name":"21"},
-                    {"Artist":"Madonna","Genre":"Pop","size":30,"name":"The Immaculate Collection"},
-                    {"Artist":"Michael Jackson","Genre":"Pop","size":30,"name":"Bad"},
-                    {"Artist":"Michael Jackson","Genre":"Pop","size":30,"name":"Dangerous"},
-                    {"Artist":"Celine Dion","Genre":"Pop","size":31,"name":"Let's Talk About Love"},
-                    {"Artist":"Celine Dion","Genre":"Pop","size":32,"name":"Falling into You"},
-                    {"Artist":"Mariah Carey","Genre":"Pop","size":32,"name":"Music Box"},
-                    {"Artist":"Various artists","Genre":"Pop","size":32,"name":"Dirty Dancing"},
-                    {"Artist":"Bee Gees / Various artists","Genre":"Pop","size":40,"name":"Saturday Night Fever"},
-                    {"Artist":"Michael Jackson","Genre":"Pop","size":51,"name":"Thriller"},
-                    {"Artist":"Whitney Houston","Genre":"R&B","size":25,"name":"Whitney Houston"},
-                    {"Artist":"Whitney Houston / Various artists","Genre":"R&B","size":44,"name":"The Bodyguard"},
-                    {"Artist":"The Beatles","Genre":"Rock","size":30,"name":"Abbey Road"},
-                    {"Artist":"Bruce Springsteen","Genre":"Rock","size":30,"name":"Born in the U.S.A."},
-                    {"Artist":"Dire Straits","Genre":"Rock","size":30,"name":"Brothers in Arms"},
-                    {"Artist":"Santana","Genre":"Rock","size":30,"name":"Supernatural"},
-                    {"Artist":"The Beatles","Genre":"Rock","size":31,"name":"1"},
-                    {"Artist":"The Beatles","Genre":"Rock","size":32,"name":"Sgt. Pepper's Lonely Hearts Club Band"},
-                    {"Artist":"Eagles","Genre":"Rock","size":32,"name":"Hotel California"},
-                    {"Artist":"Alanis Morissette","Genre":"Rock","size":33,"name":"Jagged Little Pill"},
-                    {"Artist":"Fleetwood Mac","Genre":"Rock","size":40,"name":"Rumours"},
-                    {"Artist":"Eagles","Genre":"Rock","size":42,"name":"Their Greatest Hits (1971–1975)"},
-                    {"Artist":"James Horner","Genre":"Soundtrack","size":30,"name":"Titanic: Music from the Motion Picture"}];  
-        
-        
-
-        
-        var genres = d3.set(
-            rawData.map(function(d) {
-                return d.Genre;
-            })
-            .filter(function(d) {
-                return (typeof d !== "undefined") ? d !== null : false
-            })
-            ).values();
-        
-        var color = d3.scale.ordinal()
-            .domain(genres)
-            .range(d3.range(genres.length).map(d3.scale.linear()
-                .domain([0, genres.length - 1])
-                .range(['#e08214', '#8073ac'])
-                .interpolate(d3.interpolateLab)));
-        
-        var treemapData = [];
-        var useNulls = d3.select('#useNullData').property('checked');
-        genres.forEach(function(d) {
-            var thisGenre = rawData.filter(function(e) {
-                return e.Genre === d;
-            });
-
-            thisGenre.forEach(function(f) {
-                f.itemColor = color(f.Genre);
-                if(useNulls){
-                    f.size = 0; //testing
-                }
-            });
-
-            treemapData.push({
-                'name': d,
-                'children': thisGenre
-            });
-        });
-        
-
-        var albumData = {
-            'name': 'albums',
-            'children': treemapData
-        }
-        
-
-        chart.plot(d3.select("#chart")
-        .datum(albumData));
-
-    }
 </script>
 
 </html>

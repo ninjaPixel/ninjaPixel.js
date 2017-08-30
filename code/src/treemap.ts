@@ -48,7 +48,7 @@ module ninjaPixel {
             return this;
         }
 
-        private _textWrap: any = false;
+        private _textWrap: any = false; // options: 'crop', 'hide'
 
         textWrap(_x): any {
             if (!arguments.length) return this._textWrap;
@@ -200,39 +200,65 @@ module ninjaPixel {
 
 
                 if (this._textWrap) {
-
-                    console.log('_data', _data)
                     var textWrapData = [];
-                    var addTreemapTextToArray = function (data) {
+                    var addTreemapTextToArray = function (data, i) {
                         if (data.name) {
-
                             var lineCount = 0;
-                            var lineHeight = 16;
-                            data.name.split(' ').forEach(function (line) {
-                                textWrapData.push({
+                            var lineSpacing = 1.05;
+                            var _fontSize = Number(functor(fontSize, data, i).split('px')[0]);
+                            var fontFactor = 0.7; // this is an observed factor / magic number
+                            var charsPerLine = Math.floor(data.dx / (fontFactor * _fontSize));
+                            var reg = new RegExp("(\\S(.{0," + charsPerLine + "}\\S)?)\\s+", "g");
+                            var wordwrapped = data.name.trim().replace(reg, '$1\n');
+
+                            wordwrapped.split('\n').forEach(function (line0) {
+                                var line = line0;
+                                if (line.length > charsPerLine) {
+                                    if (that._textWrap === 'hide') {
+                                        // TODO (someday) flesh this out. It's VERY janky at the moment!
+                                        console.log(line, "is too long to fit into this block");
+                                        return;
+                                    } else if (that._textWrap === 'crop') {
+                                        // slice the end of the string until it fits and add ellipsis if there is space for one
+                                        var tooManyChars = line.length - charsPerLine;
+                                        if (tooManyChars > 3) {
+                                            line = line.slice(0, charsPerLine - 1) + '...';
+                                        } else if (tooManyChars > 2) {
+                                            line = line.slice(0, charsPerLine + 0) + '..';
+                                        } else {
+                                            line = line.slice(0, charsPerLine + 1);
+
+                                        }
+                                    }
+                                }
+
+                                var lineOffset = lineCount * _fontSize * lineSpacing;
+                                var y = data.y + lineOffset;
+                                var obj = {
                                     name: line,
-                                    _index: data.name+lineCount,
+                                    _index: data.name + lineCount,
                                     x: data.x,
-                                    y: data.y + (lineCount * lineHeight),
+                                    y0: data.y,
+                                    y: y,
                                     dx: data.dx,
                                     dy: data.dy,
                                     children: data.children ? true : false
-                                });
+                                };
                                 lineCount++;
+                                var newLineOffset = lineCount * _fontSize * lineSpacing;
+                                if ((newLineOffset) <= data.dy) {
+                                    textWrapData.push(obj);
+                                } else {
+                                    // can't plot this text as it leaves the bounds of the block
+                                }
                             });
-
-
                         }
                         if (data.children) {
                             data.children.forEach(addTreemapTextToArray);
                         }
-
                     };
 
                     _data.children.forEach(addTreemapTextToArray);
-                    console.log('textWrapData', textWrapData)
-
-
                     var svgText = this._svg.select('.ninja-chartGroup')
                         .call(myToolTip)
                         // .datum(_data)
@@ -287,7 +313,6 @@ module ninjaPixel {
                         .append("xhtml:div")
                         .attr('class', 'tweetText')
                         .attr('x', function (d, i) {
-                            console.log('d', d)
                             return d.x;
                         })
                         .attr('y', function (d, i) {
@@ -302,12 +327,10 @@ module ninjaPixel {
                         .style('opacity', 1)
                         .html(function (d, i) {
 
-                            var fontSize = 12//fontSizer(d.retweet_count);
+                            var fontSize = functor(fontSize, d, i);
                             var text = functor(nodeText, d, i);
                             if (text) {
 
-
-                                console.log('text', text)
                                 return `<div style="color: #ededed; font-size:${fontSize}px; padding:${that._htmlTextPadding}">${text}</div>`;
                             }
                         });
@@ -329,7 +352,6 @@ module ninjaPixel {
                             return functor(this._transitionDelay, d, i);
                         })
                         .attr('x', function (d, i) {
-                            console.log('d', d)
                             return d.x;
                         })
                         .attr('y', function (d, i) {
@@ -344,12 +366,9 @@ module ninjaPixel {
                         .style('opacity', 1)
                         .html(function (d, i) {
 
-                            var fontSize = 12//fontSizer(d.retweet_count);
+                            var fontSize = functor(fontSize, d, i);
                             var text = functor(nodeText, d, i);
                             if (text) {
-
-
-                                console.log('text', text)
                                 return `<div style="color: #ededed; font-size:${fontSize}px; padding:${that._htmlTextPadding}">${text}</div>`;
                             }
                         })

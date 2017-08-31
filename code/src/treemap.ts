@@ -93,6 +93,7 @@ module ninjaPixel {
             var nodeTextOffsetTop = this._itemTextOffsetTop;
             var that = this;
 
+            var showLogs = true;
             _selection.each((_data) => {
 
                 var myTreemap: any = d3.layout.treemap()
@@ -112,7 +113,7 @@ module ninjaPixel {
 
                 var drawEmptyTreemap = false;
                 if (_data.area == 0) {
-                    console.log('The data area is 0. Cannot draw a treemap.');
+                    if (showLogs) console.log('The data area is 0. Cannot draw a treemap.');
                     drawEmptyTreemap = true;
                 }
 
@@ -224,6 +225,7 @@ module ninjaPixel {
                             var seperator = '\n';
                             var wordwrapped = text.trim().replace(reg, '$1' + seperator);
 
+                            if (showLogs) console.log('chars per line:', charsPerLine, wordwrapped)
                             var lineCount = 0;
                             wordwrapped.split(seperator).forEach(function (line0) {
                                 var line = line0;
@@ -231,25 +233,34 @@ module ninjaPixel {
                                     if (that._textWrap === 'hide') {
                                         // TODO (someday) flesh this 'hide' mode out. It's VERY janky at the moment!
                                         // But it's also a bit pointless, so I may delete it.
-                                        console.log(line, "is too long to fit into this block");
+                                        if (showLogs) console.log(line, "is too long to fit into this block");
                                         return;
                                     } else if (that._textWrap === 'crop') {
                                         // slice the end of the string until it fits and add ellipsis if there is space for one
-                                        if (line.length > 4 && charsPerLine > 4) {
+                                        if (charsPerLine <= 0) {
+                                            line = '';
+                                        } else if (line.length > 4 && charsPerLine > 4) {
+                                            if (showLogs) console.log('4,4', line);
                                             line = line.slice(0, charsPerLine - 2) + '...';
                                         } else if (line.length > 3 && charsPerLine > 3) {
-                                            line = line.slice(0, charsPerLine - 0) + '..';
+                                            if (showLogs) console.log('3,3', line);
+
+                                            line = line.slice(0, charsPerLine - 1) + '..';
                                         } else {
+                                            if (showLogs) console.log('<3,<3', line);
+
                                             line = line.slice(0, charsPerLine);
                                         }
+                                        if (showLogs) console.log('cropped line:', line);
                                     }
                                 }
 
                                 var lineOffset = ( lineCount * _fontSize * lineSpacing);
                                 var y = data.y + lineOffset;
+                                var _index = text.trim().replace(/\s/g, "_").replace(/&/g, "_") + lineCount;
                                 var obj = {
+                                    _index,
                                     name: line,
-                                    _index: text + lineCount,
                                     x: data.x,
                                     y0: data.y,
                                     y: y,
@@ -258,11 +269,12 @@ module ninjaPixel {
                                     children: data.children ? true : false
                                 };
                                 lineCount++;
-                                var newLineOffset = 0 + (lineCount * _fontSize * lineSpacing);
+                                var newLineOffset = nodeTopOffset + (lineCount * _fontSize * lineSpacing);
                                 if ((newLineOffset) <= data.dy) {
                                     textWrapData.push(obj);
                                 } else {
                                     // can't plot this text as it leaves the bounds of the block
+                                    if (showLogs) console.log('Y breached:', obj);
                                 }
                             });
                         }
@@ -272,25 +284,31 @@ module ninjaPixel {
                     };
 
                     _data.children.forEach(addTreemapTextToArray);
+                    if (showLogs) console.log('textWrapData', textWrapData)
                     var svgText = this._svg.select('.ninja-chartGroup')
                         .call(myToolTip)
-                        // .datum(_data)
                         .selectAll('.treemap-text')
                         .data(textWrapData, function (d) {
                             return d._index;
                         });
 
                     svgText.enter().append('text')
-                        .attr('class', 'treemap-text')
                         .attr({
+                            class: 'treemap-text',
                             fill: (d, i) => {
+                                if (showLogs) console.log('text enter:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
+
                                 return functor(this._itemTextLabelColor, d, i);
+                            },
+                            x: (d, i) => {
+                                return d.x + functor(nodeTextOffsetLeft, d, i);
+                            },
+                            y: (d, i) => {
+                                return d.y + functor(nodeTextOffsetTop, d, i);
                             },
                         })
                         .style({
-                            opacity: (d, i) => {
-                                return 0;
-                            },
+                            opacity: 1,
                         });
 
                     svgText.transition()
@@ -315,10 +333,11 @@ module ninjaPixel {
                             },
                         })
                         .text(function (d, i) {
+                            if (showLogs) console.log('text transition:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
                             return functor(nodeText, d, i);
                         });
 
-                    svgText.exit().transition().remove();
+                    svgText.exit().transition().duration(that._transitionDuration).remove();
 
                 } else if (this._useHtmlText) {
                     var htmlText = this._svg.select('.ninja-chartGroup')
@@ -393,12 +412,12 @@ module ninjaPixel {
 
 
                 } else {
-                    var svgText = this._svg.select('.ninja-chartGroup')
+                    var svgText2 = this._svg.select('.ninja-chartGroup')
                         .call(myToolTip)
                         .datum(_data)
                         .selectAll('.treemap-text')
                         .data(treemapLayout.nodes);
-                    svgText.enter().append('text')
+                    svgText2.enter().append('text')
                         .attr('class', 'treemap-text')
                         .attr({
                             fill: (d, i) => {
@@ -424,7 +443,7 @@ module ninjaPixel {
                             onClick(d);
                         });
 
-                    svgText.transition()
+                    svgText2.transition()
                         .duration(this._transitionDuration)
                         .attr({
                             x: (d, i) => {
@@ -444,7 +463,7 @@ module ninjaPixel {
                             return functor(nodeText, d, i);
                         });
 
-                    svgText.exit().transition().remove();
+                    svgText2.exit().transition().remove();
                 }
 
 

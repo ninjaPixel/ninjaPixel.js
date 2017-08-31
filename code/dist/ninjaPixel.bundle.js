@@ -12942,6 +12942,7 @@ var ninjaPixel;
             var nodeTextOffsetLeft = this._itemTextOffsetLeft;
             var nodeTextOffsetTop = this._itemTextOffsetTop;
             var that = this;
+            var showLogs = true;
             _selection.each(function (_data) {
                 var myTreemap = d3.layout.treemap();
                 var treemapLayout = myTreemap.size([_this._chartWidth, _this._chartHeight]).sticky(true).value(function (d) {
@@ -12950,7 +12951,8 @@ var ninjaPixel;
                 var treemapNode = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-node').data(treemapLayout.nodes);
                 var drawEmptyTreemap = false;
                 if (_data.area == 0) {
-                    console.log('The data area is 0. Cannot draw a treemap.');
+                    if (showLogs)
+                        console.log('The data area is 0. Cannot draw a treemap.');
                     drawEmptyTreemap = true;
                 }
                 treemapNode.enter().append('rect').attr('class', 'treemap-node').attr({
@@ -13043,31 +13045,46 @@ var ninjaPixel;
                             var reg = new RegExp("(\\S(.{0," + charsPerLine + "}\\S)?)\\s+", "g");
                             var seperator = '\n';
                             var wordwrapped = text.trim().replace(reg, '$1' + seperator);
+                            if (showLogs)
+                                console.log('chars per line:', charsPerLine, wordwrapped);
                             var lineCount = 0;
                             wordwrapped.split(seperator).forEach(function (line0) {
                                 var line = line0;
                                 if (line.length > charsPerLine) {
                                     if (that._textWrap === 'hide') {
-                                        console.log(line, "is too long to fit into this block");
+                                        if (showLogs)
+                                            console.log(line, "is too long to fit into this block");
                                         return;
                                     }
                                     else if (that._textWrap === 'crop') {
-                                        if (line.length > 4 && charsPerLine > 4) {
+                                        if (charsPerLine <= 0) {
+                                            line = '';
+                                        }
+                                        else if (line.length > 4 && charsPerLine > 4) {
+                                            if (showLogs)
+                                                console.log('4,4', line);
                                             line = line.slice(0, charsPerLine - 2) + '...';
                                         }
                                         else if (line.length > 3 && charsPerLine > 3) {
-                                            line = line.slice(0, charsPerLine - 0) + '..';
+                                            if (showLogs)
+                                                console.log('3,3', line);
+                                            line = line.slice(0, charsPerLine - 1) + '..';
                                         }
                                         else {
+                                            if (showLogs)
+                                                console.log('<3,<3', line);
                                             line = line.slice(0, charsPerLine);
                                         }
+                                        if (showLogs)
+                                            console.log('cropped line:', line);
                                     }
                                 }
                                 var lineOffset = (lineCount * _fontSize * lineSpacing);
                                 var y = data.y + lineOffset;
+                                var _index = text.trim().replace(/\s/g, "_").replace(/&/g, "_") + lineCount;
                                 var obj = {
+                                    _index: _index,
                                     name: line,
-                                    _index: text + lineCount,
                                     x: data.x,
                                     y0: data.y,
                                     y: y,
@@ -13076,11 +13093,13 @@ var ninjaPixel;
                                     children: data.children ? true : false
                                 };
                                 lineCount++;
-                                var newLineOffset = 0 + (lineCount * _fontSize * lineSpacing);
+                                var newLineOffset = nodeTopOffset + (lineCount * _fontSize * lineSpacing);
                                 if ((newLineOffset) <= data.dy) {
                                     textWrapData.push(obj);
                                 }
                                 else {
+                                    if (showLogs)
+                                        console.log('Y breached:', obj);
                                 }
                             });
                         }
@@ -13089,17 +13108,26 @@ var ninjaPixel;
                         }
                     };
                     _data.children.forEach(addTreemapTextToArray);
+                    if (showLogs)
+                        console.log('textWrapData', textWrapData);
                     var svgText = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.treemap-text').data(textWrapData, function (d) {
                         return d._index;
                     });
-                    svgText.enter().append('text').attr('class', 'treemap-text').attr({
+                    svgText.enter().append('text').attr({
+                        class: 'treemap-text',
                         fill: function (d, i) {
+                            if (showLogs)
+                                console.log('text enter:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
                             return functor(_this._itemTextLabelColor, d, i);
                         },
-                    }).style({
-                        opacity: function (d, i) {
-                            return 0;
+                        x: function (d, i) {
+                            return d.x + functor(nodeTextOffsetLeft, d, i);
                         },
+                        y: function (d, i) {
+                            return d.y + functor(nodeTextOffsetTop, d, i);
+                        },
+                    }).style({
+                        opacity: 1,
                     });
                     svgText.transition().duration(that._transitionDuration).attr({
                         x: function (d, i) {
@@ -13119,9 +13147,11 @@ var ninjaPixel;
                             return functor(defaultOpacity, d, i);
                         },
                     }).text(function (d, i) {
+                        if (showLogs)
+                            console.log('text transition:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
                         return functor(nodeText, d, i);
                     });
-                    svgText.exit().transition().remove();
+                    svgText.exit().transition().duration(that._transitionDuration).remove();
                 }
                 else if (_this._useHtmlText) {
                     var htmlText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.tweetText').data(treemapLayout.nodes);
@@ -13160,8 +13190,8 @@ var ninjaPixel;
                     });
                 }
                 else {
-                    var svgText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
-                    svgText.enter().append('text').attr('class', 'treemap-text').attr({
+                    var svgText2 = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.treemap-text').data(treemapLayout.nodes);
+                    svgText2.enter().append('text').attr('class', 'treemap-text').attr({
                         fill: function (d, i) {
                             return functor(_this._itemTextLabelColor, d, i);
                         },
@@ -13180,7 +13210,7 @@ var ninjaPixel;
                     }).on('click', function (d, i) {
                         onClick(d);
                     });
-                    svgText.transition().duration(_this._transitionDuration).attr({
+                    svgText2.transition().duration(_this._transitionDuration).attr({
                         x: function (d, i) {
                             return d.x + functor(nodeTextOffsetLeft, d, i);
                         },
@@ -13196,7 +13226,7 @@ var ninjaPixel;
                     }).text(function (d, i) {
                         return functor(nodeText, d, i);
                     });
-                    svgText.exit().transition().remove();
+                    svgText2.exit().transition().remove();
                 }
             });
         };

@@ -64,6 +64,16 @@ module ninjaPixel {
             return this;
         }
 
+        // this is a magic number and is used to calculate how many chars you can get on a line
+        // it varies with the font you're using and also the chars you are using.
+        // Juest experiment with it
+        private _fontFactor: any = 0.7;
+
+        fontFactor(_x): any {
+            if (!arguments.length) return this._fontFactor;
+            this._fontFactor = _x;
+            return this;
+        }
 
         plot(_selection) {
             this._init(_selection, Category.treemap);
@@ -202,39 +212,44 @@ module ninjaPixel {
                 if (this._textWrap) {
                     var textWrapData = [];
                     var addTreemapTextToArray = function (data, i) {
-                        if (data.name) {
-                            var lineCount = 0;
-                            var lineSpacing = 1.05;
+                        var text = functor(nodeText, data, i);
+                        // if (data.name) {
+                        if (text) {
+                            var nodeTopOffset = functor(nodeTextOffsetTop, data, i);
+                            var nodeLeftOffset = functor(nodeTextOffsetLeft, data, i);
+                            var lineSpacing = 1.0;
                             var _fontSize = Number(functor(fontSize, data, i).split('px')[0]);
-                            var fontFactor = 0.7; // this is an observed factor / magic number
-                            var charsPerLine = Math.floor(data.dx / (fontFactor * _fontSize));
+                            var charsPerLine = Math.floor((data.dx - nodeLeftOffset) / (that._fontFactor * _fontSize));
                             var reg = new RegExp("(\\S(.{0," + charsPerLine + "}\\S)?)\\s+", "g");
-                            var wordwrapped = data.name.trim().replace(reg, '$1🤠');
+                            var seperator = '\n';
+                            var wordwrapped = text.trim().replace(reg, '$1' + seperator);
 
-                            wordwrapped.split('🤠').forEach(function (line0) {
+                            var lineCount = 0;
+                            wordwrapped.split(seperator).forEach(function (line0) {
                                 var line = line0;
                                 if (line.length > charsPerLine) {
                                     if (that._textWrap === 'hide') {
-                                        // TODO (someday) flesh this out. It's VERY janky at the moment!
+                                        // TODO (someday) flesh this 'hide' mode out. It's VERY janky at the moment!
+                                        // But it's also a bit pointless, so I may delete it.
                                         console.log(line, "is too long to fit into this block");
                                         return;
                                     } else if (that._textWrap === 'crop') {
                                         // slice the end of the string until it fits and add ellipsis if there is space for one
-                                        if (line.length > 4) {
+                                        if (line.length > 4 && charsPerLine > 4) {
                                             line = line.slice(0, charsPerLine - 2) + '...';
-                                        } else if (line.length > 3) {
+                                        } else if (line.length > 3 && charsPerLine > 3) {
                                             line = line.slice(0, charsPerLine - 0) + '..';
                                         } else {
-                                            line = line.slice(0, charsPerLine + 1);
+                                            line = line.slice(0, charsPerLine);
                                         }
                                     }
                                 }
 
-                                var lineOffset = lineCount * _fontSize * lineSpacing;
+                                var lineOffset = ( lineCount * _fontSize * lineSpacing);
                                 var y = data.y + lineOffset;
                                 var obj = {
                                     name: line,
-                                    _index: line + lineCount,
+                                    _index: text + lineCount,
                                     x: data.x,
                                     y0: data.y,
                                     y: y,
@@ -243,7 +258,7 @@ module ninjaPixel {
                                     children: data.children ? true : false
                                 };
                                 lineCount++;
-                                var newLineOffset = lineCount * _fontSize * lineSpacing;
+                                var newLineOffset = 0 + (lineCount * _fontSize * lineSpacing);
                                 if ((newLineOffset) <= data.dy) {
                                     textWrapData.push(obj);
                                 } else {
@@ -279,7 +294,7 @@ module ninjaPixel {
                         });
 
                     svgText.transition()
-                    .duration(that._transitionDuration)
+                        .duration(that._transitionDuration)
                         .attr({
                             x: (d, i) => {
                                 return d.x + functor(nodeTextOffsetLeft, d, i);

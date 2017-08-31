@@ -12874,6 +12874,7 @@ var ninjaPixel;
             this._useHtmlText = false;
             this._textWrap = false;
             this._htmlTextPadding = '3px';
+            this._fontFactor = 0.7;
         }
         Treemap.prototype.nodeText = function (_x) {
             if (!arguments.length)
@@ -12915,6 +12916,12 @@ var ninjaPixel;
             if (!arguments.length)
                 return this._htmlTextPadding;
             this._htmlTextPadding = _x;
+            return this;
+        };
+        Treemap.prototype.fontFactor = function (_x) {
+            if (!arguments.length)
+                return this._fontFactor;
+            this._fontFactor = _x;
             return this;
         };
         Treemap.prototype.plot = function (_selection) {
@@ -13026,15 +13033,18 @@ var ninjaPixel;
                 if (_this._textWrap) {
                     var textWrapData = [];
                     var addTreemapTextToArray = function (data, i) {
-                        if (data.name) {
-                            var lineCount = 0;
-                            var lineSpacing = 1.05;
+                        var text = functor(nodeText, data, i);
+                        if (text) {
+                            var nodeTopOffset = functor(nodeTextOffsetTop, data, i);
+                            var nodeLeftOffset = functor(nodeTextOffsetLeft, data, i);
+                            var lineSpacing = 1.0;
                             var _fontSize = Number(functor(fontSize, data, i).split('px')[0]);
-                            var fontFactor = 0.7;
-                            var charsPerLine = Math.floor(data.dx / (fontFactor * _fontSize));
+                            var charsPerLine = Math.floor((data.dx - nodeLeftOffset) / (that._fontFactor * _fontSize));
                             var reg = new RegExp("(\\S(.{0," + charsPerLine + "}\\S)?)\\s+", "g");
-                            var wordwrapped = data.name.trim().replace(reg, '$1🤠');
-                            wordwrapped.split('🤠').forEach(function (line0) {
+                            var seperator = '\n';
+                            var wordwrapped = text.trim().replace(reg, '$1' + seperator);
+                            var lineCount = 0;
+                            wordwrapped.split(seperator).forEach(function (line0) {
                                 var line = line0;
                                 if (line.length > charsPerLine) {
                                     if (that._textWrap === 'hide') {
@@ -13042,22 +13052,22 @@ var ninjaPixel;
                                         return;
                                     }
                                     else if (that._textWrap === 'crop') {
-                                        if (line.length > 4) {
+                                        if (line.length > 4 && charsPerLine > 4) {
                                             line = line.slice(0, charsPerLine - 2) + '...';
                                         }
-                                        else if (line.length > 3) {
+                                        else if (line.length > 3 && charsPerLine > 3) {
                                             line = line.slice(0, charsPerLine - 0) + '..';
                                         }
                                         else {
-                                            line = line.slice(0, charsPerLine + 1);
+                                            line = line.slice(0, charsPerLine);
                                         }
                                     }
                                 }
-                                var lineOffset = lineCount * _fontSize * lineSpacing;
+                                var lineOffset = (lineCount * _fontSize * lineSpacing);
                                 var y = data.y + lineOffset;
                                 var obj = {
                                     name: line,
-                                    _index: line + lineCount,
+                                    _index: text + lineCount,
                                     x: data.x,
                                     y0: data.y,
                                     y: y,
@@ -13066,7 +13076,7 @@ var ninjaPixel;
                                     children: data.children ? true : false
                                 };
                                 lineCount++;
-                                var newLineOffset = lineCount * _fontSize * lineSpacing;
+                                var newLineOffset = 0 + (lineCount * _fontSize * lineSpacing);
                                 if ((newLineOffset) <= data.dy) {
                                     textWrapData.push(obj);
                                 }

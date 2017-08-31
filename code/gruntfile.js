@@ -55,4 +55,5 @@ module.exports = function (grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['ts', 'concat', 'uglify']);
+    grunt.registerTask('lite', ['ts', 'concat'])
 };

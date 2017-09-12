@@ -93,7 +93,7 @@ module ninjaPixel {
             var nodeTextOffsetTop = this._itemTextOffsetTop;
             var that = this;
 
-            var showLogs = true;
+            var showLogs = false;
             _selection.each((_data) => {
 
                 var myTreemap: any = d3.layout.treemap()
@@ -285,7 +285,7 @@ module ninjaPixel {
 
                     _data.children.forEach(addTreemapTextToArray);
                     if (showLogs) console.log('textWrapData', textWrapData)
-                    var svgText = this._svg.select('.ninja-chartGroup')
+                    var svgText = this._svg.select('.ninja-chartGroupOverlay')
                         .call(myToolTip)
                         .selectAll('.treemap-text')
                         .data(textWrapData, function (d) {
@@ -308,7 +308,7 @@ module ninjaPixel {
                             },
                         })
                         .style({
-                            opacity: 1,
+                            opacity: (d,i)=> functor(nodeText, d, i),
                         });
 
                     svgText.transition()
@@ -337,7 +337,16 @@ module ninjaPixel {
                             return functor(nodeText, d, i);
                         });
 
-                    svgText.exit().transition().duration(that._transitionDuration).remove();
+                    svgText.exit()
+                        .transition()
+                        .duration(that._transitionDuration)
+                        .style({
+                            opacity: (d, i) => {
+                                if (showLogs) console.log('text exit:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
+                                return 0;
+                            },
+                        })
+                        .remove();
 
                 } else if (this._useHtmlText) {
                     var htmlText = this._svg.select('.ninja-chartGroup')

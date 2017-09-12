@@ -10217,6 +10217,7 @@ var ninjaPixel;
                     container.append('g').classed('ninja-horizontalGrid', true);
                     container.append('g').classed('ninja-verticalGrid', true);
                     container.append('g').classed('ninja-chartGroup', true);
+                    container.append('g').classed('ninja-chartGroupOverlay', true);
                     container.append('g').classed('ninja-horizontalGridTopping', true);
                     container.append('g').classed('ninja-verticalGridTopping', true);
                     container.append('g').classed('ninja-xAxisGroup ninja-axis', true);
@@ -12942,7 +12943,7 @@ var ninjaPixel;
             var nodeTextOffsetLeft = this._itemTextOffsetLeft;
             var nodeTextOffsetTop = this._itemTextOffsetTop;
             var that = this;
-            var showLogs = true;
+            var showLogs = false;
             _selection.each(function (_data) {
                 var myTreemap = d3.layout.treemap();
                 var treemapLayout = myTreemap.size([_this._chartWidth, _this._chartHeight]).sticky(true).value(function (d) {
@@ -13110,7 +13111,7 @@ var ninjaPixel;
                     _data.children.forEach(addTreemapTextToArray);
                     if (showLogs)
                         console.log('textWrapData', textWrapData);
-                    var svgText = _this._svg.select('.ninja-chartGroup').call(myToolTip).selectAll('.treemap-text').data(textWrapData, function (d) {
+                    var svgText = _this._svg.select('.ninja-chartGroupOverlay').call(myToolTip).selectAll('.treemap-text').data(textWrapData, function (d) {
                         return d._index;
                     });
                     svgText.enter().append('text').attr({
@@ -13127,7 +13128,7 @@ var ninjaPixel;
                             return d.y + functor(nodeTextOffsetTop, d, i);
                         },
                     }).style({
-                        opacity: 1,
+                        opacity: function (d, i) { return functor(nodeText, d, i); },
                     });
                     svgText.transition().duration(that._transitionDuration).attr({
                         x: function (d, i) {
@@ -13151,7 +13152,13 @@ var ninjaPixel;
                             console.log('text transition:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
                         return functor(nodeText, d, i);
                     });
-                    svgText.exit().transition().duration(that._transitionDuration).remove();
+                    svgText.exit().transition().duration(that._transitionDuration).style({
+                        opacity: function (d, i) {
+                            if (showLogs)
+                                console.log('text exit:', functor(nodeText, d, i), 'opacity:', functor(defaultOpacity, d, i), 'font size:', functor(fontSize, d, i), 'x:', d.x + functor(nodeTextOffsetLeft, d, i), 'y:', d.y + functor(nodeTextOffsetTop, d, i), d);
+                            return 0;
+                        },
+                    }).remove();
                 }
                 else if (_this._useHtmlText) {
                     var htmlText = _this._svg.select('.ninja-chartGroup').call(myToolTip).datum(_data).selectAll('.tweetText').data(treemapLayout.nodes);

@@ -136,6 +136,7 @@ module ninjaPixel {
                     container.append('g').classed('ninja-horizontalGrid', true);
                     container.append('g').classed('ninja-verticalGrid', true);
                     container.append('g').classed('ninja-chartGroup', true);
+                    container.append('g').classed('ninja-chartGroupOverlay', true);
                     container.append('g').classed('ninja-horizontalGridTopping', true);
                     container.append('g').classed('ninja-verticalGridTopping', true);
                     container.append('g').classed('ninja-xAxisGroup ninja-axis', true);

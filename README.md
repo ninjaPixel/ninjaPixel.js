@@ -1,14 +1,14 @@
 ninjaPixel.js
 =============
 
-##Create reusable d3.js charts, without having to do the boring plumbing.
+## Create reusable d3.js charts, without having to do the boring plumbing.
 
 This is not a charting library. No charting library will ever be complete with all the various charts that you could want; if you are using d3.js then you know this already. Instead, this is a framework which handles the boring plumbing - like drawing axes, labels and setting dimensions - leaving you free to do the Hollywood coding.
 
 See the [wiki](https://github.com/ninjaPixel/ninjaPixel.js/wiki) for how to use ninjaPixel.js
 
 
-###Compiling the source
+### Compiling the source
 
 After cloning your fork of the ninjaPixel.js repository, from the terminal navigate to the `code` directory and install ninjaPixel's dependencies by running:
 
@@ -20,10 +20,10 @@ ninjaPixel is written in TypeScript; the `.ts` files are located in the `code\sr
     
 This will create ninjaPixel.js and ninjaPixel.bundle.js. The later includes [d3.js](https://github.com/mbostock/d3) and the [d3-tip](https://github.com/Caged/d3-tip) extension.
 
-###Creating your own
+### Creating your own
 Include your new TypeScript file in the `code\src` directory (alternatively, if you'd prefer to write in Javascript then save the new file into the `code\src\js` directory). Modify the concat-basic options in the gruntfile, to include your new file. Once complete, run `grunt`.
 
-###Demos
+### Demos
 There are some demo pages located in the `demo` directory. Run the webpages with
 
     npm run demo
